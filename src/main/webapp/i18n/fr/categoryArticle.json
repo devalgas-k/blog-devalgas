@@ -1,0 +1,29 @@
+{
+  "devalgasApp": {
+    "categoryArticle": {
+      "home": {
+        "title": "CategoryArticles",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Category Article",
+        "createOrEditLabel": "Créer ou éditer un Category Article",
+        "notFound": "Aucun Category Article trouvé"
+      },
+      "created": "Un nouveau Category Article a été créé avec l'identifiant { param }",
+      "updated": "Le Category Article avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Category Article avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Category Article { id } ?"
+      },
+      "detail": {
+        "title": "Category Article"
+      },
+      "id": "ID",
+      "label": "Label",
+      "code": "Code",
+      "badge": "Badge",
+      "descriptionFr": "Description Fr",
+      "descriptionEn": "Description En",
+      "article": "Article"
+    }
+  }
+}

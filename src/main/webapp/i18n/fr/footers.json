@@ -1,0 +1,25 @@
+{
+  "devalgasApp": {
+    "footers": {
+      "home": {
+        "title": "Footers",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Footers",
+        "createOrEditLabel": "Créer ou éditer un Footers",
+        "notFound": "Aucun Footers trouvé"
+      },
+      "created": "Un nouveau Footers a été créé avec l'identifiant { param }",
+      "updated": "Le Footers avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Footers avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Footers { id } ?"
+      },
+      "detail": {
+        "title": "Footers"
+      },
+      "id": "ID",
+      "logoFooters": "Logo Footers",
+      "appInfoFooters": "App Info Footers"
+    }
+  }
+}

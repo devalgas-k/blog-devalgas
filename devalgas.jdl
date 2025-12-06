@@ -1,0 +1,89 @@
+/**
+ * Headers entity.
+ * @author Devalgas.
+ */
+entity Headers {
+  logoHeaders ImageBlob
+}
+
+/**
+ * Footers entity.
+ * @author Devalgas.
+ */
+entity Footers {
+  logoFooters ImageBlob
+}
+
+
+/**
+ * AppInfo entity.
+ * @author Devalgas.
+ */
+entity AppInfo {
+  keyInfo String
+  valueInfo String
+}
+
+/**
+ * CategoryArticle entity
+ * @author Devalgas
+ */
+entity CategoryArticle {
+  label String maxlength(256) unique required pattern(/^[A-Z].*$/)
+  code String minlength(2) maxlength(2) unique required pattern(/^[A-Z]+$/)
+  badge ImageBlob
+  descriptionFr String
+  descriptionEn String
+}
+
+/**
+ * Article entity
+ * @author Devalgas
+ */
+entity Article {
+  labelEn String maxlength(256) unique required pattern(/^[A-Z].*$/)
+  labelFr String maxlength(256) unique required pattern(/^[A-Z].*$/)
+  descriptionFr String
+  descriptionEn String
+  markdownFr AnyBlob
+  markdownEn AnyBlob
+  status Status required
+  date ZonedDateTime required
+  badge ImageBlob
+  banner ImageBlob
+  views Integer
+  stars Integer
+}
+
+/**
+ * ArticleStatus a enum
+ * @author Devalgas
+ */
+enum Status {
+  COMPLETED("Completed"), PENDING("Pending"), CANCELLED("Cancelled"), INPROGRESS("InProgress")
+}
+
+
+relationship OneToMany {
+  Footers{appInfoFooters(keyInfo)} to AppInfo
+  Headers{appInfoHeaders(keyInfo)} to AppInfo
+}
+
+relationship ManyToMany {
+  Article{categoryArticle(label) } to CategoryArticle
+}
+
+
+// Set pagination options
+// paginate Headers, Footers with infinite-scroll
+paginate * with pagination
+
+// Use Data Transfer Objects (DTO)
+// dto all with mapstruct except Headers, Footers
+dto * with mapstruct
+
+// Set service options to all except few
+service * with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

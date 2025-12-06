@@ -1,0 +1,27 @@
+{
+  "annotations": {
+    "changelogDate": "20251206142314"
+  },
+  "applications": "*",
+  "documentation": "Headers entity.\\n@author Devalgas.",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "logoHeaders",
+      "fieldType": "ImageBlob"
+    }
+  ],
+  "name": "Headers",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "keyInfo",
+      "otherEntityName": "appInfo",
+      "relationshipName": "appInfoHeaders",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

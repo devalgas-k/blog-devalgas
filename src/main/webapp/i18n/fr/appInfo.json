@@ -1,0 +1,27 @@
+{
+  "devalgasApp": {
+    "appInfo": {
+      "home": {
+        "title": "AppInfos",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau App Info",
+        "createOrEditLabel": "Créer ou éditer un App Info",
+        "notFound": "Aucun App Info trouvé"
+      },
+      "created": "Un nouveau App Info a été créé avec l'identifiant { param }",
+      "updated": "Le App Info avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le App Info avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le App Info { id } ?"
+      },
+      "detail": {
+        "title": "App Info"
+      },
+      "id": "ID",
+      "keyInfo": "Key Info",
+      "valueInfo": "Value Info",
+      "headers": "Headers",
+      "footers": "Footers"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "annotations": {
+    "changelogDate": "20251206142316"
+  },
+  "applications": "*",
+  "documentation": "AppInfo entity.\\n@author Devalgas.",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "keyInfo",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "valueInfo",
+      "fieldType": "String"
+    }
+  ],
+  "name": "AppInfo",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

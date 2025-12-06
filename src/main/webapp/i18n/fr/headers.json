@@ -1,0 +1,25 @@
+{
+  "devalgasApp": {
+    "headers": {
+      "home": {
+        "title": "Headers",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Headers",
+        "createOrEditLabel": "Créer ou éditer un Headers",
+        "notFound": "Aucun Headers trouvé"
+      },
+      "created": "Un nouveau Headers a été créé avec l'identifiant { param }",
+      "updated": "Le Headers avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Headers avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Headers { id } ?"
+      },
+      "detail": {
+        "title": "Headers"
+      },
+      "id": "ID",
+      "logoHeaders": "Logo Headers",
+      "appInfoHeaders": "App Info Headers"
+    }
+  }
+}
