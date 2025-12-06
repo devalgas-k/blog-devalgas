@@ -1,0 +1,46 @@
+/**
+ * Headers entity.
+ * @author Devalgas.
+ */
+entity Headers {
+  logoHeaders ImageBlob
+}
+
+/**
+ * Footers entity.
+ * @author Devalgas.
+ */
+entity Footers {
+  logoFooters ImageBlob
+}
+
+
+/**
+ * AppInfo entity.
+ * @author Devalgas.
+ */
+entity AppInfo {
+  keyInfo String
+  valueInfo String
+}
+
+
+relationship OneToMany {
+  Footers{appInfoFooters(keyInfo)} to AppInfo
+  Headers{appInfoHeaders(keyInfo)} to AppInfo
+}
+
+
+// Set pagination options
+// paginate Headers, Footers with infinite-scroll
+paginate * with pagination
+
+// Use Data Transfer Objects (DTO)
+// dto all with mapstruct except Headers, Footers
+dto * with mapstruct
+
+// Set service options to all except few
+service * with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

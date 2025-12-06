@@ -1,0 +1,27 @@
+{
+  "annotations": {
+    "changelogDate": "20251206142315"
+  },
+  "applications": "*",
+  "documentation": "Footers entity.\\n@author Devalgas.",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "logoFooters",
+      "fieldType": "ImageBlob"
+    }
+  ],
+  "name": "Footers",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "keyInfo",
+      "otherEntityName": "appInfo",
+      "relationshipName": "appInfoFooters",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

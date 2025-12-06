@@ -1,0 +1,27 @@
+{
+  "devalgasApp": {
+    "appInfo": {
+      "home": {
+        "title": "App Infos",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new App Info",
+        "createOrEditLabel": "Create or edit a App Info",
+        "notFound": "No App Infos found"
+      },
+      "created": "A new App Info is created with identifier { param }",
+      "updated": "A App Info is updated with identifier { param }",
+      "deleted": "A App Info is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete App Info { id }?"
+      },
+      "detail": {
+        "title": "App Info"
+      },
+      "id": "ID",
+      "keyInfo": "Key Info",
+      "valueInfo": "Value Info",
+      "headers": "Headers",
+      "footers": "Footers"
+    }
+  }
+}
