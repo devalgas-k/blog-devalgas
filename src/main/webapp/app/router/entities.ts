@@ -13,6 +13,14 @@ const AppInfo = () => import('@/entities/app-info/app-info.vue');
 const AppInfoUpdate = () => import('@/entities/app-info/app-info-update.vue');
 const AppInfoDetails = () => import('@/entities/app-info/app-info-details.vue');
 
+const CategoryArticle = () => import('@/entities/category-article/category-article.vue');
+const CategoryArticleUpdate = () => import('@/entities/category-article/category-article-update.vue');
+const CategoryArticleDetails = () => import('@/entities/category-article/category-article-details.vue');
+
+const Article = () => import('@/entities/article/article.vue');
+const ArticleUpdate = () => import('@/entities/article/article-update.vue');
+const ArticleDetails = () => import('@/entities/article/article-details.vue');
+
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
@@ -89,6 +97,54 @@ export default {
       path: 'app-info/:appInfoId/view',
       name: 'AppInfoView',
       component: AppInfoDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'category-article',
+      name: 'CategoryArticle',
+      component: CategoryArticle,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'category-article/new',
+      name: 'CategoryArticleCreate',
+      component: CategoryArticleUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'category-article/:categoryArticleId/edit',
+      name: 'CategoryArticleEdit',
+      component: CategoryArticleUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'category-article/:categoryArticleId/view',
+      name: 'CategoryArticleView',
+      component: CategoryArticleDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'article',
+      name: 'Article',
+      component: Article,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'article/new',
+      name: 'ArticleCreate',
+      component: ArticleUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'article/:articleId/edit',
+      name: 'ArticleEdit',
+      component: ArticleUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'article/:articleId/view',
+      name: 'ArticleView',
+      component: ArticleDetails,
       meta: { authorities: [Authority.USER] },
     },
     // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here

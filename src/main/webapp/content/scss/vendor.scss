@@ -17,6 +17,31 @@ eg $input-color: red;
   --dark: #{$dark};
   --white: #{$white};
   --blue: #{$blue};
+  .row.jh-entity-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 10px;
+    line-height: 1.5;
+  }
+  .row.jh-entity-details > dt,
+  .row.jh-entity-details > dd {
+    padding: 0.5em 0;
+  }
+  @media screen and (min-width: 768px) {
+    .row.jh-entity-details {
+      grid-template-columns: minmax(180px, 30%) 1fr;
+    }
+    .row.jh-entity-details > dt {
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .row.jh-entity-details > dd {
+      border-bottom: 1px solid #eee;
+      margin-left: 0;
+    }
+  }
 }
 
 :root.theme-dark {
@@ -31,6 +56,31 @@ eg $input-color: red;
   --dark: #{$dark};
   --white: #{$white};
   --blue: #{$blue};
+  .row.jh-entity-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 10px;
+    line-height: 1.5;
+  }
+  .row.jh-entity-details > dt,
+  .row.jh-entity-details > dd {
+    padding: 0.5em 0;
+  }
+  @media screen and (min-width: 768px) {
+    .row.jh-entity-details {
+      grid-template-columns: minmax(180px, 30%) 1fr;
+    }
+    .row.jh-entity-details > dt {
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .row.jh-entity-details > dd {
+      border-bottom: 1px solid #eee;
+      margin-left: 0;
+    }
+  }
 }
 
 /* jhipster-needle-scss-add-vendor JHipster will add new css style */

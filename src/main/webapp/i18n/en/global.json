@@ -10,7 +10,9 @@
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "headers": "Headers",
         "footers": "Footers",
-        "appInfo": "App Info"
+        "appInfo": "App Info",
+        "categoryArticle": "Category Article",
+        "article": "Article"
       },
       "account": {
         "main": "Account",

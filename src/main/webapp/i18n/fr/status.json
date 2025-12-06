@@ -1,0 +1,11 @@
+{
+  "devalgasApp": {
+    "Status": {
+      "null": "",
+      "COMPLETED": "Completed",
+      "PENDING": "Pending",
+      "CANCELLED": "Cancelled",
+      "INPROGRESS": "InProgress"
+    }
+  }
+}

@@ -8,9 +8,12 @@ Je suis expert Java, Spring Boot, Css, Vue.js et je souhaite faire une maintenan
 
 ## Analyse
 
-- 'src/main/webapp/app/entities/headers/v1/headers-v1.vue'
-- 'src/main/webapp/app/core/title/title.vue'
+- 'diff-dev-jdl.patch'
+- 'diff-jdl-dev.patch'
+- 'src/main/webapp/app/entities/app-info/app-info-details.vue'
+- 'src/main/webapp/app/entities/app-info/\*-details.vue'
 
 ## Objectif
 
-- Apres avoir analyser les vues et ses composants en creer ou completant des tests pertinant en s'inspirant du code existant.
+- Quand je fais une cherry pick sur la branch develop a partir de la branche develop-jdl, j'obtiens un bug
+  sur les pages \*-details.vue comme app-info-details.vue les elements ne sont plus bien alignes xom

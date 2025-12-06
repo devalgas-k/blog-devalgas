@@ -277,6 +277,8 @@ class FootersResourceIT {
         Footers partialUpdatedFooters = new Footers();
         partialUpdatedFooters.setId(footers.getId());
 
+        partialUpdatedFooters.logoFooters(UPDATED_LOGO_FOOTERS).logoFootersContentType(UPDATED_LOGO_FOOTERS_CONTENT_TYPE);
+
         restFootersMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedFooters.getId())

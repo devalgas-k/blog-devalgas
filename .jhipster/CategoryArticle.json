@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20251210162103"
+  },
+  "applications": "*",
+  "documentation": "CategoryArticle entity\\n@author Devalgas",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required", "pattern"],
+      "fieldValidateRulesMaxlength": "256",
+      "fieldValidateRulesPattern": "^[A-Z].*$"
+    },
+    {
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "maxlength", "unique", "required", "pattern"],
+      "fieldValidateRulesMaxlength": "2",
+      "fieldValidateRulesMinlength": "2",
+      "fieldValidateRulesPattern": "^[A-Z]+$"
+    },
+    {
+      "fieldName": "badge",
+      "fieldType": "ImageBlob"
+    },
+    {
+      "fieldName": "descriptionFr",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descriptionEn",
+      "fieldType": "String"
+    }
+  ],
+  "name": "CategoryArticle",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

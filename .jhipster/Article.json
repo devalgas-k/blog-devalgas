@@ -1,0 +1,81 @@
+{
+  "annotations": {
+    "changelogDate": "20251210162104"
+  },
+  "applications": "*",
+  "documentation": "Article entity\\n@author Devalgas",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "labelEn",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required", "pattern"],
+      "fieldValidateRulesMaxlength": "256",
+      "fieldValidateRulesPattern": "^[A-Z].*$"
+    },
+    {
+      "fieldName": "labelFr",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "unique", "required", "pattern"],
+      "fieldValidateRulesMaxlength": "256",
+      "fieldValidateRulesPattern": "^[A-Z].*$"
+    },
+    {
+      "fieldName": "descriptionFr",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descriptionEn",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "markdownFr",
+      "fieldType": "AnyBlob"
+    },
+    {
+      "fieldName": "markdownEn",
+      "fieldType": "AnyBlob"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Status",
+      "fieldTypeDocumentation": "ArticleStatus a enum\\n@author Devalgas",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "COMPLETED (Completed),PENDING (Pending),CANCELLED (Cancelled),INPROGRESS (InProgress)"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "ZonedDateTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "badge",
+      "fieldType": "ImageBlob"
+    },
+    {
+      "fieldName": "banner",
+      "fieldType": "ImageBlob"
+    },
+    {
+      "fieldName": "views",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "stars",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Article",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "label",
+      "otherEntityName": "categoryArticle",
+      "relationshipName": "categoryArticle",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}
