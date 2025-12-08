@@ -40,6 +40,10 @@ import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { faUsersCog } from '@fortawesome/free-solid-svg-icons/faUsersCog';
 import { faWrench } from '@fortawesome/free-solid-svg-icons/faWrench';
 
+import { faCircleHalfStroke } from '@fortawesome/free-solid-svg-icons/faCircleHalfStroke';
+import { faSun } from '@fortawesome/free-solid-svg-icons/faSun';
+import { faMoon } from '@fortawesome/free-solid-svg-icons/faMoon';
+
 const datetimeFormats: IntlDateTimeFormats = {
   fr: {
     short: {
@@ -95,7 +99,7 @@ const datetimeFormats: IntlDateTimeFormats = {
 };
 
 export function initFortAwesome(vue) {
-  vue.component('font-awesome-icon', FontAwesomeIcon);
+  vue.component('FontAwesomeIcon', FontAwesomeIcon);
 
   library.add(
     faArrowLeft,
@@ -135,6 +139,10 @@ export function initFortAwesome(vue) {
     faUsers,
     faUsersCog,
     faWrench,
+
+    faCircleHalfStroke,
+    faSun,
+    faMoon,
   );
 }
 export function initI18N(opts: any = {}) {

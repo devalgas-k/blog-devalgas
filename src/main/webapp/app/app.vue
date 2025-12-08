@@ -2,7 +2,8 @@
   <div id="app">
     <ribbon></ribbon>
     <div id="app-header">
-      <jhi-navbar></jhi-navbar>
+      <!--      <jhi-navbar v-if="false"></jhi-navbar>-->
+      <headers-v1></headers-v1>
     </div>
     <div class="container-fluid">
       <div class="card jh-card">

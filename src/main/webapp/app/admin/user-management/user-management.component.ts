@@ -8,9 +8,6 @@ import { useDateFormat } from '@/shared/composables';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'JhiUserManagementComponent',
-  mounted(): void {
-    this.loadAll();
-  },
   setup() {
     const alertService = inject('alertService', () => useAlertService(), true);
     const { formatDateShort: formatDate } = useDateFormat();
@@ -49,6 +46,9 @@ export default defineComponent({
       queryCount,
       t$: useI18n().t,
     };
+  },
+  mounted(): void {
+    this.loadAll();
   },
   methods: {
     setActive(user, isActivated): void {

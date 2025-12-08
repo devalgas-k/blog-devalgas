@@ -1,6 +1,6 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.common with an alias.
-import Vue, { computed, createApp, onMounted, provide, watch } from 'vue';
+import Vue, { computed, createApp, onMounted, provide, watch, ref } from 'vue';
 import { createPinia, storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 
@@ -69,6 +69,21 @@ const app = createApp({
     const i18n = useI18n();
     const translationStore = useTranslationStore();
     const translationService = new TranslationService(i18n);
+    const applyTheme = (theme: string) => {
+      const root = document.documentElement;
+      root.classList.remove('theme-light', 'theme-dark');
+      root.classList.add(theme === 'dark' ? 'theme-dark' : 'theme-light');
+    };
+    const themeFromStorage = localStorage.getItem('currentTheme');
+    const themeRef = ref(themeFromStorage ? themeFromStorage : 'light');
+    const changeTheme = async (newTheme: string) => {
+      if (themeRef.value !== newTheme) {
+        themeRef.value = newTheme;
+        localStorage.setItem('currentTheme', newTheme);
+        applyTheme(newTheme);
+      }
+    };
+    applyTheme(themeRef.value);
 
     const changeLanguage = async (newLanguage: string) => {
       if (i18n.locale.value !== newLanguage) {
@@ -79,6 +94,11 @@ const app = createApp({
 
     provide('currentLanguage', i18n.locale);
     provide('changeLanguage', changeLanguage);
+    provide(
+      'currentTheme',
+      computed(() => themeRef.value),
+    );
+    provide('changeTheme', changeTheme);
 
     watch(
       () => store.account,
@@ -161,7 +181,7 @@ const app = createApp({
 initFortAwesome(app);
 
 app
-  .component('jhi-item-count', JhiItemCountComponent)
+  .component('JhiItemCount', JhiItemCountComponent)
   .component('jhi-sort-indicator', JhiSortIndicatorComponent)
   .use(router)
   .use(pinia)
