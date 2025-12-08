@@ -4,15 +4,25 @@
 put Sass variables here:
 eg $input-color: red;
 ****************************/
-// Override Boostrap variables
-// Import Bootstrap source files from node_modules
-@import 'bootswatch/dist/slate/variables';
-@import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-vue/src/index.scss';
-@import 'bootswatch/dist/slate/bootswatch';
-/* Dirty fix on navbar active link with bootswatch theme */
-nav li.router-link-active .navbar-dropdown-menu {
-  color: $navbar-dark-active-color;
+// Thèmes scoppés: Solar (light) et Slate (dark)
+:root.theme-light {
+  @import '_variables-solar.scss';
+  @import 'bootstrap/scss/bootstrap';
+  @import 'bootstrap-vue/src/index.scss';
+  @import 'bootswatch/dist/slate/bootswatch';
+  nav li.router-link-active .navbar-dropdown-menu {
+    color: $navbar-dark-active-color;
+  }
+}
+
+:root.theme-dark {
+  @import '_variables-slate.scss';
+  @import 'bootstrap/scss/bootstrap';
+  @import 'bootstrap-vue/src/index.scss';
+  @import 'bootswatch/dist/slate/bootswatch';
+  nav li.router-link-active .navbar-dropdown-menu {
+    color: $navbar-dark-active-color;
+  }
 }
 
 /* jhipster-needle-scss-add-vendor JHipster will add new css style */

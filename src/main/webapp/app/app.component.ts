@@ -7,6 +7,7 @@ import LoginForm from '@/account/login-form/login-form.vue';
 import Ribbon from '@/core/ribbon/ribbon.vue';
 import JhiFooter from '@/core/jhi-footer/jhi-footer.vue';
 import JhiNavbar from '@/core/jhi-navbar/jhi-navbar.vue';
+import HeadersV1 from '@/entities/headers/v1/headers-v1.vue';
 import { useAlertService } from '@/shared/alert/alert.service';
 import '@/shared/config/dayjs';
 
@@ -18,6 +19,7 @@ export default defineComponent({
     'jhi-navbar': JhiNavbar,
     'login-form': LoginForm,
     'jhi-footer': JhiFooter,
+    'headers-v1': HeadersV1,
   },
   setup() {
     provide('alertService', useAlertService());
