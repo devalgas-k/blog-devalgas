@@ -1,0 +1,11 @@
+{
+  "globalV1": {
+    "headers": {
+      "subTitle": "Software engineer"
+    },
+    "themes": {
+      "light": "Light",
+      "dark": "Dark"
+    }
+  }
+}

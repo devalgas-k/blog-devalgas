@@ -59,4 +59,24 @@ describe('Headers V1', () => {
     await comp.changeTheme('light');
     expect(changeTheme).toHaveBeenCalledWith('light');
   });
+
+  it('isActiveLanguage reflète currentLanguage', () => {
+    const wrapper = shallowMount(Headers, { global: mountOptions });
+    const comp = wrapper.vm as any;
+    expect(comp.isActiveLanguage('fr')).toBe(true);
+    expect(comp.isActiveLanguage('en')).toBe(false);
+  });
+
+  it('changeLanguage est appelable', async () => {
+    const changeLanguage = vitest.fn();
+    const wrapper = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, changeLanguage },
+      },
+    });
+    const comp = wrapper.vm as any;
+    await comp.changeLanguage('en');
+    expect(changeLanguage).toHaveBeenCalledWith('en');
+  });
 });

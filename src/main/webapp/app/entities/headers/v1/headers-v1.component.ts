@@ -10,12 +10,14 @@ import EntitiesMenu from '@/entities/entities-menu.vue';
 
 import { useStore } from '@/store';
 import HeadersService from '@/entities/headers/headers.service.ts';
+import Title from '@/core/title/title.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'HeadersV1',
   components: {
     'entities-menu': EntitiesMenu,
+    'title-app': Title,
   },
   setup() {
     const { showLogin } = useLoginModal();

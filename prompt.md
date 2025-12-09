@@ -8,10 +8,9 @@ Je suis expert Java, Spring Boot, Css, Vue.js et je souhaite faire une maintenan
 
 ## Analyse
 
-- 'src/main/webapp/content/scss'
-- 'src/main/webapp/content/scss/\_variables-slate.scss'
-- 'src/main/webapp/content/scss/\_variables-solar.scss'
+- 'src/main/webapp/app/entities/headers/v1/headers-v1.vue'
+- 'src/main/webapp/app/core/title/title.vue'
 
 ## Objectif
 
-- Je souhaite utiliser creer un fichier common entre \_variables-slate et \_variables-solar pour des variable commun juste le sythem color differe
+- Apres avoir analyser les vues et ses composants en creer ou completant des tests pertinant en s'inspirant du code existant.

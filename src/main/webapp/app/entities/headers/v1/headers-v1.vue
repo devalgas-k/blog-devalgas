@@ -1,8 +1,7 @@
 <template>
-  <b-navbar data-cy="navbar" toggleable="md" type="dark" class="bg-primary">
+  <b-navbar data-cy="navbar" toggleable="md" type="dark" class="bg-primary py-0">
     <b-navbar-brand class="logo" b-link to="/">
-      <span class="logo-img"></span>
-      <span v-text="t$('global.title')" class="navbar-title"></span> <span class="navbar-version">{{ version }}</span>
+      <title-app class="text-dark" style="margin-top: -0.1em"></title-app>
     </b-navbar-brand>
     <b-navbar-toggle
       right
@@ -17,13 +16,18 @@
     </b-navbar-toggle>
 
     <b-collapse is-nav id="header-tabs">
-      <b-navbar-nav class="ml-auto">
-        <b-nav-item to="/" exact>
+      <b-navbar-nav class="ml-auto row pl-lg-5">
+        <b-nav-item to="/" exact v-if="!authenticated">
           <span>
             <font-awesome-icon icon="home" />
             <span v-text="t$('global.menu.home')"></span>
           </span>
         </b-nav-item>
+      </b-navbar-nav>
+    </b-collapse>
+
+    <b-collapse is-nav id="header-tabs">
+      <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right id="entity-menu" v-if="authenticated" active-class="active" class="pointer" data-cy="entity">
           <template #button-content>
             <span class="navbar-dropdown-menu">
@@ -78,10 +82,12 @@
             <span v-text="t$('global.menu.admin.apidocs')"></span>
           </b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-nav-item-dropdown id="languagesnavBarDropdown" right v-if="languages && Object.keys(languages).length > 1">
+      </b-navbar-nav>
+
+      <b-navbar-nav class="ml-auto inline-mobile-nav">
+        <b-nav-item-dropdown id="languagesnavBarDropdown" left v-if="languages && Object.keys(languages).length > 1">
           <template #button-content>
-            <font-awesome-icon icon="flag" />
-            <span class="no-bold" v-text="t$('global.menu.language')"></span>
+            <font-awesome-icon icon="earth-africa" />
           </template>
           <b-dropdown-item
             v-for="(value, key) in languages"
@@ -89,14 +95,14 @@
             @click="changeLanguage(key)"
             :class="{ active: isActiveLanguage(key) }"
           >
+            <img alt="flag" src="/content/images/flag_placeholder.png" :class="`flag flag-${value.code}`" style="width: 24px" />
             {{ value.name }}
           </b-dropdown-item>
         </b-nav-item-dropdown>
 
-        <b-nav-item-dropdown id="languagesnavBarDropdown" right v-if="themes && Object.keys(themes).length > 1">
+        <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1 px-0" right v-if="themes && Object.keys(themes).length > 1">
           <template #button-content>
             <font-awesome-icon icon="circle-half-stroke" />
-            <!--            <span class="no-bold" v-text="t$('global.menu.language')"></span>-->
           </template>
           <b-dropdown-item
             v-for="(value, key) in themes"
@@ -104,9 +110,14 @@
             @click="changeTheme(key)"
             :class="{ active: isActiveTheme(key) }"
           >
-            {{ value.name }}
+            <font-awesome-icon :icon="value.icon" :class="['theme-icon', 'theme-icon-' + key]" />
+
+            {{ t$(value.nameKey) }}
           </b-dropdown-item>
         </b-nav-item-dropdown>
+      </b-navbar-nav>
+
+      <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown
           right
           href="javascript:void(0);"
@@ -151,8 +162,8 @@
 <script lang="ts" src="./headers-v1.component.ts"></script>
 
 <style scoped>
-.navbar-version {
-  font-size: 0.65em;
+.navbar-brand {
+  padding: 0.3rem 0.5rem calc(15px - 0.75rem) !important;
 }
 
 @media screen and (min-width: 768px) {
@@ -187,10 +198,49 @@
 
 .logo-img {
   height: 100%;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
+  background: url('/content/images/logo-app.png') no-repeat center center;
   background-size: contain;
   width: 100%;
   filter: drop-shadow(0 0 0.05rem white);
   margin: 0 5px;
+}
+
+span.flag {
+  width: 44px;
+  height: 30px;
+  display: inline-block;
+}
+img.flag {
+  width: 30px;
+}
+.flag {
+  background: url('/content/images/flags_responsive.png') no-repeat;
+  background-size: 100%;
+  vertical-align: middle;
+}
+.flag-fr {
+  background-position: 0 29.752066%;
+}
+.flag-uk {
+  background-position: 0 92.561983%;
+}
+.theme-icon-light {
+  color: #b58900;
+}
+.theme-icon-dark {
+  color: #000000;
+}
+
+@media screen and (max-width: 767px) {
+  .inline-mobile-nav {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .inline-mobile-nav > li.nav-item {
+    margin-right: 0.25rem;
+  }
 }
 </style>

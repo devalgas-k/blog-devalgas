@@ -1,6 +1,6 @@
 const languages = () => ({
-  fr: { name: 'Français' },
-  en: { name: 'English' },
+  fr: { name: 'Français', code: 'fr' },
+  en: { name: 'English', code: 'uk' },
   // jhipster-needle-i18n-language-key-pipe - JHipster will add/remove languages in this object
 });
 

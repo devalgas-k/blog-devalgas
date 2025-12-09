@@ -43,6 +43,7 @@ import { faWrench } from '@fortawesome/free-solid-svg-icons/faWrench';
 import { faCircleHalfStroke } from '@fortawesome/free-solid-svg-icons/faCircleHalfStroke';
 import { faSun } from '@fortawesome/free-solid-svg-icons/faSun';
 import { faMoon } from '@fortawesome/free-solid-svg-icons/faMoon';
+import { faEarthAfrica } from '@fortawesome/free-solid-svg-icons/faEarthAfrica';
 
 const datetimeFormats: IntlDateTimeFormats = {
   fr: {
@@ -143,6 +144,7 @@ export function initFortAwesome(vue) {
     faCircleHalfStroke,
     faSun,
     faMoon,
+    faEarthAfrica,
   );
 }
 export function initI18N(opts: any = {}) {

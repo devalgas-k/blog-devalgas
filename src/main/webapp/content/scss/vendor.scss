@@ -13,6 +13,10 @@ eg $input-color: red;
   nav li.router-link-active .navbar-dropdown-menu {
     color: $navbar-dark-active-color;
   }
+  --primary: #{$primary};
+  --dark: #{$dark};
+  --white: #{$white};
+  --blue: #{$blue};
 }
 
 :root.theme-dark {
@@ -23,6 +27,10 @@ eg $input-color: red;
   nav li.router-link-active .navbar-dropdown-menu {
     color: $navbar-dark-active-color;
   }
+  --primary: #{$primary};
+  --dark: #{$dark};
+  --white: #{$white};
+  --blue: #{$blue};
 }
 
 /* jhipster-needle-scss-add-vendor JHipster will add new css style */

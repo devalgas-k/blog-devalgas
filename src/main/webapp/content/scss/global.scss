@@ -271,3 +271,142 @@ ui bootstrap tweaks
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+
+@mixin prefix($prop, $val) {
+  @each $prefix in '-webkit-', '-moz-', '-ms-', '' {
+    #{$prefix}#{$prop}: $val;
+  }
+}
+
+.btn,
+.breadcrumb {
+  padding: 10px 20px !important;
+  text-decoration: none;
+  background: transparent;
+  display: inline-block;
+  position: relative;
+  text-transform: capitalize;
+  font-size: 12px;
+  @include prefix(border-radius, 5px);
+  @include prefix(transition, background 0.3s ease);
+  @include prefix(box-shadow, 2px 2px 0 var(--primary));
+
+  &:hover {
+    box-shadow: none;
+    top: 2px;
+    left: 2px;
+    @include prefix(box-shadow, 2px 2px 0 transparent);
+  }
+}
+
+.or-spacer {
+  width: 100%;
+  position: relative;
+
+  .mask {
+    overflow: hidden;
+    height: 20px;
+    &:after {
+      content: '';
+      display: block;
+      margin: -25px auto 0;
+      width: 100%;
+      height: 25px;
+      border-radius: 125px / 12px;
+      box-shadow: 0 0 8px var(--primary);
+    }
+  }
+  span {
+    $size: 50px;
+    width: $size;
+    height: $size;
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: -$size/2;
+    left: 50%;
+    margin-left: -$size/2;
+    border-radius: 100%;
+    box-shadow: 0 2px 4px var(--primary);
+    background: #003f50;
+  }
+  span i {
+    $offset: 4px;
+    position: absolute;
+    top: $offset;
+    bottom: $offset;
+    left: $offset;
+    right: $offset;
+    border-radius: 100%;
+    border: 1px dashed #fff;
+
+    text-align: center;
+    line-height: 40px;
+    font-style: normal;
+    color: #fff;
+  }
+}
+
+// vertical variation
+
+.or-spacer-vertical {
+  display: inline-block;
+  margin-top: 100px;
+  margin-left: 100px;
+
+  .mask {
+    overflow: hidden;
+    height: 200px;
+    outline: 1px solid pink;
+  }
+  &.left .mask:after {
+    content: '';
+    display: block;
+    margin-left: -20px;
+    width: 20px;
+    height: 100%;
+    border-radius: 12px / 125px;
+    box-shadow: 0 0 8px black;
+  }
+  &.right .mask:before {
+    content: '';
+    display: block;
+    margin-left: 20px;
+    height: 100%;
+    border-radius: 12px / 125px;
+    box-shadow: 0 0 8px black;
+  }
+}
+
+.or-spacer-vertical {
+  display: inline-block;
+  position: relative;
+
+  .mask {
+    overflow: hidden;
+    width: 20px;
+    height: 200px;
+    //outline:1px solid pink;
+  }
+  &.left .mask:after {
+    content: '';
+    display: block;
+    margin-left: -20px;
+    width: 20px;
+    height: 100%;
+    border-radius: 12px / 125px;
+    box-shadow: 0 0 8px black;
+  }
+  &.right .mask:before {
+    content: '';
+    display: block;
+    margin-left: 20px;
+    width: 20px;
+    height: 100%;
+    border-radius: 12px / 125px;
+    box-shadow: 0 0 8px black;
+  }
+}
+
+.p-scrolltop {
+  background-color: var(--blue) !important;
+}
