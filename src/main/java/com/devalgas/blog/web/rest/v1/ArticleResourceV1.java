@@ -1,0 +1,144 @@
+package com.devalgas.blog.web.rest.v1;
+
+import com.devalgas.blog.repository.ArticleRepository;
+import com.devalgas.blog.service.ArticleService;
+import com.devalgas.blog.service.dto.ArticleDTO;
+import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Objects;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.ResponseUtil;
+
+/**
+ * REST controller for managing {@link com.devalgas.blog.domain.Article}.
+ */
+@RestController
+@RequestMapping("/api/v1/articles")
+public class ArticleResourceV1 {
+
+    private static final Logger log = LoggerFactory.getLogger(ArticleResourceV1.class);
+
+    private static final String ENTITY_NAME = "article";
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
+
+    private final ArticleService articleService;
+
+    private final ArticleRepository articleRepository;
+
+    public ArticleResourceV1(ArticleService articleService, ArticleRepository articleRepository) {
+        this.articleService = articleService;
+        this.articleRepository = articleRepository;
+    }
+
+    /**
+     * {@code GET  /v1/articles/:id} : get the "id" article.
+     *
+     * @param id the id of the articleDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the articleDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ArticleDTO> getArticle(@PathVariable("id") Long id) {
+        log.debug("REST request to get Article : {}", id);
+        Optional<ArticleDTO> articleDTO = articleService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(articleDTO);
+    }
+
+    /**
+     * {@code POST  /v1/articles} : Create a new article.
+     *
+     * @param articleDTO the articleDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new articleDTO, or with status {@code 400 (Bad Request)} if the article has already an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PostMapping("")
+    public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO articleDTO) throws URISyntaxException {
+        log.debug("REST request to save Article : {}", articleDTO);
+        if (articleDTO.getId() != null) {
+            throw new BadRequestAlertException("A new article cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        articleDTO = articleService.save(articleDTO);
+        return ResponseEntity.created(new URI("/api/articles/" + articleDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
+            .body(articleDTO);
+    }
+
+    /**
+     * {@code PUT  /v1/articles/:id} : Updates an existing article.
+     *
+     * @param id the id of the articleDTO to save.
+     * @param articleDTO the articleDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated articleDTO,
+     * or with status {@code 400 (Bad Request)} if the articleDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the articleDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ArticleDTO> updateArticle(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody ArticleDTO articleDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update Article : {}, {}", id, articleDTO);
+        if (articleDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, articleDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!articleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        articleDTO = articleService.update(articleDTO);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
+            .body(articleDTO);
+    }
+
+    /**
+     * {@code PATCH  /articles/:id} : Partial updates given fields of an existing article, field will ignore if it is null
+     *
+     * @param id the id of the articleDTO to save.
+     * @param articleDTO the articleDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated articleDTO,
+     * or with status {@code 400 (Bad Request)} if the articleDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the articleDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the articleDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    public ResponseEntity<ArticleDTO> partialUpdateArticle(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody ArticleDTO articleDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update Article partially : {}, {}", id, articleDTO);
+        if (articleDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, articleDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!articleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<ArticleDTO> result = articleService.partialUpdate(articleDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString())
+        );
+    }
+}
