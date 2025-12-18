@@ -1,5 +1,8 @@
 <template>
-  <div class="home row">
+  <div class="row">
+    <article-search class="col-12"></article-search>
+  </div>
+  <div class="home row d-none">
     <div class="col-md-3">
       <span class="hipster img-fluid rounded"></span>
     </div>

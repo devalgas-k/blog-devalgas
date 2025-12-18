@@ -1,23 +1,29 @@
 import { type ComputedRef, defineComponent, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { useLoginModal } from '@/account/login-modal';
-import ArticleSearchV1 from '@/entities/article/v1/search/article-search-v1.vue';
+import type LoginService from '@/account/login.service';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
-  components: {
-    'article-search': ArticleSearchV1,
+  name: 'Subtitle',
+  components: {},
+  props: {
+    title: { type: String, default: '' },
   },
   setup() {
-    const { showLogin } = useLoginModal();
+    const loginService = inject<LoginService>('loginService');
+
     const authenticated = inject<ComputedRef<boolean>>('authenticated');
     const username = inject<ComputedRef<string>>('currentUsername');
+
+    const openLogin = () => {
+      loginService.openLogin();
+    };
 
     return {
       authenticated,
       username,
-      showLogin,
+      openLogin,
       t$: useI18n().t,
     };
   },

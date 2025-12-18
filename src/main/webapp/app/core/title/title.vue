@@ -24,11 +24,6 @@
   padding: 0;
 }
 
-body,
-html {
-  overflow: hidden;
-}
-
 .container-title {
   .box {
     width: 250px;
@@ -50,7 +45,7 @@ html {
         height: inherit;
         background: linear-gradient(to left, var(--primary), var(--dark));
         position: absolute;
-        animation: mainBlock 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
+        animation: blockSweep 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
         display: flex;
       }
 
@@ -75,7 +70,6 @@ html {
           border-radius: 50%;
 
           background: var(--dark);
-          -webkit-animation: load 0.6s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
           animation: popIn 0.8s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
           animation-delay: 2s;
           margin-left: 5px;
@@ -100,7 +94,7 @@ html {
         height: inherit;
         background: var(--dark);
         position: absolute;
-        animation: secBlock 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
+        animation: blockSweep 2s cubic-bezier(0.74, 0.06, 0.4, 0.92) forwards;
         animation-delay: 2s;
         display: flex;
       }
@@ -121,22 +115,7 @@ html {
   }
 }
 
-@keyframes mainBlock {
-  0% {
-    width: 0%;
-    left: 0;
-  }
-  50% {
-    width: 100%;
-    left: 0;
-  }
-  100% {
-    width: 0;
-    left: 100%;
-  }
-}
-
-@keyframes secBlock {
+@keyframes blockSweep {
   0% {
     width: 0%;
     left: 0;
@@ -202,63 +181,6 @@ html {
   }
   100% {
     opacity: 0.5;
-  }
-}
-
-footer {
-  width: 350px;
-  height: 80px;
-  background: var(--dark);
-  position: absolute;
-  right: 0;
-  bottom: -80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: top 0.8s forwards;
-  animation-delay: 4s;
-  span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: #232323;
-    font-family: 'Poppins';
-
-    i {
-      margin-right: 25px;
-      font-size: 22px;
-      color: var(--dark);
-      animation: icon 2s forwards;
-      animation-delay: 4s;
-      opacity: 0;
-    }
-  }
-}
-
-@keyframes top {
-  0% {
-    opacity: 0;
-    bottom: -80px;
-  }
-  100% {
-    opacity: 1;
-    bottom: 0px;
-  }
-}
-
-@keyframes icon {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.3) rotate(-02deg);
-  }
-  100% {
-    opacity: 1;
-    bottom: 0px;
   }
 }
 

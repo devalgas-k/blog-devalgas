@@ -7,6 +7,9 @@ import admin from '@/router/admin';
 import entities from '@/router/entities';
 import pages from '@/router/pages';
 
+//Custom
+import articles from '@/router/articles';
+
 export const createRouter = () =>
   createVueRouter({
     history: createWebHistory(),
@@ -32,6 +35,7 @@ export const createRouter = () =>
       ...admin,
       entities,
       ...pages,
+      ...articles,
     ],
   });
 

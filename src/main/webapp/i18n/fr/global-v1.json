@@ -6,6 +6,17 @@
     "themes": {
       "light": "Clair",
       "dark": "Sombre"
+    },
+    "about": {
+      "position": "Ingénieur logiciel",
+      "placeholder": "\uD83D\uDD0D Découvrez mes articles",
+      "view-article": "Voir l'article",
+      "no-results-found": "Aucun résultat trouvé"
+    },
+    "footer": {
+      "links": "Liens utiles",
+      "info": "Contact info",
+      "copyright": "Copyright © 2024, Tous droits réservés"
     }
   }
 }

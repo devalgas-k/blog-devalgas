@@ -7,6 +7,8 @@ services:
     #   - ~/volumes/jhipster/devalgas/postgresql/:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=devalgas
+      - POSTGRES_DB=devalgas
+      - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER}']
       interval: 5s

@@ -3,6 +3,7 @@ package com.devalgas.blog.service.impl.v1;
 import com.devalgas.blog.repository.v1.CategoryArticleRepositoryV1;
 import com.devalgas.blog.service.dto.CategoryArticleDTO;
 import com.devalgas.blog.service.mapper.CategoryArticleMapper;
+import com.devalgas.blog.service.mapper.v1.CategoryArticleMapperV1;
 import com.devalgas.blog.service.v1.CategoryArticleServiceV1;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -23,11 +24,11 @@ public class CategoryArticleServiceV1Impl implements CategoryArticleServiceV1 {
 
     private final CategoryArticleRepositoryV1 categoryArticleRepository;
 
-    private final CategoryArticleMapper categoryArticleMapper;
+    private final CategoryArticleMapperV1 categoryArticleMapper;
 
     public CategoryArticleServiceV1Impl(
         CategoryArticleRepositoryV1 categoryArticleRepository,
-        CategoryArticleMapper categoryArticleMapper
+        CategoryArticleMapperV1 categoryArticleMapper
     ) {
         this.categoryArticleRepository = categoryArticleRepository;
         this.categoryArticleMapper = categoryArticleMapper;

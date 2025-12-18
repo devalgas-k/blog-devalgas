@@ -5,8 +5,8 @@
       <!--      <jhi-navbar v-if="false"></jhi-navbar>-->
       <headers-v1></headers-v1>
     </div>
-    <div class="container-fluid">
-      <div class="card jh-card">
+    <div class="container">
+      <div class="w-75 mx-auto">
         <router-view></router-view>
       </div>
       <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>

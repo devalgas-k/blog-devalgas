@@ -6,6 +6,17 @@
     "themes": {
       "light": "Light",
       "dark": "Dark"
+    },
+    "about": {
+      "position": "Software engineer",
+      "placeholder": "\uD83D\uDD0D Discover my articles",
+      "view-article": "View article",
+      "no-results-found": "No results found"
+    },
+    "footer": {
+      "links": "Useful links",
+      "info": "Contact info",
+      "copyright": "Copyright © 2024, All Right Reserved"
     }
   }
 }

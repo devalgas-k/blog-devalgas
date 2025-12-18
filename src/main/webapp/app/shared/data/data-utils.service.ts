@@ -155,6 +155,76 @@ const useDataUtils = () => ({
     });
     return links;
   },
+
+  decodeBase64(base64) {
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  },
+
+  sanitizeHtml(html) {
+    DOMPurify.removeAllHooks();
+    DOMPurify.addHook('afterSanitizeAttributes', node => {
+      const tag = node.nodeName;
+      if (tag === 'IMG' || tag === 'IFRAME' || tag === 'VIDEO' || tag === 'CANVAS') {
+        node.removeAttribute('width');
+        node.removeAttribute('height');
+        node.removeAttribute('style');
+        if (tag === 'IMG') {
+          if (!node.hasAttribute('loading')) node.setAttribute('loading', 'lazy');
+          node.removeAttribute('srcset');
+        }
+        const src = node.getAttribute('src') ?? '';
+        if (/^\s*javascript:/i.test(src)) node.removeAttribute('src');
+      }
+    });
+    const clean = DOMPurify.sanitize(html, {
+      USE_PROFILES: { html: true },
+      ADD_TAGS: ['iframe'],
+      ALLOWED_ATTR: [
+        'href',
+        'target',
+        'rel',
+        'src',
+        'alt',
+        'title',
+        'class',
+        'id',
+        'name',
+        'srcdoc',
+        'referrerpolicy',
+        'loading',
+        'decoding',
+        'type',
+        'value',
+        'aria-label',
+        'aria-hidden',
+        'role',
+        'allow',
+        'allowfullscreen',
+      ],
+      FORBID_TAGS: ['style', 'script', 'link'],
+      ALLOW_DATA_ATTR: true,
+    });
+    DOMPurify.removeAllHooks();
+    return clean;
+  },
+
+  decodeMarkdownContent(base64, contentType) {
+    const mk = base64 ?? '';
+    if (!mk) return { html: '', isHtmlContent: false };
+    const ct = (contentType ?? '').toLowerCase();
+    const text = this.decodeBase64(mk);
+    const isMarkdown = ct.includes('markdown') || ct.includes('md');
+    const rawHtml = isMarkdown ? md.render(text) : text;
+    const html = this.sanitizeHtml(rawHtml);
+    return { html, isHtmlContent: !isMarkdown };
+  },
 });
 
 export default useDataUtils;
+
+import MarkdownIt from 'markdown-it';
+import markdownItKatex from 'markdown-it-katex';
+import DOMPurify from 'dompurify';
+const md = new MarkdownIt({ linkify: true, typographer: true });
+md.use(markdownItKatex);

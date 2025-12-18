@@ -17,6 +17,9 @@ eg $input-color: red;
   --dark: #{$dark};
   --white: #{$white};
   --blue: #{$blue};
+  --warning: #{$warning};
+  --light: #{$light};
+
   .row.jh-entity-details {
     display: grid;
     grid-template-columns: 1fr;
@@ -56,6 +59,9 @@ eg $input-color: red;
   --dark: #{$dark};
   --white: #{$white};
   --blue: #{$blue};
+  --warning: #{$warning};
+  --light: #{$light};
+
   .row.jh-entity-details {
     display: grid;
     grid-template-columns: 1fr;

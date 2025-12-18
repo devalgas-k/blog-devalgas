@@ -1,0 +1,13 @@
+{
+  "devalgasApp": {
+    "articleV1": {
+      "info": {
+        "published": "Publié",
+        "readingTime": "Temps de lecture"
+      },
+      "content": {
+        "explore": "Explorez plus de contenus"
+      }
+    }
+  }
+}

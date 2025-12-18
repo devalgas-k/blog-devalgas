@@ -17,9 +17,15 @@ import JhiSortIndicatorComponent from '@/shared/sort/jhi-sort-indicator.vue';
 import { useLoginModal } from '@/account/login-modal';
 import AccountService from '@/account/account.service';
 
-import '../content/scss/global.scss';
 import '../content/scss/vendor.scss';
+import '../content/scss/global.scss';
 import TranslationService from '@/locale/translation.service';
+
+import PrimeVue from 'primevue/config';
+import 'primeicons/primeicons.css';
+import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/bootstrap4-dark-blue/theme.css';
+import ScrollTop from 'primevue/scrolltop';
 
 const pinia = createPinia();
 
@@ -123,6 +129,19 @@ const app = createApp({
       await changeLanguage(lang);
     });
 
+    /* TODO onMounted(() => {
+      const scriptId = 'adsbygoogle-js';
+      if (!document.getElementById(scriptId)) {
+        const s = document.createElement('script');
+        s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6181972205565553';
+        s.crossOrigin = 'anonymous';
+        s.id = scriptId;
+        document.head.appendChild(s);
+      }
+    });*/
+
     router.beforeResolve(async (to, from, next) => {
       // Make sure login modal is closed
       hideLogin();
@@ -183,7 +202,9 @@ initFortAwesome(app);
 app
   .component('JhiItemCount', JhiItemCountComponent)
   .component('jhi-sort-indicator', JhiSortIndicatorComponent)
+  .component('ScrollTop', ScrollTop)
   .use(router)
   .use(pinia)
   .use(i18n)
+  .use(PrimeVue, { inputStyle: 'filled', ripple: true })
   .mount('#app');

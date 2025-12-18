@@ -8,12 +8,9 @@ Je suis expert Java, Spring Boot, Css, Vue.js et je souhaite faire une maintenan
 
 ## Analyse
 
-- 'diff-dev-jdl.patch'
-- 'diff-jdl-dev.patch'
-- 'src/main/webapp/app/entities/app-info/app-info-details.vue'
-- 'src/main/webapp/app/entities/app-info/\*-details.vue'
+- 'v1.patch'
 
 ## Objectif
 
-- Quand je fais une cherry pick sur la branch develop a partir de la branche develop-jdl, j'obtiens un bug
-  sur les pages \*-details.vue comme app-info-details.vue les elements ne sont plus bien alignes xom
+- Analyser v1.patch et trouver une strategie pour verifier si ses mofifications sont couvert par les tests,
+  et les fichiers ayant v1 notamment _-v1._ utiliser les bonnes pratiques. Pas de regressions dans les modifications
