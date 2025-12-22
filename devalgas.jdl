@@ -56,6 +56,18 @@ entity Article {
 }
 
 /**
+ * This is a subscribe
+ * subscribe a class
+ * @author Devalgas
+ */
+entity Subscribe {
+  email String unique required pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)
+  langKey String minlength(2) maxlength(2)
+  countryKey String minlength(2)
+  date ZonedDateTime
+}
+
+/**
  * ArticleStatus a enum
  * @author Devalgas
  */

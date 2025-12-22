@@ -1,8 +1,10 @@
 import axios from 'axios';
 import sinon from 'sinon';
+import dayjs from 'dayjs';
 
-import CategoryArticleService from './category-article.service';
-import { CategoryArticle } from '@/shared/model/category-article.model';
+import SubscribeService from './subscribe.service';
+import { DATE_TIME_FORMAT } from '@/shared/composables/date-format';
+import { Subscribe } from '@/shared/model/subscribe.model';
 
 const error = {
   response: {
@@ -22,18 +24,20 @@ const axiosStub = {
 };
 
 describe('Service Tests', () => {
-  describe('CategoryArticle Service', () => {
-    let service: CategoryArticleService;
+  describe('Subscribe Service', () => {
+    let service: SubscribeService;
     let elemDefault;
+    let currentDate: Date;
 
     beforeEach(() => {
-      service = new CategoryArticleService();
-      elemDefault = new CategoryArticle(123, 'AAAAAAA', 'AAAAAAA', 'image/png', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA');
+      service = new SubscribeService();
+      currentDate = new Date();
+      elemDefault = new Subscribe(123, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', currentDate);
     });
 
     describe('Service methods', () => {
       it('should find an element', async () => {
-        const returnedFromService = { ...elemDefault };
+        const returnedFromService = { date: dayjs(currentDate).format(DATE_TIME_FORMAT), ...elemDefault };
         axiosStub.get.resolves({ data: returnedFromService });
 
         return service.find(123).then(res => {
@@ -51,9 +55,9 @@ describe('Service Tests', () => {
           });
       });
 
-      it('should create a CategoryArticle', async () => {
-        const returnedFromService = { id: 123, ...elemDefault };
-        const expected = { ...returnedFromService };
+      it('should create a Subscribe', async () => {
+        const returnedFromService = { id: 123, date: dayjs(currentDate).format(DATE_TIME_FORMAT), ...elemDefault };
+        const expected = { date: currentDate, ...returnedFromService };
 
         axiosStub.post.resolves({ data: returnedFromService });
         return service.create({}).then(res => {
@@ -61,7 +65,7 @@ describe('Service Tests', () => {
         });
       });
 
-      it('should not create a CategoryArticle', async () => {
+      it('should not create a Subscribe', async () => {
         axiosStub.post.rejects(error);
 
         return service
@@ -72,17 +76,16 @@ describe('Service Tests', () => {
           });
       });
 
-      it('should update a CategoryArticle', async () => {
+      it('should update a Subscribe', async () => {
         const returnedFromService = {
-          label: 'BBBBBB',
-          code: 'BBBBBB',
-          badge: 'BBBBBB',
-          descriptionFr: 'BBBBBB',
-          descriptionEn: 'BBBBBB',
+          email: 'BBBBBB',
+          langKey: 'BBBBBB',
+          countryKey: 'BBBBBB',
+          date: dayjs(currentDate).format(DATE_TIME_FORMAT),
           ...elemDefault,
         };
 
-        const expected = { ...returnedFromService };
+        const expected = { date: currentDate, ...returnedFromService };
         axiosStub.put.resolves({ data: returnedFromService });
 
         return service.update(expected).then(res => {
@@ -90,7 +93,7 @@ describe('Service Tests', () => {
         });
       });
 
-      it('should not update a CategoryArticle', async () => {
+      it('should not update a Subscribe', async () => {
         axiosStub.put.rejects(error);
 
         return service
@@ -101,11 +104,11 @@ describe('Service Tests', () => {
           });
       });
 
-      it('should partial update a CategoryArticle', async () => {
-        const patchObject = { label: 'BBBBBB', code: 'BBBBBB', descriptionFr: 'BBBBBB', descriptionEn: 'BBBBBB', ...new CategoryArticle() };
+      it('should partial update a Subscribe', async () => {
+        const patchObject = { countryKey: 'BBBBBB', ...new Subscribe() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
-        const expected = { ...returnedFromService };
+        const expected = { date: currentDate, ...returnedFromService };
         axiosStub.patch.resolves({ data: returnedFromService });
 
         return service.partialUpdate(patchObject).then(res => {
@@ -113,7 +116,7 @@ describe('Service Tests', () => {
         });
       });
 
-      it('should not partial update a CategoryArticle', async () => {
+      it('should not partial update a Subscribe', async () => {
         axiosStub.patch.rejects(error);
 
         return service
@@ -124,23 +127,22 @@ describe('Service Tests', () => {
           });
       });
 
-      it('should return a list of CategoryArticle', async () => {
+      it('should return a list of Subscribe', async () => {
         const returnedFromService = {
-          label: 'BBBBBB',
-          code: 'BBBBBB',
-          badge: 'BBBBBB',
-          descriptionFr: 'BBBBBB',
-          descriptionEn: 'BBBBBB',
+          email: 'BBBBBB',
+          langKey: 'BBBBBB',
+          countryKey: 'BBBBBB',
+          date: dayjs(currentDate).format(DATE_TIME_FORMAT),
           ...elemDefault,
         };
-        const expected = { ...returnedFromService };
+        const expected = { date: currentDate, ...returnedFromService };
         axiosStub.get.resolves([returnedFromService]);
         return service.retrieve({ sort: {}, page: 0, size: 10 }).then(res => {
           expect(res).toContainEqual(expected);
         });
       });
 
-      it('should not return a list of CategoryArticle', async () => {
+      it('should not return a list of Subscribe', async () => {
         axiosStub.get.rejects(error);
 
         return service
@@ -151,14 +153,14 @@ describe('Service Tests', () => {
           });
       });
 
-      it('should delete a CategoryArticle', async () => {
+      it('should delete a Subscribe', async () => {
         axiosStub.delete.resolves({ ok: true });
         return service.delete(123).then(res => {
           expect(res.ok).toBeTruthy();
         });
       });
 
-      it('should not delete a CategoryArticle', async () => {
+      it('should not delete a Subscribe', async () => {
         axiosStub.delete.rejects(error);
 
         return service

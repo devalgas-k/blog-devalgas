@@ -1,0 +1,27 @@
+{
+  "devalgasApp": {
+    "subscribe": {
+      "home": {
+        "title": "Subscribes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Subscribe",
+        "createOrEditLabel": "Créer ou éditer un Subscribe",
+        "notFound": "Aucun Subscribe trouvé"
+      },
+      "created": "Un nouveau Subscribe a été créé avec l'identifiant { param }",
+      "updated": "Le Subscribe avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Subscribe avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Subscribe { id } ?"
+      },
+      "detail": {
+        "title": "Subscribe"
+      },
+      "id": "ID",
+      "email": "Email",
+      "langKey": "Lang Key",
+      "countryKey": "Country Key",
+      "date": "Date"
+    }
+  }
+}

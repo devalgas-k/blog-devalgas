@@ -277,6 +277,8 @@ class HeadersResourceIT {
         Headers partialUpdatedHeaders = new Headers();
         partialUpdatedHeaders.setId(headers.getId());
 
+        partialUpdatedHeaders.logoHeaders(UPDATED_LOGO_HEADERS).logoHeadersContentType(UPDATED_LOGO_HEADERS_CONTENT_TYPE);
+
         restHeadersMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedHeaders.getId())

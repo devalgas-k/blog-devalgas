@@ -59,6 +59,7 @@ public class CacheConfiguration {
             createCache(cm, com.devalgas.blog.domain.CategoryArticle.class.getName() + ".articles");
             createCache(cm, com.devalgas.blog.domain.Article.class.getName());
             createCache(cm, com.devalgas.blog.domain.Article.class.getName() + ".categoryArticles");
+            createCache(cm, com.devalgas.blog.domain.Subscribe.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

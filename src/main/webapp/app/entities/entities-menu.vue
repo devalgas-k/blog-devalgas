@@ -20,6 +20,10 @@
       <font-awesome-icon icon="asterisk" />
       <span v-text="t$('global.menu.entities.article')"></span>
     </b-dropdown-item>
+    <b-dropdown-item to="/subscribe">
+      <font-awesome-icon icon="asterisk" />
+      <span v-text="t$('global.menu.entities.subscribe')"></span>
+    </b-dropdown-item>
     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
   </div>
 </template>
