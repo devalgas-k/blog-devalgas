@@ -10,6 +10,7 @@ import Title from '@/core/title/title.vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store.ts';
 import BannerFooters from '@/core/banner/banner-footers.vue';
+import MessageContactV1 from '@/core/message-contact/message-contact-v1.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -18,6 +19,7 @@ export default defineComponent({
     'entities-menu': EntitiesMenu,
     'dp-title': Title,
     'banner-footers': BannerFooters,
+    'message-contact-v1': MessageContactV1,
   },
   setup() {
     const { t: t$ } = useI18n();

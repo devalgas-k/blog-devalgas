@@ -1,0 +1,139 @@
+<template>
+  <div class="newsletter w-100">
+    <div class="subscribe ml-4">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="content">
+            <h2 v-if="!success" v-text="t$('devalgasApp.subscribeV1.title')"></h2>
+            <h6 v-if="!success" class="content-tuned"></h6>
+            <h6
+              class="alert alert-primary text-dark font-weight-bold"
+              v-if="!success && !emailFormatError && !recaptchaError && !errorEmailExists"
+              v-text="t$('devalgasApp.subscribeV1.subTitle')"
+            ></h6>
+            <h6
+              class="alert alert-danger text-dark font-weight-bold"
+              role="alert"
+              v-if="recaptchaError && !errorEmailExists"
+              v-text="t$('devalgasApp.subscribeV1.messages.error.recaptchaRequired')"
+            ></h6>
+            <h6
+              class="alert alert-primary text-dark font-weight-bold"
+              role="alert"
+              v-if="success"
+              v-html="t$('devalgasApp.subscribeV1.messages.success.validEmail')"
+            ></h6>
+            <h6
+              class="alert alert-danger text-dark font-weight-bold"
+              role="alert"
+              v-if="errorEmailExists"
+              v-html="t$('devalgasApp.subscribeV1.messages.error.emailexists')"
+            ></h6>
+            <h6
+              class="alert alert-danger font-weight-bold"
+              role="alert"
+              v-if="emailFormatError"
+              v-text="t$('devalgasApp.subscribeV1.messages.error.invalidEmail')"
+            ></h6>
+            <div class="d-flex justify-content-center my-3">
+              <VueRecaptcha
+                :sitekey="siteKey"
+                :load-recaptcha-script="true"
+                @verify="handleSuccess"
+                @error="handleError"
+                @expired="handleError"
+                v-if="!success && v$?.subscribe?.email?.$invalid === false"
+              ></VueRecaptcha>
+            </div>
+            <div class="input-group" v-if="!success">
+              <input
+                type="email"
+                class="form-control"
+                :placeholder="t$('devalgasApp.subscribeV1.placeholder')"
+                v-model="v$.subscribe.email.$model"
+                :class="{ 'is-invalid': emailFormatError }"
+                @keydown.enter.prevent="subscribeEmail()"
+              />
+              <span class="input-group-btn"></span>
+              <button class="btn" type="submit" @click="subscribeEmail()"><font-awesome-icon icon="paper-plane" /></button>
+            </div>
+            <!--            TODO unsubscribe-->
+            <div class="text-center d-none">
+              <a class="unsubscribe-link" href="#">Would you like to unsubscribe?</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" src="./subscribe-v1.component.ts"></script>
+
+<style lang="scss" scoped>
+.newsletter {
+  background: rgba(0, 0, 0, 0.3) !important;
+  padding: 40px 40px;
+}
+
+.newsletter .content {
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.content-tuned {
+  font-size: 0.8rem;
+  margin-bottom: 34px !important;
+  color: Var(--white);
+}
+
+h2 {
+  color: Var(--white);
+  margin-bottom: 6px;
+}
+.form-control {
+  height: 45px !important;
+  border-color: var(--white);
+  border-radius: 2px 0px 0px 2px;
+  /*
+  background: rgba(0, 0, 0, 0.3) !important;
+  */
+  color: var(--dark) !important;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+  border: 2px solid var(--dark);
+  border-color: none;
+}
+
+.btn {
+  border-radius: 0;
+  color: var(--white) !important;
+  font-weight: 900;
+}
+
+.btn:hover {
+  background: var(--primary);
+}
+
+.form-control:focus {
+  color: #495057;
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 0rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.unsubscribe-link {
+  text-decoration: none !important;
+  font-size: 13px;
+  color: Var(--white);
+}
+
+.unsubscribe-link:hover {
+  text-decoration: none !important;
+  color: Var(--white);
+}
+</style>

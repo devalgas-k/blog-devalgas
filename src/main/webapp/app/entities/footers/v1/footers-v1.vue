@@ -1,6 +1,6 @@
 <template>
   <!-- TODO https://bootstrapbrain.com/component/bootstrap-signup-form-design/ -->
-  <section class="py-3 py-md-5 py-xl-8 d-none">
+  <section class="py-3 py-md-5 py-xl-8">
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -39,7 +39,7 @@
 
   <div class="pt-5">
     <footer class="footer-section">
-      <div class="container d-none">
+      <div class="container">
         <div class="footer-cta pb-5">
           <div class="d-flex justify-content-between">
             <div class="col-xl-4 col-md-4 mb-30">
@@ -141,13 +141,10 @@
                   <h3>Subscribe</h3>
                 </div>
                 <div class="footer-text mb-25">
-                  <p>Don’t miss to subscribe to our new feeds, kindly fill the form below.</p>
+                  <p></p>
                 </div>
-                <div class="subscribe-form">
-                  <form action="#">
-                    <input type="text" placeholder="Email Address" />
-                    <button><font-awesome-icon icon="search" /></button>
-                  </form>
+                <div class="subscribe-form mt-4">
+                  <message-contact-v1></message-contact-v1>
                 </div>
               </div>
             </div>

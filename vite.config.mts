@@ -22,10 +22,6 @@ let config = defineConfig({
           ],
           dest: 'swagger-ui',
         },
-        {
-          src: normalizePath(fileURLToPath(new URL('./src/main/webapp/ads.txt', import.meta.url))),
-          dest: '.',
-        },
       ],
     }),
   ],

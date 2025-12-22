@@ -2,8 +2,9 @@
   "globalV1": {
     "headers": {
       "subTitle": "Ingenieur logiciel",
-      "resources": "Ressources",
-      "theme": "Thème"
+      "blog": "Blog",
+      "theme": "Thème",
+      "newsletter": "Newsletter"
     },
     "themes": {
       "light": "Clair",

@@ -15,7 +15,7 @@ describe('CategoryArticle e2e test', () => {
   const categoryArticlePageUrlPattern = new RegExp('/category-article(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const categoryArticleSample = { label: 'I4bn)G', code: 'LY' };
+  const categoryArticleSample = { label: 'Fy%[L', code: 'BR' };
 
   let categoryArticle;
 
@@ -160,19 +160,19 @@ describe('CategoryArticle e2e test', () => {
     });
 
     it('should create an instance of CategoryArticle', () => {
-      cy.get(`[data-cy="label"]`).type('Mbnh');
-      cy.get(`[data-cy="label"]`).should('have.value', 'Mbnh');
+      cy.get(`[data-cy="label"]`).type('DvW/.');
+      cy.get(`[data-cy="label"]`).should('have.value', 'DvW/.');
 
-      cy.get(`[data-cy="code"]`).type('JX');
-      cy.get(`[data-cy="code"]`).should('have.value', 'JX');
+      cy.get(`[data-cy="code"]`).type('JM');
+      cy.get(`[data-cy="code"]`).should('have.value', 'JM');
 
       cy.setFieldImageAsBytesOfEntity('badge', 'integration-test.png', 'image/png');
 
-      cy.get(`[data-cy="descriptionFr"]`).type('quand à moins de après que');
-      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'quand à moins de après que');
+      cy.get(`[data-cy="descriptionFr"]`).type('moyennant bang');
+      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'moyennant bang');
 
-      cy.get(`[data-cy="descriptionEn"]`).type('dans la mesure où');
-      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'dans la mesure où');
+      cy.get(`[data-cy="descriptionEn"]`).type('au-dessus');
+      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'au-dessus');
 
       // since cypress clicks submit too fast before the blob fields are validated
       cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting

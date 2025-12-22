@@ -1,0 +1,19 @@
+{
+  "devalgasApp": {
+    "subscribeV1": {
+      "messages": {
+        "error": {
+          "invalidEmail": "Please enter a valid email address",
+          "recaptchaRequired": "Please verify the reCAPTCHA before submitting",
+          "emailexists": "<strong>This e-mail address is already registered </strong> Please choose another one."
+        },
+        "success": {
+          "validEmail": "<strong>Email saved !</strong> Thank you for your subscription \uD83C\uDF89"
+        }
+      },
+      "title": "SUBSCRIBE NOW",
+      "subTitle": "Subscribe to our newsletter and stay tuned with future updates. ! \uD83D\uDE80 \uD83D\uDCE9",
+      "placeholder": "Enter your e-mail address"
+    }
+  }
+}

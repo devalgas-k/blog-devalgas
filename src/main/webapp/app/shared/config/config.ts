@@ -48,6 +48,9 @@ import { faThumbsUp } from '@fortawesome/free-solid-svg-icons/faThumbsUp';
 import { faBorderAll } from '@fortawesome/free-solid-svg-icons/faBorderAll';
 import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faUpRightFromSquare';
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons/faCalendarDays';
+import { faEnvelopesBulk } from '@fortawesome/free-solid-svg-icons/faEnvelopesBulk';
+import { faBlog } from '@fortawesome/free-solid-svg-icons/faBlog';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 
 const datetimeFormats: IntlDateTimeFormats = {
   fr: {
@@ -153,6 +156,9 @@ export function initFortAwesome(vue) {
     faBorderAll,
     faUpRightFromSquare,
     faCalendarDays,
+    faEnvelopesBulk,
+    faBlog,
+    faPaperPlane,
   );
 }
 export function initI18N(opts: any = {}) {

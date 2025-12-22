@@ -19,16 +19,48 @@
       <b-navbar-nav class="ml-auto row pl-lg-5">
         <b-nav-item to="/" exact v-if="!authenticated">
           <span>
-            <font-awesome-icon icon="home" />
-            <span v-text="t$('global.menu.home')"></span>
+            <font-awesome-icon icon="blog" />
+            <span v-text="t$('globalV1.headers.blog')"></span>
           </span>
         </b-nav-item>
-        <b-nav-item href="#blog" class="mx-1" exact v-if="!authenticated">
+        <b-nav-item href="#" class="mx-1" exact v-if="!authenticated">
           <span>
-            <font-awesome-icon icon="border-all" />
-            <span v-text="t$('globalV1.headers.resources')"></span>
+            <font-awesome-icon icon="envelopes-bulk" />
+            <span v-text="t$('globalV1.headers.newsletter')"></span>
           </span>
         </b-nav-item>
+        <b-nav-item-dropdown id="languagesnavBarDropdown" left v-if="languages && Object.keys(languages).length > 1">
+          <template #button-content>
+            <font-awesome-icon icon="earth-africa" />
+            <span class="no-bold" v-text="t$('global.menu.language')"></span>
+          </template>
+          <!--          https://freefrontend.com/css-menu/-->
+          <b-dropdown-item
+            v-for="(value, key) in languages"
+            :key="`lang-${key}`"
+            @click="changeLanguage(key)"
+            :class="{ active: isActiveLanguage(key) }"
+          >
+            <img alt="flag" src="/content/images/flag_placeholder.png" :class="`flag flag-${value.code}`" style="width: 24px" />
+            {{ value.name }}
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1" right v-if="themes && Object.keys(themes).length > 1">
+          <template #button-content>
+            <font-awesome-icon icon="circle-half-stroke" />
+            <span class="no-bold" v-text="t$('globalV1.headers.theme')"></span>
+          </template>
+          <b-dropdown-item
+            v-for="(value, key) in themes"
+            :key="`theme-${key}`"
+            @click="changeTheme(key)"
+            :class="{ active: isActiveTheme(key) }"
+          >
+            <font-awesome-icon :icon="value.icon" :class="['theme-icon', 'theme-icon-' + key]" />
+
+            {{ t$(value.nameKey) }}
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
 
@@ -91,37 +123,6 @@
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown id="languagesnavBarDropdown" left v-if="languages && Object.keys(languages).length > 1">
-          <template #button-content>
-            <font-awesome-icon icon="earth-africa" />
-            <span class="no-bold" v-text="t$('global.menu.language')"></span>
-          </template>
-          <b-dropdown-item
-            v-for="(value, key) in languages"
-            :key="`lang-${key}`"
-            @click="changeLanguage(key)"
-            :class="{ active: isActiveLanguage(key) }"
-          >
-            <img alt="flag" src="/content/images/flag_placeholder.png" :class="`flag flag-${value.code}`" style="width: 24px" />
-            {{ value.name }}
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1" right v-if="themes && Object.keys(themes).length > 1">
-          <template #button-content>
-            <font-awesome-icon icon="circle-half-stroke" />
-            <span class="no-bold" v-text="t$('globalV1.headers.theme')"></span>
-          </template>
-          <b-dropdown-item
-            v-for="(value, key) in themes"
-            :key="`theme-${key}`"
-            @click="changeTheme(key)"
-            :class="{ active: isActiveTheme(key) }"
-          >
-            <font-awesome-icon :icon="value.icon" :class="['theme-icon', 'theme-icon-' + key]" />
-
-            {{ t$(value.nameKey) }}
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
         <b-nav-item-dropdown
           right
           href="javascript:void(0);"

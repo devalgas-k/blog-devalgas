@@ -21,6 +21,10 @@ const Article = () => import('@/entities/article/article.vue');
 const ArticleUpdate = () => import('@/entities/article/article-update.vue');
 const ArticleDetails = () => import('@/entities/article/article-details.vue');
 
+const Subscribe = () => import('@/entities/subscribe/subscribe.vue');
+const SubscribeUpdate = () => import('@/entities/subscribe/subscribe-update.vue');
+const SubscribeDetails = () => import('@/entities/subscribe/subscribe-details.vue');
+
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
@@ -145,6 +149,30 @@ export default {
       path: 'article/:articleId/view',
       name: 'ArticleView',
       component: ArticleDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subscribe',
+      name: 'Subscribe',
+      component: Subscribe,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subscribe/new',
+      name: 'SubscribeCreate',
+      component: SubscribeUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subscribe/:subscribeId/edit',
+      name: 'SubscribeEdit',
+      component: SubscribeUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subscribe/:subscribeId/view',
+      name: 'SubscribeView',
+      component: SubscribeDetails,
       meta: { authorities: [Authority.USER] },
     },
     // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here

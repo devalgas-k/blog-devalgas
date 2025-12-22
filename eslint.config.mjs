@@ -18,7 +18,6 @@ export default tseslint.config(
   },
   { ignores: ['src/main/docker/'] },
   { ignores: ['target/classes/static/', 'target/'] },
-  { ignores: ['src/main/webapp/app/core/adsense/lib/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended.map(config =>
     config.name === 'typescript-eslint/base' ? config : { ...config, files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'] },

@@ -95,7 +95,7 @@ describe('Service Tests', () => {
       });
 
       it('should partial update a Headers', async () => {
-        const patchObject = { logoHeaders: 'BBBBBB', ...new Headers() };
+        const patchObject = { ...new Headers() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
         const expected = { ...returnedFromService };

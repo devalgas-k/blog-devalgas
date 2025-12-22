@@ -102,7 +102,7 @@ describe('Service Tests', () => {
       });
 
       it('should partial update a CategoryArticle', async () => {
-        const patchObject = { label: 'BBBBBB', badge: 'BBBBBB', descriptionEn: 'BBBBBB', ...new CategoryArticle() };
+        const patchObject = { label: 'BBBBBB', code: 'BBBBBB', descriptionFr: 'BBBBBB', descriptionEn: 'BBBBBB', ...new CategoryArticle() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
         const expected = { ...returnedFromService };

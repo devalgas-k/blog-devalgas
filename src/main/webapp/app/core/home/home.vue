@@ -1,8 +1,9 @@
 <template>
   <div class="row">
     <article-search class="col-12 mt-4"></article-search>
-    <p-separator class="col-12 my-4 d-none" icon="border-all"></p-separator>
-    <articles-home class="col-12 mt-1 mb-4"></articles-home>
+    <articles-home class="col-12 mt-1"></articles-home>
+    <p-separator class="col-12 mt-5" icon="envelopes-bulk"></p-separator>
+    <subscribe-v1 class="mt-3"></subscribe-v1>
   </div>
   <div class="home row d-none">
     <div class="col-md-3">

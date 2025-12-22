@@ -11,7 +11,7 @@
           <div class="w-75 mx-auto">
             <router-view></router-view>
           </div>
-          <b-modal id="login-page" hide-footer lazy>
+          <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
             <template #modal-title>
               <span data-cy="loginTitle" id="login-title" v-text="t$('login.title')"></span>
             </template>
