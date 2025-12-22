@@ -1,6 +1,8 @@
 <template>
   <div class="row">
-    <article-search class="col-12"></article-search>
+    <article-search class="col-12 mt-4"></article-search>
+    <p-separator class="col-12 my-4 d-none" icon="border-all"></p-separator>
+    <articles-home class="col-12 mt-1 mb-4"></articles-home>
   </div>
   <div class="home row d-none">
     <div class="col-md-3">

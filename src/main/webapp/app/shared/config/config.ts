@@ -46,6 +46,8 @@ import { faMoon } from '@fortawesome/free-solid-svg-icons/faMoon';
 import { faEarthAfrica } from '@fortawesome/free-solid-svg-icons/faEarthAfrica';
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons/faThumbsUp';
 import { faBorderAll } from '@fortawesome/free-solid-svg-icons/faBorderAll';
+import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faUpRightFromSquare';
+import { faCalendarDays } from '@fortawesome/free-solid-svg-icons/faCalendarDays';
 
 const datetimeFormats: IntlDateTimeFormats = {
   fr: {
@@ -149,6 +151,8 @@ export function initFortAwesome(vue) {
     faEarthAfrica,
     faThumbsUp,
     faBorderAll,
+    faUpRightFromSquare,
+    faCalendarDays,
   );
 }
 export function initI18N(opts: any = {}) {

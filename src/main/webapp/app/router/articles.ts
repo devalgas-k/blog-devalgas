@@ -1,7 +1,7 @@
 /* tslint:disable */
 // prettier-ignore
 
-const ArticleDetailsV1 = () => import('@/entities/article/v1/article-details-v1.vue');
+const ArticleDetailsV1 = () => import('@/entities/article/v1/details/article-details-v1.vue');
 
 export default [
   {

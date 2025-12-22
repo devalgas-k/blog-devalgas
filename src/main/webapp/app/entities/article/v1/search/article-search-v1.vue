@@ -6,7 +6,7 @@
     <figure>
       <figcaption>
         <div class="d-flex justify-content-center">
-          <InputGroup style="height: 55px; width: 40vw; min-width: 250px !important">
+          <p-input-group style="height: 55px; width: 40vw; min-width: 250px !important">
             <p-auto-complete
               icon="pi pi-search"
               severity="contrast"
@@ -54,12 +54,12 @@
                 <div></div>
               </template>
             </p-auto-complete>
-          </InputGroup>
+          </p-input-group>
         </div>
       </figcaption>
     </figure>
   </div>
-  <!--  <div class="row">
+  <!--TODO  <div class="row">
       <ul class="list-group offset-1 offset-lg-4 mt-lg-n5 mt-3 mb-5 list-group-horizontal">
         <li class="list-group-item">
           <a href="https://github.com/devalgas-k/" target="_blank" rel="noopener noreferrer" v-text="t$('home.link.twitter')"></a>

@@ -1,12 +1,13 @@
 <template>
   <div class="article-info">
-    <h1 class="article-info__title">{{ label }}</h1>
+    <h2 class="article-info__title">{{ label }}</h2>
     <div class="article-info__body">
       <div class="article-info__header">
         <dl class="article-info__meta">
           <div class="article-info__row">
-            <dt class="article-info__value" v-if="publishedDate">{{ publishedDate }}</dt>
-            <dd class="article-info__label" v-if="publishedDate" v-text="t$('devalgasApp.articleV1.info.published')"></dd>
+            <dt class="article-info__value" v-if="publishedDate">
+              <font-awesome-icon icon="calendar-days" color="var(--primary)" class="mt-n1" /> {{ publishedDate }}
+            </dt>
           </div>
           <div class="article-info__row d-none">
             <dt class="article-info__value">3 minute</dt>
@@ -29,6 +30,7 @@
       <div class="article-info__share"></div>
 
       <div class="article-info__tags">
+        <!--        TODO Defini chaque categorie-->
         <a
           v-for="cat in article && article.categoryArticles ? article.categoryArticles : []"
           :key="cat.id ?? cat.label"
@@ -51,7 +53,11 @@
   min-width: 250px;
   padding: 1rem;
   border-radius: 16px;
-  box-shadow: -1rem 0 3rem #00000067;
+  /*box-shadow: -1rem 0 3rem #00000067;*/
+  box-shadow:
+    0 0.1rem 0.2rem rgb(0 0 0 / 20%),
+    0 0.1rem 0.5rem rgb(0 0 0 / 30%),
+    0 0.2rem 1.5rem rgb(0 0 0 / 40%);
   transition: 0.2s;
   font-family: 'Inter', sans-serif;
 
@@ -66,6 +72,8 @@
     font-size: 2rem;
     line-height: 1.2;
     color: var(--white);
+    text-transform: capitalize !important;
+    font-weight: bolder !important;
   }
 
   &__body {
@@ -96,12 +104,12 @@
   &__value {
     line-height: 1.25rem;
     font-weight: 600;
-    color: var(--white);
+    color: var(--light);
   }
 
   &__label {
     line-height: 1rem;
-    color: var(--light);
+    color: var(--white);
   }
 
   &__stats {
@@ -123,16 +131,16 @@
     a {
       font-style: normal;
       font-weight: 700;
-      color: #fff;
+      color: var(--light);
       text-transform: uppercase;
       font-size: 0.66rem;
-      border: 2px solid var(--light);
+      border: 2px solid var(--primary);
       border-radius: 2rem;
       padding: 0.2rem 0.85rem 0.25rem;
       position: relative;
 
       &:hover {
-        background: linear-gradient(90deg, #fff, #e52e71);
+        background: linear-gradient(90deg, var(--light), var(--warning));
         text-shadow: none;
         -webkit-text-fill-color: transparent;
         -webkit-background-clip: text;
@@ -162,5 +170,64 @@
       flex-wrap: wrap;
     }
   }
+}
+
+button {
+  position: relative;
+  height: 30px;
+  padding: 0 20px;
+  border: 2px solid var(--white);
+  background: var(--body-bg);
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.05s linear;
+  font-family: inherit;
+}
+
+button:before,
+button:after {
+  content: '';
+  position: absolute;
+  background: var(--body-bg);
+  transition: all 0.2s linear;
+}
+
+button:before {
+  width: calc(100% + 6px);
+  height: calc(100% - 16px);
+  top: 8px;
+  left: -3px;
+}
+
+button:after {
+  width: calc(100% - 16px);
+  height: calc(100% + 6px);
+  top: -3px;
+  left: 8px;
+}
+
+button:hover {
+  cursor: crosshair;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:hover:before {
+  height: calc(100% - 32px);
+  top: 16px;
+}
+
+button:hover:after {
+  width: calc(100% - 32px);
+  left: 16px;
+}
+
+button span {
+  font-size: 15px;
+  z-index: 3;
+  position: relative;
+  font-weight: 600;
 }
 </style>

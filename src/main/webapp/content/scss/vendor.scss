@@ -19,6 +19,7 @@ eg $input-color: red;
   --blue: #{$blue};
   --warning: #{$warning};
   --light: #{$light};
+  --body-bg: #{$body-bg};
 
   .row.jh-entity-details {
     display: grid;
@@ -61,6 +62,7 @@ eg $input-color: red;
   --blue: #{$blue};
   --warning: #{$warning};
   --light: #{$light};
+  --body-bg: #{$body-bg};
 
   .row.jh-entity-details {
     display: grid;

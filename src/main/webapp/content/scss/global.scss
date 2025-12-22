@@ -323,12 +323,12 @@ ui bootstrap tweaks
     height: $size;
     position: absolute;
     bottom: 100%;
-    margin-bottom: -$size/2;
+    margin-bottom: -$size/4;
     left: 50%;
     margin-left: -$size/2;
     border-radius: 100%;
     box-shadow: 0 2px 4px var(--primary);
-    background: #003f50;
+    background: var(--dark);
   }
   span i {
     $offset: 4px;
@@ -344,67 +344,6 @@ ui bootstrap tweaks
     line-height: 40px;
     font-style: normal;
     color: #fff;
-  }
-}
-
-// vertical variation
-
-.or-spacer-vertical {
-  display: inline-block;
-  margin-top: 100px;
-  margin-left: 100px;
-
-  .mask {
-    overflow: hidden;
-    height: 200px;
-    outline: 1px solid pink;
-  }
-  &.left .mask:after {
-    content: '';
-    display: block;
-    margin-left: -20px;
-    width: 20px;
-    height: 100%;
-    border-radius: 12px / 125px;
-    box-shadow: 0 0 8px black;
-  }
-  &.right .mask:before {
-    content: '';
-    display: block;
-    margin-left: 20px;
-    height: 100%;
-    border-radius: 12px / 125px;
-    box-shadow: 0 0 8px black;
-  }
-}
-
-.or-spacer-vertical {
-  display: inline-block;
-  position: relative;
-
-  .mask {
-    overflow: hidden;
-    width: 20px;
-    height: 200px;
-    //outline:1px solid pink;
-  }
-  &.left .mask:after {
-    content: '';
-    display: block;
-    margin-left: -20px;
-    width: 20px;
-    height: 100%;
-    border-radius: 12px / 125px;
-    box-shadow: 0 0 8px black;
-  }
-  &.right .mask:before {
-    content: '';
-    display: block;
-    margin-left: 20px;
-    width: 20px;
-    height: 100%;
-    border-radius: 12px / 125px;
-    box-shadow: 0 0 8px black;
   }
 }
 

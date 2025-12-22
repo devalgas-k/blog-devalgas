@@ -1,24 +1,50 @@
 <template>
   <div id="app">
-    <ribbon></ribbon>
-    <div id="app-header">
-      <!--      <jhi-navbar v-if="false"></jhi-navbar>-->
-      <headers-v1></headers-v1>
-    </div>
-    <div class="container">
-      <div class="w-75 mx-auto">
-        <router-view></router-view>
-      </div>
-      <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
-        <template #modal-title>
-          <span data-cy="loginTitle" id="login-title" v-text="t$('login.title')"></span>
-        </template>
-        <login-form></login-form>
-      </b-modal>
+    <div id="page-container">
+      <div id="content-wrap">
+        <ribbon></ribbon>
+        <div id="app-header">
+          <headers-v1></headers-v1>
+        </div>
 
-      <jhi-footer></jhi-footer>
+        <div class="container">
+          <div class="w-75 mx-auto">
+            <router-view></router-view>
+          </div>
+          <b-modal id="login-page" hide-footer lazy>
+            <template #modal-title>
+              <span data-cy="loginTitle" id="login-title" v-text="t$('login.title')"></span>
+            </template>
+            <login-form></login-form>
+          </b-modal>
+        </div>
+
+        <div id="footer">
+          <footers-v1></footers-v1>
+          <ScrollTop />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" src="./app.component.ts"></script>
+
+<style>
+#page-container {
+  position: relative;
+  min-height: 100vh;
+}
+
+#content-wrap {
+  padding-bottom: 2.5rem;
+  /* Footer height */
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 2.5rem;
+}
+</style>

@@ -23,6 +23,12 @@
             <span v-text="t$('global.menu.home')"></span>
           </span>
         </b-nav-item>
+        <b-nav-item href="#blog" class="mx-1" exact v-if="!authenticated">
+          <span>
+            <font-awesome-icon icon="border-all" />
+            <span v-text="t$('globalV1.headers.resources')"></span>
+          </span>
+        </b-nav-item>
       </b-navbar-nav>
     </b-collapse>
 
@@ -84,10 +90,11 @@
         </b-nav-item-dropdown>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto inline-mobile-nav">
+      <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown id="languagesnavBarDropdown" left v-if="languages && Object.keys(languages).length > 1">
           <template #button-content>
             <font-awesome-icon icon="earth-africa" />
+            <span class="no-bold" v-text="t$('global.menu.language')"></span>
           </template>
           <b-dropdown-item
             v-for="(value, key) in languages"
@@ -99,10 +106,10 @@
             {{ value.name }}
           </b-dropdown-item>
         </b-nav-item-dropdown>
-
-        <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1 px-0" right v-if="themes && Object.keys(themes).length > 1">
+        <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1" right v-if="themes && Object.keys(themes).length > 1">
           <template #button-content>
             <font-awesome-icon icon="circle-half-stroke" />
+            <span class="no-bold" v-text="t$('globalV1.headers.theme')"></span>
           </template>
           <b-dropdown-item
             v-for="(value, key) in themes"
@@ -115,9 +122,6 @@
             {{ t$(value.nameKey) }}
           </b-dropdown-item>
         </b-nav-item-dropdown>
-      </b-navbar-nav>
-
-      <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown
           right
           href="javascript:void(0);"
@@ -229,18 +233,5 @@ img.flag {
 }
 .theme-icon-dark {
   color: #000000;
-}
-
-@media screen and (max-width: 767px) {
-  .inline-mobile-nav {
-    display: flex;
-    flex-direction: row !important;
-    align-items: center;
-    width: 100%;
-    justify-content: flex-start;
-  }
-  .inline-mobile-nav > li.nav-item {
-    margin-right: 0.25rem;
-  }
 }
 </style>

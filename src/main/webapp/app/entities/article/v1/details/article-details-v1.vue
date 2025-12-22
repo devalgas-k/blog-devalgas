@@ -19,7 +19,6 @@
           <p-skeleton width="60%" height="16px" />
         </template>
       </div>
-      <ScrollTop />
     </p-splitter-panel>
   </p-splitter>
   <!--  TODO lors du clique dois arriver #articles-->

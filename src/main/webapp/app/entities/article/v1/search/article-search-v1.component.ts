@@ -1,7 +1,6 @@
 import { type ComputedRef, computed, defineComponent, inject, onMounted, type Ref, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import type LoginService from '@/account/login.service';
 import InputGroup from 'primevue/inputgroup';
 import AutoComplete from 'primevue/autocomplete';
 import Avatar from 'primevue/avatar';
@@ -10,7 +9,6 @@ import type { ICategoryArticle } from '@/shared/model/category-article.model';
 import CategoryArticleService from '@/entities/category-article/v1/category-article-v1.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
-import Subtitle from '@/core/subtitle/subtitle.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -18,28 +16,21 @@ export default defineComponent({
   components: {
     'p-auto-complete': AutoComplete,
     'p-avatar': Avatar,
-    subtitle: Subtitle,
+    'p-input-group': InputGroup,
     InputGroup,
   },
   setup: function () {
-    const loginService = inject<LoginService>('loginService');
     const dataUtils = useDataUtils();
     const categoryArticleService = inject('categoryArticleService', () => new CategoryArticleService());
     const alertService = inject('alertService', () => useAlertService(), true);
 
-    const authenticated = inject<ComputedRef<boolean>>('authenticated');
     const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const currentTheme = inject<ComputedRef<string>>(
       'currentTheme',
       () => computed(() => localStorage.getItem('currentTheme') ?? defaultTheme),
       true,
     );
-    const username = inject<ComputedRef<string>>('currentUsername');
     const currentLanguage = inject<ComputedRef<string>>('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
-
-    const openLogin = () => {
-      loginService.openLogin();
-    };
 
     const isFetching = ref(false);
     const itemsPerPage = ref(20);
@@ -127,9 +118,6 @@ export default defineComponent({
     );
 
     return {
-      authenticated,
-      username,
-      openLogin,
       t$: useI18n().t,
       search,
       selectedArticle,

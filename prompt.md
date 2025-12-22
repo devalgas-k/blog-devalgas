@@ -8,9 +8,10 @@ Je suis expert Java, Spring Boot, Css, Vue.js et je souhaite faire une maintenan
 
 ## Analyse
 
-- 'v1.patch'
+- 'src/main/webapp/app/entities/article/v1/info/article-info-v1.vue'
+- 'src/main/webapp/app/entities/article/v1/home/articles-home-v1.vue'
 
 ## Objectif
 
-- Analyser v1.patch et trouver une strategie pour verifier si ses mofifications sont couvert par les tests,
-  et les fichiers ayant v1 notamment _-v1._ utiliser les bonnes pratiques. Pas de regressions dans les modifications
+- Dans articles-home-v1 je veux que si on clique sur article-info cca redirige vers detail s'inspire de
+  router-link dans article-info-v1

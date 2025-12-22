@@ -1,4 +1,4 @@
-import { type ComputedRef, type PropType, computed, defineComponent, inject, toRef } from 'vue';
+import { type PropType, computed, defineComponent, inject, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import type { IArticle } from '@/shared/model/article.model';
@@ -15,20 +15,13 @@ export default defineComponent({
     },
   },
   setup: function (props) {
-    type LoginSvc = { openLogin: () => void };
-    const loginService = inject<LoginSvc>('loginService')!;
-    const authenticated = inject<ComputedRef<boolean>>('authenticated');
-    const openLogin = () => {
-      loginService.openLogin();
-    };
-
     const dateFormat = useDateFormat();
     const articleData = toRef(props, 'article');
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
     const publishedDate = computed(() => {
       const d = articleData.value?.date as any;
       if (!d) return '';
-      return dateFormat.formatDate(d);
+      return dateFormat.formatDateShort(d);
     });
     const label = computed(() => {
       const lang = (currentLanguage?.value ?? 'fr').split('-')[0]?.toLowerCase();
@@ -38,8 +31,6 @@ export default defineComponent({
     });
 
     return {
-      authenticated,
-      openLogin,
       t$: useI18n().t,
       ...dateFormat,
       publishedDate,

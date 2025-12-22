@@ -2,17 +2,17 @@ import { computed, defineComponent, inject, ref, type Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
-import useDataUtils from '@/shared/data/data-utils.service';
-import { type IArticle } from '@/shared/model/article.model';
-import { useAlertService } from '@/shared/alert/alert.service';
+import useDataUtils from '@/shared/data/data-utils.service.ts';
+import { type IArticle } from '@/shared/model/article.model.ts';
+import { useAlertService } from '@/shared/alert/alert.service.ts';
 import { useDateFormat } from '@/shared/composables';
 
 import Panel from 'primevue/panel';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Skeleton from 'primevue/skeleton';
-import ArticleServiceV1 from '@/entities/article/v1/article.service-v1';
-import ArticleInfoV1 from './info/article-info-v1.vue';
+import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
+import ArticleInfoV1 from '../info/article-info-v1.vue';
 import Adsense from '@/core/adsense/adsense.vue';
 
 export default defineComponent({

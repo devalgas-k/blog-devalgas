@@ -1,0 +1,23 @@
+{
+  "devalgasApp": {
+    "footersV1": {
+      "me": "Devalgas",
+      "home": "Accueil",
+      "about": "À propos",
+      "portfolio": "Portfolio",
+      "experience": "Expérience",
+      "contact": "Contact",
+      "posts": "Posts",
+      "followUs": "Suivez-moi",
+      "usefulLinks": "Liens rapides",
+      "contactInfo": "Contact Info",
+      "address": "Flic en Flac, Ile Maurice",
+      "mail": "kamgadevalgas@icloud.com",
+      "number": "+23055040199",
+      "terms": "Termes",
+      "privacy": "Confidentialité",
+      "policy": "Politique",
+      "copyright": "Copyright © 2022, Tous droits réservés "
+    }
+  }
+}

@@ -2,14 +2,14 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
-  name: 'Subtitle',
+  name: 'Separator',
   components: {},
   props: {
-    title: { type: String, default: '' },
+    icon: { type: String, default: '' },
   },
   setup(props) {
     return {
-      subtitle: props.title,
+      iconProp: props.icon,
     };
   },
 });
