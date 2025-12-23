@@ -1,0 +1,684 @@
+Index: src/main/java/com/devalgas/blog/config/CacheConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/devalgas/blog/config/CacheConfiguration.java b/src/main/java/com/devalgas/blog/config/CacheConfiguration.java
+--- a/src/main/java/com/devalgas/blog/config/CacheConfiguration.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/java/com/devalgas/blog/config/CacheConfiguration.java	(date 1766503599144)
+@@ -60,6 +60,8 @@
+             createCache(cm, com.devalgas.blog.domain.Article.class.getName());
+             createCache(cm, com.devalgas.blog.domain.Article.class.getName() + ".categoryArticles");
+             createCache(cm, com.devalgas.blog.domain.Subscribe.class.getName());
++            createCache(cm, com.devalgas.blog.domain.Message.class.getName());
++            createCache(cm, com.devalgas.blog.domain.Subject.class.getName());
+             // jhipster-needle-ehcache-add-entry
+         };
+     }
+Index: src/main/resources/config/liquibase/master.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/config/liquibase/master.xml b/src/main/resources/config/liquibase/master.xml
+--- a/src/main/resources/config/liquibase/master.xml	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/resources/config/liquibase/master.xml	(date 1766503599132)
+@@ -18,9 +18,12 @@
+     <include file="config/liquibase/changelog/20251210162103_added_entity_CategoryArticle.xml" relativeToChangelogFile="false"/>
+     <include file="config/liquibase/changelog/20251210162104_added_entity_Article.xml" relativeToChangelogFile="false"/>
+     <include file="config/liquibase/changelog/20251222115839_added_entity_Subscribe.xml" relativeToChangelogFile="false"/>
++    <include file="config/liquibase/changelog/20251223152637_added_entity_Message.xml" relativeToChangelogFile="false"/>
++    <include file="config/liquibase/changelog/20251223152638_added_entity_Subject.xml" relativeToChangelogFile="false"/>
+     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+     <include file="config/liquibase/changelog/20251206142316_added_entity_constraints_AppInfo.xml" relativeToChangelogFile="false"/>
+     <include file="config/liquibase/changelog/20251210162104_added_entity_constraints_Article.xml" relativeToChangelogFile="false"/>
++    <include file="config/liquibase/changelog/20251223152637_added_entity_constraints_Message.xml" relativeToChangelogFile="false"/>
+     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+ </databaseChangeLog>
+Index: src/main/webapp/app/entities/app-info/app-info.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/app-info/app-info.service.spec.ts b/src/main/webapp/app/entities/app-info/app-info.service.spec.ts
+--- a/src/main/webapp/app/entities/app-info/app-info.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/app-info/app-info.service.spec.ts	(date 1766503599150)
+@@ -95,7 +95,7 @@
+       });
+ 
+       it('should partial update a AppInfo', async () => {
+-        const patchObject = { valueInfo: 'BBBBBB', ...new AppInfo() };
++        const patchObject = { ...new AppInfo() };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+ 
+         const expected = { ...returnedFromService };
+Index: src/main/webapp/app/entities/article/article.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/article/article.service.spec.ts b/src/main/webapp/app/entities/article/article.service.spec.ts
+--- a/src/main/webapp/app/entities/article/article.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/article/article.service.spec.ts	(date 1766503599151)
+@@ -132,15 +132,14 @@
+ 
+       it('should partial update a Article', async () => {
+         const patchObject = {
+-          labelEn: 'BBBBBB',
++          labelFr: 'BBBBBB',
+           descriptionEn: 'BBBBBB',
+           markdownFr: 'BBBBBB',
++          markdownEn: 'BBBBBB',
+           status: 'BBBBBB',
+           date: dayjs(currentDate).format(DATE_TIME_FORMAT),
+           badge: 'BBBBBB',
+-          banner: 'BBBBBB',
+           views: 1,
+-          stars: 1,
+           ...new Article(),
+         };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+Index: src/main/webapp/app/entities/category-article/category-article.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/category-article/category-article.service.spec.ts b/src/main/webapp/app/entities/category-article/category-article.service.spec.ts
+--- a/src/main/webapp/app/entities/category-article/category-article.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/category-article/category-article.service.spec.ts	(date 1766503599151)
+@@ -102,7 +102,7 @@
+       });
+ 
+       it('should partial update a CategoryArticle', async () => {
+-        const patchObject = { label: 'BBBBBB', code: 'BBBBBB', descriptionFr: 'BBBBBB', descriptionEn: 'BBBBBB', ...new CategoryArticle() };
++        const patchObject = { label: 'BBBBBB', code: 'BBBBBB', descriptionFr: 'BBBBBB', ...new CategoryArticle() };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+ 
+         const expected = { ...returnedFromService };
+Index: src/main/webapp/app/entities/footers/footers.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/footers/footers.service.spec.ts b/src/main/webapp/app/entities/footers/footers.service.spec.ts
+--- a/src/main/webapp/app/entities/footers/footers.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/footers/footers.service.spec.ts	(date 1766503599150)
+@@ -95,7 +95,7 @@
+       });
+ 
+       it('should partial update a Footers', async () => {
+-        const patchObject = { ...new Footers() };
++        const patchObject = { logoFooters: 'BBBBBB', ...new Footers() };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+ 
+         const expected = { ...returnedFromService };
+Index: src/main/webapp/app/entities/headers/headers.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/headers/headers.service.spec.ts b/src/main/webapp/app/entities/headers/headers.service.spec.ts
+--- a/src/main/webapp/app/entities/headers/headers.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/headers/headers.service.spec.ts	(date 1766503599150)
+@@ -95,7 +95,7 @@
+       });
+ 
+       it('should partial update a Headers', async () => {
+-        const patchObject = { ...new Headers() };
++        const patchObject = { logoHeaders: 'BBBBBB', ...new Headers() };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+ 
+         const expected = { ...returnedFromService };
+Index: src/main/webapp/app/entities/subscribe/subscribe.service.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/subscribe/subscribe.service.spec.ts b/src/main/webapp/app/entities/subscribe/subscribe.service.spec.ts
+--- a/src/main/webapp/app/entities/subscribe/subscribe.service.spec.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/subscribe/subscribe.service.spec.ts	(date 1766503599152)
+@@ -105,7 +105,7 @@
+       });
+ 
+       it('should partial update a Subscribe', async () => {
+-        const patchObject = { countryKey: 'BBBBBB', ...new Subscribe() };
++        const patchObject = { email: 'BBBBBB', countryKey: 'BBBBBB', ...new Subscribe() };
+         const returnedFromService = Object.assign(patchObject, elemDefault);
+ 
+         const expected = { date: currentDate, ...returnedFromService };
+Index: src/main/webapp/app/entities/entities.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/entities.component.ts b/src/main/webapp/app/entities/entities.component.ts
+--- a/src/main/webapp/app/entities/entities.component.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/entities.component.ts	(date 1766503599145)
+@@ -6,6 +6,8 @@
+ import CategoryArticleService from './category-article/category-article.service';
+ import ArticleService from './article/article.service';
+ import SubscribeService from './subscribe/subscribe.service';
++import MessageService from './message/message.service';
++import SubjectService from './subject/subject.service';
+ import UserService from '@/entities/user/user.service';
+ // jhipster-needle-add-entity-service-to-entities-component-import - JHipster will import entities services here
+ 
+@@ -20,6 +22,8 @@
+     provide('categoryArticleService', () => new CategoryArticleService());
+     provide('articleService', () => new ArticleService());
+     provide('subscribeService', () => new SubscribeService());
++    provide('messageService', () => new MessageService());
++    provide('subjectService', () => new SubjectService());
+     // jhipster-needle-add-entity-service-to-entities-component - JHipster will import entities services here
+   },
+ });
+Index: src/main/webapp/app/entities/entities-menu.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/entities/entities-menu.vue b/src/main/webapp/app/entities/entities-menu.vue
+--- a/src/main/webapp/app/entities/entities-menu.vue	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/entities/entities-menu.vue	(date 1766503599134)
+@@ -24,6 +24,14 @@
+       <font-awesome-icon icon="asterisk" />
+       <span v-text="t$('global.menu.entities.subscribe')"></span>
+     </b-dropdown-item>
++    <b-dropdown-item to="/message">
++      <font-awesome-icon icon="asterisk" />
++      <span v-text="t$('global.menu.entities.message')"></span>
++    </b-dropdown-item>
++    <b-dropdown-item to="/subject">
++      <font-awesome-icon icon="asterisk" />
++      <span v-text="t$('global.menu.entities.subject')"></span>
++    </b-dropdown-item>
+     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
+   </div>
+ </template>
+Index: src/main/webapp/app/router/entities.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/app/router/entities.ts b/src/main/webapp/app/router/entities.ts
+--- a/src/main/webapp/app/router/entities.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/app/router/entities.ts	(date 1766503599148)
+@@ -25,6 +25,14 @@
+ const SubscribeUpdate = () => import('@/entities/subscribe/subscribe-update.vue');
+ const SubscribeDetails = () => import('@/entities/subscribe/subscribe-details.vue');
+ 
++const Message = () => import('@/entities/message/message.vue');
++const MessageUpdate = () => import('@/entities/message/message-update.vue');
++const MessageDetails = () => import('@/entities/message/message-details.vue');
++
++const Subject = () => import('@/entities/subject/subject.vue');
++const SubjectUpdate = () => import('@/entities/subject/subject-update.vue');
++const SubjectDetails = () => import('@/entities/subject/subject-details.vue');
++
+ // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
+ 
+ export default {
+@@ -174,6 +182,54 @@
+       name: 'SubscribeView',
+       component: SubscribeDetails,
+       meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'message',
++      name: 'Message',
++      component: Message,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'message/new',
++      name: 'MessageCreate',
++      component: MessageUpdate,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'message/:messageId/edit',
++      name: 'MessageEdit',
++      component: MessageUpdate,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'message/:messageId/view',
++      name: 'MessageView',
++      component: MessageDetails,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'subject',
++      name: 'Subject',
++      component: Subject,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'subject/new',
++      name: 'SubjectCreate',
++      component: SubjectUpdate,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'subject/:subjectId/edit',
++      name: 'SubjectEdit',
++      component: SubjectUpdate,
++      meta: { authorities: [Authority.USER] },
++    },
++    {
++      path: 'subject/:subjectId/view',
++      name: 'SubjectView',
++      component: SubjectDetails,
++      meta: { authorities: [Authority.USER] },
+     },
+     // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here
+   ],
+Index: src/main/webapp/i18n/en/global.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/i18n/en/global.json b/src/main/webapp/i18n/en/global.json
+--- a/src/main/webapp/i18n/en/global.json	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/i18n/en/global.json	(date 1766503599138)
+@@ -13,7 +13,9 @@
+         "appInfo": "App Info",
+         "categoryArticle": "Category Article",
+         "article": "Article",
+-        "subscribe": "Subscribe"
++        "subscribe": "Subscribe",
++        "message": "Message",
++        "subject": "Subject"
+       },
+       "account": {
+         "main": "Account",
+Index: src/main/webapp/i18n/fr/global.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/i18n/fr/global.json b/src/main/webapp/i18n/fr/global.json
+--- a/src/main/webapp/i18n/fr/global.json	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/main/webapp/i18n/fr/global.json	(date 1766503599136)
+@@ -13,7 +13,9 @@
+         "appInfo": "App Info",
+         "categoryArticle": "Category Article",
+         "article": "Article",
+-        "subscribe": "Subscribe"
++        "subscribe": "Subscribe",
++        "message": "Message",
++        "subject": "Subject"
+       },
+       "account": {
+         "main": "Compte",
+Index: src/test/java/com/devalgas/blog/web/rest/AppInfoResourceIT.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/devalgas/blog/web/rest/AppInfoResourceIT.java b/src/test/java/com/devalgas/blog/web/rest/AppInfoResourceIT.java
+--- a/src/test/java/com/devalgas/blog/web/rest/AppInfoResourceIT.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/java/com/devalgas/blog/web/rest/AppInfoResourceIT.java	(date 1766503599140)
+@@ -277,8 +277,6 @@
+         AppInfo partialUpdatedAppInfo = new AppInfo();
+         partialUpdatedAppInfo.setId(appInfo.getId());
+ 
+-        partialUpdatedAppInfo.keyInfo(UPDATED_KEY_INFO);
+-
+         restAppInfoMockMvc
+             .perform(
+                 patch(ENTITY_API_URL_ID, partialUpdatedAppInfo.getId())
+Index: src/test/java/com/devalgas/blog/web/rest/ArticleResourceIT.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/devalgas/blog/web/rest/ArticleResourceIT.java b/src/test/java/com/devalgas/blog/web/rest/ArticleResourceIT.java
+--- a/src/test/java/com/devalgas/blog/web/rest/ArticleResourceIT.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/java/com/devalgas/blog/web/rest/ArticleResourceIT.java	(date 1766503599143)
+@@ -500,17 +500,10 @@
+ 
+         partialUpdatedArticle
+             .labelEn(UPDATED_LABEL_EN)
+-            .descriptionFr(UPDATED_DESCRIPTION_FR)
+-            .markdownFr(UPDATED_MARKDOWN_FR)
+-            .markdownFrContentType(UPDATED_MARKDOWN_FR_CONTENT_TYPE)
++            .labelFr(UPDATED_LABEL_FR)
+             .markdownEn(UPDATED_MARKDOWN_EN)
+             .markdownEnContentType(UPDATED_MARKDOWN_EN_CONTENT_TYPE)
+-            .date(UPDATED_DATE)
+-            .badge(UPDATED_BADGE)
+-            .badgeContentType(UPDATED_BADGE_CONTENT_TYPE)
+-            .banner(UPDATED_BANNER)
+-            .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
+-            .stars(UPDATED_STARS);
++            .status(UPDATED_STATUS);
+ 
+         restArticleMockMvc
+             .perform(
+Index: src/test/java/com/devalgas/blog/web/rest/CategoryArticleResourceIT.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/devalgas/blog/web/rest/CategoryArticleResourceIT.java b/src/test/java/com/devalgas/blog/web/rest/CategoryArticleResourceIT.java
+--- a/src/test/java/com/devalgas/blog/web/rest/CategoryArticleResourceIT.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/java/com/devalgas/blog/web/rest/CategoryArticleResourceIT.java	(date 1766503599141)
+@@ -353,7 +353,12 @@
+         CategoryArticle partialUpdatedCategoryArticle = new CategoryArticle();
+         partialUpdatedCategoryArticle.setId(categoryArticle.getId());
+ 
+-        partialUpdatedCategoryArticle.label(UPDATED_LABEL);
++        partialUpdatedCategoryArticle
++            .label(UPDATED_LABEL)
++            .code(UPDATED_CODE)
++            .badge(UPDATED_BADGE)
++            .badgeContentType(UPDATED_BADGE_CONTENT_TYPE)
++            .descriptionEn(UPDATED_DESCRIPTION_EN);
+ 
+         restCategoryArticleMockMvc
+             .perform(
+Index: src/test/java/com/devalgas/blog/web/rest/HeadersResourceIT.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/devalgas/blog/web/rest/HeadersResourceIT.java b/src/test/java/com/devalgas/blog/web/rest/HeadersResourceIT.java
+--- a/src/test/java/com/devalgas/blog/web/rest/HeadersResourceIT.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/java/com/devalgas/blog/web/rest/HeadersResourceIT.java	(date 1766503599140)
+@@ -277,8 +277,6 @@
+         Headers partialUpdatedHeaders = new Headers();
+         partialUpdatedHeaders.setId(headers.getId());
+ 
+-        partialUpdatedHeaders.logoHeaders(UPDATED_LOGO_HEADERS).logoHeadersContentType(UPDATED_LOGO_HEADERS_CONTENT_TYPE);
+-
+         restHeadersMockMvc
+             .perform(
+                 patch(ENTITY_API_URL_ID, partialUpdatedHeaders.getId())
+Index: src/test/java/com/devalgas/blog/web/rest/SubscribeResourceIT.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/devalgas/blog/web/rest/SubscribeResourceIT.java b/src/test/java/com/devalgas/blog/web/rest/SubscribeResourceIT.java
+--- a/src/test/java/com/devalgas/blog/web/rest/SubscribeResourceIT.java	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/java/com/devalgas/blog/web/rest/SubscribeResourceIT.java	(date 1766503599143)
+@@ -39,8 +39,8 @@
+ @WithMockUser
+ class SubscribeResourceIT {
+ 
+-    private static final String DEFAULT_EMAIL = "XS*b'6@c.JI\"F8";
+-    private static final String UPDATED_EMAIL = "Nj.(@}e.G/I:";
++    private static final String DEFAULT_EMAIL = "+}@f6a.Lp5}/p";
++    private static final String UPDATED_EMAIL = "t{T!t@L'D.mu1N";
+ 
+     private static final String DEFAULT_LANG_KEY = "AA";
+     private static final String UPDATED_LANG_KEY = "BB";
+@@ -313,7 +313,7 @@
+         Subscribe partialUpdatedSubscribe = new Subscribe();
+         partialUpdatedSubscribe.setId(subscribe.getId());
+ 
+-        partialUpdatedSubscribe.date(UPDATED_DATE);
++        partialUpdatedSubscribe.countryKey(UPDATED_COUNTRY_KEY).date(UPDATED_DATE);
+ 
+         restSubscribeMockMvc
+             .perform(
+Index: src/test/javascript/cypress/e2e/entity/app-info.cy.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/javascript/cypress/e2e/entity/app-info.cy.ts b/src/test/javascript/cypress/e2e/entity/app-info.cy.ts
+--- a/src/test/javascript/cypress/e2e/entity/app-info.cy.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/javascript/cypress/e2e/entity/app-info.cy.ts	(date 1766503599152)
+@@ -160,11 +160,11 @@
+     });
+ 
+     it('should create an instance of AppInfo', () => {
+-      cy.get(`[data-cy="keyInfo"]`).type('géométrique rétablir bzzz');
+-      cy.get(`[data-cy="keyInfo"]`).should('have.value', 'géométrique rétablir bzzz');
++      cy.get(`[data-cy="keyInfo"]`).type('hisser antagoniste en dépit de');
++      cy.get(`[data-cy="keyInfo"]`).should('have.value', 'hisser antagoniste en dépit de');
+ 
+-      cy.get(`[data-cy="valueInfo"]`).type('du moment que');
+-      cy.get(`[data-cy="valueInfo"]`).should('have.value', 'du moment que');
++      cy.get(`[data-cy="valueInfo"]`).type('mature lorsque de peur que');
++      cy.get(`[data-cy="valueInfo"]`).should('have.value', 'mature lorsque de peur que');
+ 
+       cy.get(entityCreateSaveButtonSelector).click();
+ 
+Index: src/test/javascript/cypress/e2e/entity/article.cy.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/javascript/cypress/e2e/entity/article.cy.ts b/src/test/javascript/cypress/e2e/entity/article.cy.ts
+--- a/src/test/javascript/cypress/e2e/entity/article.cy.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/javascript/cypress/e2e/entity/article.cy.ts	(date 1766503599152)
+@@ -15,7 +15,7 @@
+   const articlePageUrlPattern = new RegExp('/article(\\?.*)?$');
+   const username = Cypress.env('E2E_USERNAME') ?? 'user';
+   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
+-  const articleSample = { labelEn: 'QVXu', labelFr: 'YEg"', status: 'CANCELLED', date: '2025-12-09T23:43:24.999Z' };
++  const articleSample = { labelEn: 'O]y}hq', labelFr: 'E.bu4', status: 'COMPLETED', date: '2025-12-10T13:01:56.466Z' };
+ 
+   let article;
+ 
+@@ -160,17 +160,17 @@
+     });
+ 
+     it('should create an instance of Article', () => {
+-      cy.get(`[data-cy="labelEn"]`).type('U');
+-      cy.get(`[data-cy="labelEn"]`).should('have.value', 'U');
++      cy.get(`[data-cy="labelEn"]`).type('I');
++      cy.get(`[data-cy="labelEn"]`).should('have.value', 'I');
+ 
+-      cy.get(`[data-cy="labelFr"]`).type('QBdn#');
+-      cy.get(`[data-cy="labelFr"]`).should('have.value', 'QBdn#');
++      cy.get(`[data-cy="labelFr"]`).type('K}0');
++      cy.get(`[data-cy="labelFr"]`).should('have.value', 'K}0');
+ 
+-      cy.get(`[data-cy="descriptionFr"]`).type('naguère vlan émérite');
+-      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'naguère vlan émérite');
++      cy.get(`[data-cy="descriptionFr"]`).type('après pis');
++      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'après pis');
+ 
+-      cy.get(`[data-cy="descriptionEn"]`).type('assez mairie');
+-      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'assez mairie');
++      cy.get(`[data-cy="descriptionEn"]`).type('écraser membre de l’équipe');
++      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'écraser membre de l’équipe');
+ 
+       cy.setFieldImageAsBytesOfEntity('markdownFr', 'integration-test.png', 'image/png');
+ 
+@@ -178,19 +178,19 @@
+ 
+       cy.get(`[data-cy="status"]`).select('INPROGRESS');
+ 
+-      cy.get(`[data-cy="date"]`).type('2025-12-10T10:10');
++      cy.get(`[data-cy="date"]`).type('2025-12-10T02:50');
+       cy.get(`[data-cy="date"]`).blur();
+-      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T10:10');
++      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T02:50');
+ 
+       cy.setFieldImageAsBytesOfEntity('badge', 'integration-test.png', 'image/png');
+ 
+       cy.setFieldImageAsBytesOfEntity('banner', 'integration-test.png', 'image/png');
+ 
+-      cy.get(`[data-cy="views"]`).type('6727');
+-      cy.get(`[data-cy="views"]`).should('have.value', '6727');
++      cy.get(`[data-cy="views"]`).type('19837');
++      cy.get(`[data-cy="views"]`).should('have.value', '19837');
+ 
+-      cy.get(`[data-cy="stars"]`).type('6542');
+-      cy.get(`[data-cy="stars"]`).should('have.value', '6542');
++      cy.get(`[data-cy="stars"]`).type('15510');
++      cy.get(`[data-cy="stars"]`).should('have.value', '15510');
+ 
+       // since cypress clicks submit too fast before the blob fields are validated
+       cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting
+Index: src/test/javascript/cypress/e2e/entity/category-article.cy.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/javascript/cypress/e2e/entity/category-article.cy.ts b/src/test/javascript/cypress/e2e/entity/category-article.cy.ts
+--- a/src/test/javascript/cypress/e2e/entity/category-article.cy.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/javascript/cypress/e2e/entity/category-article.cy.ts	(date 1766503599152)
+@@ -15,7 +15,7 @@
+   const categoryArticlePageUrlPattern = new RegExp('/category-article(\\?.*)?$');
+   const username = Cypress.env('E2E_USERNAME') ?? 'user';
+   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
+-  const categoryArticleSample = { label: 'Fy%[L', code: 'BR' };
++  const categoryArticleSample = { label: 'K9>{>', code: 'UZ' };
+ 
+   let categoryArticle;
+ 
+@@ -160,19 +160,19 @@
+     });
+ 
+     it('should create an instance of CategoryArticle', () => {
+-      cy.get(`[data-cy="label"]`).type('DvW/.');
+-      cy.get(`[data-cy="label"]`).should('have.value', 'DvW/.');
++      cy.get(`[data-cy="label"]`).type('N$`|cE');
++      cy.get(`[data-cy="label"]`).should('have.value', 'N$`|cE');
+ 
+-      cy.get(`[data-cy="code"]`).type('JM');
+-      cy.get(`[data-cy="code"]`).should('have.value', 'JM');
++      cy.get(`[data-cy="code"]`).type('YI');
++      cy.get(`[data-cy="code"]`).should('have.value', 'YI');
+ 
+       cy.setFieldImageAsBytesOfEntity('badge', 'integration-test.png', 'image/png');
+ 
+-      cy.get(`[data-cy="descriptionFr"]`).type('moyennant bang');
+-      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'moyennant bang');
++      cy.get(`[data-cy="descriptionFr"]`).type('envers large');
++      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'envers large');
+ 
+-      cy.get(`[data-cy="descriptionEn"]`).type('au-dessus');
+-      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'au-dessus');
++      cy.get(`[data-cy="descriptionEn"]`).type('raisonner membre titulaire');
++      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'raisonner membre titulaire');
+ 
+       // since cypress clicks submit too fast before the blob fields are validated
+       cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting
+Index: src/test/javascript/cypress/e2e/entity/subscribe.cy.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/javascript/cypress/e2e/entity/subscribe.cy.ts b/src/test/javascript/cypress/e2e/entity/subscribe.cy.ts
+--- a/src/test/javascript/cypress/e2e/entity/subscribe.cy.ts	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/src/test/javascript/cypress/e2e/entity/subscribe.cy.ts	(date 1766503599153)
+@@ -15,7 +15,7 @@
+   const subscribePageUrlPattern = new RegExp('/subscribe(\\?.*)?$');
+   const username = Cypress.env('E2E_USERNAME') ?? 'user';
+   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
+-  const subscribeSample = { email: 'w-?@yb.\\6' };
++  const subscribeSample = { email: 'Y\\}HHx@mB7wP.F' };
+ 
+   let subscribe;
+ 
+@@ -160,18 +160,18 @@
+     });
+ 
+     it('should create an instance of Subscribe', () => {
+-      cy.get(`[data-cy="email"]`).type('H<)s:+@I|E.=d!X{');
+-      cy.get(`[data-cy="email"]`).should('have.value', 'H<)s:+@I|E.=d!X{');
++      cy.get(`[data-cy="email"]`).type("p;1[d+@2kR-6.'Wj?");
++      cy.get(`[data-cy="email"]`).should('have.value', "p;1[d+@2kR-6.'Wj?");
+ 
+-      cy.get(`[data-cy="langKey"]`).type('ra');
+-      cy.get(`[data-cy="langKey"]`).should('have.value', 'ra');
++      cy.get(`[data-cy="langKey"]`).type('av');
++      cy.get(`[data-cy="langKey"]`).should('have.value', 'av');
+ 
+-      cy.get(`[data-cy="countryKey"]`).type('de peur que');
+-      cy.get(`[data-cy="countryKey"]`).should('have.value', 'de peur que');
++      cy.get(`[data-cy="countryKey"]`).type('supposer de manière à ce que quasiment');
++      cy.get(`[data-cy="countryKey"]`).should('have.value', 'supposer de manière à ce que quasiment');
+ 
+-      cy.get(`[data-cy="date"]`).type('2025-12-22T05:26');
++      cy.get(`[data-cy="date"]`).type('2025-12-21T14:39');
+       cy.get(`[data-cy="date"]`).blur();
+-      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-22T05:26');
++      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-21T14:39');
+ 
+       cy.get(entityCreateSaveButtonSelector).click();
+ 
+Index: .yo-rc.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.yo-rc.json b/.yo-rc.json
+--- a/.yo-rc.json	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/.yo-rc.json	(date 1766503597645)
+@@ -17,12 +17,12 @@
+     "enableHibernateCache": true,
+     "enableSwaggerCodegen": true,
+     "enableTranslation": true,
+-    "entities": ["Headers", "Footers", "AppInfo", "CategoryArticle", "Article", "Subscribe"],
++    "entities": ["Headers", "Footers", "AppInfo", "CategoryArticle", "Article", "Subscribe", "Message", "Subject"],
+     "feignClient": null,
+     "jhipsterVersion": "8.11.0",
+     "jwtSecretKey": "YjRmYTBmYzhjNDc0OTA2NTZjZDJmYTA3Y2RkNjZjZWU2YWRiMDdlOGE5MjU1Zjg1YzdmM2EyODA5OGE3MjI1OWE3NjZkYjdjODU4OGU2NjhkY2Q3YWQyMGJiNjhkYjMyNWFkNThlN2QxZGZmOGMzNjM3YzM0NjBlZTFkYTdiYjM=",
+     "languages": ["fr", "en"],
+-    "lastLiquibaseTimestamp": 1766404719000,
++    "lastLiquibaseTimestamp": 1766503598000,
+     "microfrontend": null,
+     "microfrontends": [],
+     "nativeLanguage": "fr",
+Index: devalgas.jdl
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/devalgas.jdl b/devalgas.jdl
+--- a/devalgas.jdl	(revision a7cd88f74483bbd81e290a85d105267648c6ebe6)
++++ b/devalgas.jdl	(date 1766503519377)
+@@ -67,6 +67,32 @@
+   date ZonedDateTime
+ }
+ 
++
++/**
++ * Message entity
++ * @author Devalgas
++ */
++entity Message {
++  name String maxlength(256) required
++  email String required pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)
++  phone String pattern(/^\+?[0-9]{1,4}?[-.\s]?(\(?\d{1,3}?\)?[-.\s]?)?\d{3}[-.\s]?\d{3}[-.\s]?\d{4}$/)
++  message String required maxlength(256)
++  file AnyBlob maxbytes(5242880)
++  date ZonedDateTime
++  langKey String minlength(2) maxlength(2)
++  countryKey String minlength(2)
++}
++
++/**
++ * This is a subject
++ * subject a class
++ * @author Devalgas
++ */
++entity Subject {
++  titleFr String maxlength(256) required
++  titleEn String maxlength(256) required
++}
++
+ /**
+  * ArticleStatus a enum
+  * @author Devalgas
+@@ -85,6 +111,11 @@
+   Article{categoryArticle(label) } to CategoryArticle
+ }
+ 
++relationship ManyToOne {
++  Message{subject(titleFr) required} to Subject
++}
++
++
+ 
+ // Set pagination options
+ // paginate Headers, Footers with infinite-scroll

@@ -95,7 +95,7 @@ describe('Service Tests', () => {
       });
 
       it('should partial update a AppInfo', async () => {
-        const patchObject = { valueInfo: 'BBBBBB', ...new AppInfo() };
+        const patchObject = { ...new AppInfo() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
         const expected = { ...returnedFromService };

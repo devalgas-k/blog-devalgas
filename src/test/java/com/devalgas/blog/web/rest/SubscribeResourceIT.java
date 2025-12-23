@@ -39,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class SubscribeResourceIT {
 
-    private static final String DEFAULT_EMAIL = "XS*b'6@c.JI\"F8";
-    private static final String UPDATED_EMAIL = "Nj.(@}e.G/I:";
+    private static final String DEFAULT_EMAIL = "+}@f6a.Lp5}/p";
+    private static final String UPDATED_EMAIL = "t{T!t@L'D.mu1N";
 
     private static final String DEFAULT_LANG_KEY = "AA";
     private static final String UPDATED_LANG_KEY = "BB";
@@ -313,7 +313,7 @@ class SubscribeResourceIT {
         Subscribe partialUpdatedSubscribe = new Subscribe();
         partialUpdatedSubscribe.setId(subscribe.getId());
 
-        partialUpdatedSubscribe.date(UPDATED_DATE);
+        partialUpdatedSubscribe.countryKey(UPDATED_COUNTRY_KEY).date(UPDATED_DATE);
 
         restSubscribeMockMvc
             .perform(

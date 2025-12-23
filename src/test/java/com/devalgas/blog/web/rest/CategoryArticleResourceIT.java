@@ -353,7 +353,12 @@ class CategoryArticleResourceIT {
         CategoryArticle partialUpdatedCategoryArticle = new CategoryArticle();
         partialUpdatedCategoryArticle.setId(categoryArticle.getId());
 
-        partialUpdatedCategoryArticle.label(UPDATED_LABEL);
+        partialUpdatedCategoryArticle
+            .label(UPDATED_LABEL)
+            .code(UPDATED_CODE)
+            .badge(UPDATED_BADGE)
+            .badgeContentType(UPDATED_BADGE_CONTENT_TYPE)
+            .descriptionEn(UPDATED_DESCRIPTION_EN);
 
         restCategoryArticleMockMvc
             .perform(

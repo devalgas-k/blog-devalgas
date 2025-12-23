@@ -1,0 +1,27 @@
+{
+  "annotations": {
+    "changelogDate": "20251223152638"
+  },
+  "applications": "*",
+  "documentation": "This is a subject\\nsubject a class\\n@author Devalgas",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "titleFr",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "256"
+    },
+    {
+      "fieldName": "titleEn",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "256"
+    }
+  ],
+  "name": "Subject",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}
