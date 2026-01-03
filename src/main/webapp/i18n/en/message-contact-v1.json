@@ -1,0 +1,35 @@
+{
+  "devalgasApp": {
+    "messageContactV1": {
+      "title": "Have a need? An idea? Let's discuss it!",
+      "name": "Enter your name *",
+      "mail": "Enter your mail address *",
+      "message": "Enter your message *",
+      "companyName": "Company",
+      "contact": "Get in touch",
+      "file": "File",
+      "sent": "Sent",
+      "subject": "Subject",
+      "phone": "Phone",
+      "messages": {
+        "error": {
+          "recaptchaRequired": "Please verify the reCAPTCHA before sending"
+        }
+      },
+      "success": {
+        "validEmail": "<strong>Message sent !</strong> \uD83D\uDE80",
+        "messageSent": "Your message has been sent successfully.",
+        "sent": "Sent"
+      },
+      "validation": {
+        "email": "Value is not a valid email address",
+        "file": {
+          "maxsize": "File size must not exceed 5 MB"
+        },
+        "phone": {
+          "pattern": "Phone number format is not valid, Ex: +25055010203"
+        }
+      }
+    }
+  }
+}

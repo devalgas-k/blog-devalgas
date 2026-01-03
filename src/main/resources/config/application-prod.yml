@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/devalgas
-    username: devalgas
-    password:
+    url: jdbc:postgresql://${AZURE_POSTGRES_FLEXIBLE_HOST:localhost}:${AZURE_POSTGRES_FLEXIBLE_PORT:5432}/${AZURE_POSTGRES_FLEXIBLE_DB:devalgas}?sslmode=require
+    username: ${AZURE_POSTGRES_FLEXIBLE_USER:devalgas}
+    password: ${AZURE_POSTGRES_FLEXIBLE_PASSWORD:}
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -43,10 +43,10 @@ spring:
   liquibase:
     contexts: prod
   mail:
-    host: localhost
-    port: 25
-    username:
-    password:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USER:}
+    password: ${MAIL_PASSWORD:}
   thymeleaf:
     cache: true
 

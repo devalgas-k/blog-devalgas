@@ -15,7 +15,7 @@ describe('Subscribe e2e test', () => {
   const subscribePageUrlPattern = new RegExp('/subscribe(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const subscribeSample = { email: 'w-?@yb.\\6' };
+  const subscribeSample = { email: 'Y\\}HHx@mB7wP.F' };
 
   let subscribe;
 
@@ -160,18 +160,18 @@ describe('Subscribe e2e test', () => {
     });
 
     it('should create an instance of Subscribe', () => {
-      cy.get(`[data-cy="email"]`).type('H<)s:+@I|E.=d!X{');
-      cy.get(`[data-cy="email"]`).should('have.value', 'H<)s:+@I|E.=d!X{');
+      cy.get(`[data-cy="email"]`).type("p;1[d+@2kR-6.'Wj?");
+      cy.get(`[data-cy="email"]`).should('have.value', "p;1[d+@2kR-6.'Wj?");
 
-      cy.get(`[data-cy="langKey"]`).type('ra');
-      cy.get(`[data-cy="langKey"]`).should('have.value', 'ra');
+      cy.get(`[data-cy="langKey"]`).type('av');
+      cy.get(`[data-cy="langKey"]`).should('have.value', 'av');
 
-      cy.get(`[data-cy="countryKey"]`).type('de peur que');
-      cy.get(`[data-cy="countryKey"]`).should('have.value', 'de peur que');
+      cy.get(`[data-cy="countryKey"]`).type('supposer de manière à ce que quasiment');
+      cy.get(`[data-cy="countryKey"]`).should('have.value', 'supposer de manière à ce que quasiment');
 
-      cy.get(`[data-cy="date"]`).type('2025-12-22T05:26');
+      cy.get(`[data-cy="date"]`).type('2025-12-21T14:39');
       cy.get(`[data-cy="date"]`).blur();
-      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-22T05:26');
+      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-21T14:39');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

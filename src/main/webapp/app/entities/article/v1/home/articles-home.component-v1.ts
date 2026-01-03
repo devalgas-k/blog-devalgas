@@ -1,4 +1,4 @@
-import { type Ref, defineComponent, inject, onMounted, ref, watch } from 'vue';
+import { type Ref, defineAsyncComponent, defineComponent, inject, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { type IArticle } from '@/shared/model/article.model';
@@ -8,14 +8,20 @@ import { useAlertService } from '@/shared/alert/alert.service';
 import ArticleServiceV1 from '../article.service-v1';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import ArticleInfo from '@/entities/article/v1/info/article-info-v1.vue';
+const ArticleInfo = defineAsyncComponent(() => import('@/entities/article/v1/info/article-info-v1.vue'));
+import Skeleton from 'primevue/skeleton';
 
+/**
+ * Composant V1 de page d’accueil des articles.
+ * Liste paginée des articles avec projection summary, tri et skeleton lors du chargement.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Article',
   components: {
     FontAwesomeIcon,
     'article-info': ArticleInfo,
+    'p-skeleton': Skeleton,
   },
   setup() {
     const { t: t$ } = useI18n();
@@ -25,7 +31,7 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const itemsPerPage = ref(10);
-    const queryCount: Ref<number> = ref(null);
+    const queryCount: Ref<number | null> = ref(null);
     const page: Ref<number> = ref(1);
     const propOrder = ref('id');
     const reverse = ref(false);
@@ -59,8 +65,8 @@ export default defineComponent({
         totalItems.value = Number(res.headers['x-total-count']);
         queryCount.value = totalItems.value;
         articles.value = res.data;
-      } catch (err) {
-        alertService.showHttpError(err.response);
+      } catch (err: any) {
+        alertService.showHttpError(err?.response);
       } finally {
         isFetching.value = false;
       }
@@ -74,26 +80,14 @@ export default defineComponent({
       await retrieveArticles();
     });
 
-    const removeId: Ref<number> = ref(null);
+    const removeId: Ref<number | null> = ref(null);
     const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IArticle) => {
-      removeId.value = instance.id;
+      removeId.value = instance.id ?? null;
       removeEntity.value.show();
     };
     const closeDialog = () => {
       removeEntity.value.hide();
-    };
-    const removeArticle = async () => {
-      try {
-        await articleService().delete(removeId.value);
-        const message = t$('devalgasApp.article.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
-        removeId.value = null;
-        retrieveArticles();
-        closeDialog();
-      } catch (error) {
-        alertService.showHttpError(error.response);
-      }
     };
 
     const changeOrder = (newOrder: string) => {
@@ -134,7 +128,6 @@ export default defineComponent({
       removeEntity,
       prepareRemove,
       closeDialog,
-      removeArticle,
       itemsPerPage,
       queryCount,
       page,

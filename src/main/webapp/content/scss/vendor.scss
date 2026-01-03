@@ -31,6 +31,9 @@ eg $input-color: red;
   .row.jh-entity-details > dd {
     padding: 0.5em 0;
   }
+  .dropdown-item {
+    padding: 0.5rem 0px;
+  }
   @media screen and (min-width: 768px) {
     .row.jh-entity-details {
       grid-template-columns: minmax(180px, 30%) 1fr;
@@ -74,6 +77,10 @@ eg $input-color: red;
   .row.jh-entity-details > dd {
     padding: 0.5em 0;
   }
+  .dropdown-item {
+    padding: 0.5rem 0px;
+  }
+
   @media screen and (min-width: 768px) {
     .row.jh-entity-details {
       grid-template-columns: minmax(180px, 30%) 1fr;

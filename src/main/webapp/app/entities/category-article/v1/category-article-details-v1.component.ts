@@ -7,6 +7,10 @@ import { type ICategoryArticle } from '@/shared/model/category-article.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 import CategoryArticleServiceV1 from './category-article-v1.service';
 
+/**
+ * Composant V1 d’affichage des détails d’une catégorie d’articles.
+ * Récupère la catégorie par identifiant et expose ses données au template.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'CategoryArticleDetailsV1',
@@ -22,17 +26,17 @@ export default defineComponent({
     const previousState = () => router.go(-1);
     const categoryArticle: Ref<ICategoryArticle> = ref({});
 
-    const retrieveCategoryArticle = async categoryArticleId => {
+    const retrieveCategoryArticle = async (categoryArticleId: number) => {
       try {
         const res = await categoryArticleService().find(categoryArticleId);
         categoryArticle.value = res;
-      } catch (error) {
-        alertService.showHttpError(error.response);
+      } catch (error: any) {
+        alertService.showHttpError(error?.response);
       }
     };
 
     if (route.params?.categoryArticleId) {
-      retrieveCategoryArticle(route.params.categoryArticleId);
+      retrieveCategoryArticle(Number(route.params.categoryArticleId));
     }
 
     return {

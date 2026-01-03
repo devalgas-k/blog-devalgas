@@ -500,17 +500,10 @@ class ArticleResourceIT {
 
         partialUpdatedArticle
             .labelEn(UPDATED_LABEL_EN)
-            .descriptionFr(UPDATED_DESCRIPTION_FR)
-            .markdownFr(UPDATED_MARKDOWN_FR)
-            .markdownFrContentType(UPDATED_MARKDOWN_FR_CONTENT_TYPE)
+            .labelFr(UPDATED_LABEL_FR)
             .markdownEn(UPDATED_MARKDOWN_EN)
             .markdownEnContentType(UPDATED_MARKDOWN_EN_CONTENT_TYPE)
-            .date(UPDATED_DATE)
-            .badge(UPDATED_BADGE)
-            .badgeContentType(UPDATED_BADGE_CONTENT_TYPE)
-            .banner(UPDATED_BANNER)
-            .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
-            .stars(UPDATED_STARS);
+            .status(UPDATED_STATUS);
 
         restArticleMockMvc
             .perform(

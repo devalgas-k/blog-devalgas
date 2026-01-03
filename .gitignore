@@ -148,6 +148,10 @@ Desktop.ini
 
 ######################
 # Code coverage
-######################
 coverage/
 .nyc_output/
+
+# Environment variables
+.env
+.env.*
+!.env.example

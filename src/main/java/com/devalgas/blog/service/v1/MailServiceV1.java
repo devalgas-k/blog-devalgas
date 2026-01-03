@@ -50,6 +50,15 @@ public class MailServiceV1 {
     }
 
     @Async
+    /**
+     * Send an email asynchronously.
+     *
+     * @param to the recipient email address.
+     * @param subject the email subject.
+     * @param content the email content.
+     * @param isMultipart whether the email is multipart.
+     * @param isHtml whether the content is HTML.
+     */
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         this.sendEmailSync(to, subject, content, isMultipart, isHtml);
     }
@@ -80,12 +89,24 @@ public class MailServiceV1 {
     }
 
     @Async
+    /**
+     * Send the confirmation email for a new subscribe.
+     *
+     * @param subscribe the subscribe DTO containing email and localization info.
+     */
     public void sendEmailNewSubscribe(SubscribeDTO subscribe) {
         LOG.debug("Sending confirmation email to '{}'", subscribe.getEmail());
         this.sendEmailFromTemplateSync(subscribe, "/mail/subscribeEmail.html", "email.subscribe.title");
     }
 
     @Async
+    /**
+     * Send an email using a template, asynchronously.
+     *
+     * @param subscribe the subscribe DTO containing email and localization info.
+     * @param templateName the Thymeleaf template path.
+     * @param titleKey the i18n key for the email subject.
+     */
     public void sendEmailFromTemplate(SubscribeDTO subscribe, String templateName, String titleKey) {
         this.sendEmailFromTemplateSync(subscribe, templateName, titleKey);
     }

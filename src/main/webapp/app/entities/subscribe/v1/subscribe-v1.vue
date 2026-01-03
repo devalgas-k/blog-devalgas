@@ -1,5 +1,5 @@
 <template>
-  <div class="newsletter w-100">
+  <div id="newsletter" class="newsletter w-100">
     <div class="subscribe ml-4">
       <div class="row">
         <div class="col-sm-12">
@@ -18,19 +18,13 @@
               v-text="t$('devalgasApp.subscribeV1.messages.error.recaptchaRequired')"
             ></h6>
             <h6
-              class="alert alert-primary text-dark font-weight-bold"
-              role="alert"
-              v-if="success"
-              v-html="t$('devalgasApp.subscribeV1.messages.success.validEmail')"
-            ></h6>
-            <h6
               class="alert alert-danger text-dark font-weight-bold"
               role="alert"
               v-if="errorEmailExists"
               v-html="t$('devalgasApp.subscribeV1.messages.error.emailexists')"
             ></h6>
             <h6
-              class="alert alert-danger font-weight-bold"
+              class="alert alert-danger text-dark font-weight-bold"
               role="alert"
               v-if="emailFormatError"
               v-text="t$('devalgasApp.subscribeV1.messages.error.invalidEmail')"
@@ -42,7 +36,7 @@
                 @verify="handleSuccess"
                 @error="handleError"
                 @expired="handleError"
-                v-if="!success && v$?.subscribe?.email?.$invalid === false"
+                v-if="!success && showRecaptcha"
               ></VueRecaptcha>
             </div>
             <div class="input-group" v-if="!success">
@@ -61,6 +55,10 @@
             <div class="text-center d-none">
               <a class="unsubscribe-link" href="#">Would you like to unsubscribe?</a>
             </div>
+
+            <div class="text-center mt-5">
+              <social-media></social-media>
+            </div>
           </div>
         </div>
       </div>
@@ -74,66 +72,67 @@
 .newsletter {
   background: rgba(0, 0, 0, 0.3) !important;
   padding: 40px 40px;
-}
+  z-index: 5;
 
-.newsletter .content {
-  margin: 0 auto;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
+  .content {
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
 
-.content-tuned {
-  font-size: 0.8rem;
-  margin-bottom: 34px !important;
-  color: Var(--white);
-}
+  h2 {
+    color: var(--white);
+    margin-bottom: 6px;
+  }
 
-h2 {
-  color: Var(--white);
-  margin-bottom: 6px;
-}
-.form-control {
-  height: 45px !important;
-  border-color: var(--white);
-  border-radius: 2px 0px 0px 2px;
-  /*
-  background: rgba(0, 0, 0, 0.3) !important;
-  */
-  color: var(--dark) !important;
-}
+  .content-tuned {
+    font-size: 0.8rem;
+    margin-bottom: 34px !important;
+    color: var(--white);
+  }
 
-.form-control:focus {
-  box-shadow: none !important;
-  border: 2px solid var(--dark);
-  border-color: none;
-}
+  .form-control {
+    height: 45px !important;
+    border-color: var(--white);
+    border-radius: 2px 0px 0px 2px;
+    /*
+    background: rgba(0, 0, 0, 0.3) !important;
+    */
+    color: var(--dark) !important;
 
-.btn {
-  border-radius: 0;
-  color: var(--white) !important;
-  font-weight: 900;
-}
+    &:focus {
+      color: #495057;
+      border: 2px solid var(--dark);
+      border-color: var(--primary);
+      outline: 0;
+      box-shadow: 0 0 0 0rem rgba(0, 123, 255, 0.25) !important;
+    }
+  }
 
-.btn:hover {
-  background: var(--primary);
-}
+  .btn {
+    border-radius: 0;
+    color: var(--white) !important;
+    font-weight: 900;
 
-.form-control:focus {
-  color: #495057;
-  border-color: var(--primary);
-  outline: 0;
-  box-shadow: 0 0 0 0rem rgba(0, 123, 255, 0.25) !important;
-}
+    &:hover {
+      background: var(--primary);
+    }
+  }
 
-.unsubscribe-link {
-  text-decoration: none !important;
-  font-size: 13px;
-  color: Var(--white);
-}
+  .unsubscribe-link {
+    text-decoration: none !important;
+    font-size: 13px;
+    color: var(--white);
 
-.unsubscribe-link:hover {
-  text-decoration: none !important;
-  color: Var(--white);
+    &:hover {
+      text-decoration: none !important;
+      color: var(--white);
+    }
+  }
+
+  :deep(.dp-social-media) {
+    justify-content: center !important;
+  }
 }
 </style>

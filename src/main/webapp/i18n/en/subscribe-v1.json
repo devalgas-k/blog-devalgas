@@ -8,7 +8,9 @@
           "emailexists": "<strong>This e-mail address is already registered </strong> Please choose another one."
         },
         "success": {
-          "validEmail": "<strong>Email saved !</strong> Thank you for your subscription \uD83C\uDF89"
+          "validEmail": "<strong>Email saved !</strong> Thank you for your subscription \uD83C\uDF89",
+          "subscribeSent": "Your subscription has been successfully saved.",
+          "sent": "Sent"
         }
       },
       "title": "SUBSCRIBE NOW",

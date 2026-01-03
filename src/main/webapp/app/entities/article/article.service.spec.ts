@@ -132,15 +132,14 @@ describe('Service Tests', () => {
 
       it('should partial update a Article', async () => {
         const patchObject = {
-          labelEn: 'BBBBBB',
+          labelFr: 'BBBBBB',
           descriptionEn: 'BBBBBB',
           markdownFr: 'BBBBBB',
+          markdownEn: 'BBBBBB',
           status: 'BBBBBB',
           date: dayjs(currentDate).format(DATE_TIME_FORMAT),
           badge: 'BBBBBB',
-          banner: 'BBBBBB',
           views: 1,
-          stars: 1,
           ...new Article(),
         };
         const returnedFromService = Object.assign(patchObject, elemDefault);

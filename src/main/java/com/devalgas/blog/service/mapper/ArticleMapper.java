@@ -19,6 +19,18 @@ public interface ArticleMapper extends EntityMapper<ArticleDTO, Article> {
     @Mapping(target = "removeCategoryArticle", ignore = true)
     Article toEntity(ArticleDTO articleDTO);
 
+    @Named("articleLabel")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "labelEn", source = "labelEn")
+    @Mapping(target = "labelFr", source = "labelFr")
+    ArticleDTO toDtoArticleLabel(Article article);
+
+    @Named("articleLabelSet")
+    default Set<ArticleDTO> toDtoArticleLabelSet(Set<Article> articles) {
+        return articles.stream().map(this::toDtoArticleLabel).collect(Collectors.toSet());
+    }
+
     @Named("categoryArticleLabel")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

@@ -15,7 +15,7 @@ describe('Article e2e test', () => {
   const articlePageUrlPattern = new RegExp('/article(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const articleSample = { labelEn: 'QVXu', labelFr: 'YEg"', status: 'CANCELLED', date: '2025-12-09T23:43:24.999Z' };
+  const articleSample = { labelEn: 'O]y}hq', labelFr: 'E.bu4', status: 'COMPLETED', date: '2025-12-10T13:01:56.466Z' };
 
   let article;
 
@@ -160,17 +160,17 @@ describe('Article e2e test', () => {
     });
 
     it('should create an instance of Article', () => {
-      cy.get(`[data-cy="labelEn"]`).type('U');
-      cy.get(`[data-cy="labelEn"]`).should('have.value', 'U');
+      cy.get(`[data-cy="labelEn"]`).type('I');
+      cy.get(`[data-cy="labelEn"]`).should('have.value', 'I');
 
-      cy.get(`[data-cy="labelFr"]`).type('QBdn#');
-      cy.get(`[data-cy="labelFr"]`).should('have.value', 'QBdn#');
+      cy.get(`[data-cy="labelFr"]`).type('K}0');
+      cy.get(`[data-cy="labelFr"]`).should('have.value', 'K}0');
 
-      cy.get(`[data-cy="descriptionFr"]`).type('naguère vlan émérite');
-      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'naguère vlan émérite');
+      cy.get(`[data-cy="descriptionFr"]`).type('après pis');
+      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'après pis');
 
-      cy.get(`[data-cy="descriptionEn"]`).type('assez mairie');
-      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'assez mairie');
+      cy.get(`[data-cy="descriptionEn"]`).type('écraser membre de l’équipe');
+      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'écraser membre de l’équipe');
 
       cy.setFieldImageAsBytesOfEntity('markdownFr', 'integration-test.png', 'image/png');
 
@@ -178,19 +178,19 @@ describe('Article e2e test', () => {
 
       cy.get(`[data-cy="status"]`).select('INPROGRESS');
 
-      cy.get(`[data-cy="date"]`).type('2025-12-10T10:10');
+      cy.get(`[data-cy="date"]`).type('2025-12-10T02:50');
       cy.get(`[data-cy="date"]`).blur();
-      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T10:10');
+      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T02:50');
 
       cy.setFieldImageAsBytesOfEntity('badge', 'integration-test.png', 'image/png');
 
       cy.setFieldImageAsBytesOfEntity('banner', 'integration-test.png', 'image/png');
 
-      cy.get(`[data-cy="views"]`).type('6727');
-      cy.get(`[data-cy="views"]`).should('have.value', '6727');
+      cy.get(`[data-cy="views"]`).type('19837');
+      cy.get(`[data-cy="views"]`).should('have.value', '19837');
 
-      cy.get(`[data-cy="stars"]`).type('6542');
-      cy.get(`[data-cy="stars"]`).should('have.value', '6542');
+      cy.get(`[data-cy="stars"]`).type('15510');
+      cy.get(`[data-cy="stars"]`).should('have.value', '15510');
 
       // since cypress clicks submit too fast before the blob fields are validated
       cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting

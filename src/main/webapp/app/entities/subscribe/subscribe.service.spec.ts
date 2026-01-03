@@ -105,7 +105,7 @@ describe('Service Tests', () => {
       });
 
       it('should partial update a Subscribe', async () => {
-        const patchObject = { countryKey: 'BBBBBB', ...new Subscribe() };
+        const patchObject = { email: 'BBBBBB', countryKey: 'BBBBBB', ...new Subscribe() };
         const returnedFromService = Object.assign(patchObject, elemDefault);
 
         const expected = { date: currentDate, ...returnedFromService };

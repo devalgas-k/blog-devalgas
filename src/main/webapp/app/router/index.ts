@@ -13,6 +13,22 @@ import articles from '@/router/articles';
 export const createRouter = () =>
   createVueRouter({
     history: createWebHistory(),
+    scrollBehavior(to, from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      }
+      if (to.hash) {
+        const el = document.querySelector(to.hash);
+        if (el) {
+          return {
+            el: to.hash,
+            behavior: 'smooth',
+          } as any;
+        }
+        return { left: 0, top: 0 };
+      }
+      return { left: 0, top: 0 };
+    },
     routes: [
       {
         path: '/',

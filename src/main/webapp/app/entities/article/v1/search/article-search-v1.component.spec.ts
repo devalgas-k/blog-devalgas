@@ -38,7 +38,7 @@ describe('ArticleSearchV1', () => {
       provide: {
         loginService: mockLoginService,
         alertService: () => mockAlertService,
-        categoryArticleService: () => ({ retrieve: mockRetrieve }),
+        categoryArticleService: () => ({ retrieveHome: mockRetrieve }),
         authenticated: computed(() => true),
         currentUsername: computed(() => 'john'),
         currentLanguage: computed(() => lang),
@@ -81,6 +81,118 @@ describe('ArticleSearchV1', () => {
     vm.search({ query: 'Des' });
     expect(vm.filteredArticles.length).toBe(1);
     expect(vm.filteredArticles[0].items.some((i: any) => i.label === 'Designer')).toBe(true);
+  });
+
+  it('affiche le label de catégorie en anglais', async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('en-US', 'dark'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: '' });
+    expect(vm.filteredArticles[0].label).toBe('Category A');
+  });
+
+  it('affiche le label de catégorie en français', async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('fr-FR', 'light'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: '' });
+    expect(vm.filteredArticles[0].label).toBe('Catégorie A');
+  });
+
+  it('filtre par label de catégorie en français', async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('fr-FR', 'light'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: 'Caté' });
+    expect(vm.filteredArticles.length).toBe(1);
+    expect(vm.filteredArticles[0].label).toBe('Catégorie A');
+    expect(vm.filteredArticles[0].items.length).toBe(2);
+  });
+
+  it('filtre par label de catégorie en anglais', async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('en-US', 'dark'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: 'Category' });
+    expect(vm.filteredArticles.length).toBe(1);
+    expect(vm.filteredArticles[0].label).toBe('Category A');
+    expect(vm.filteredArticles[0].items.length).toBe(2);
+  });
+
+  it('déduplique les items et expose categoryLabels en français', async () => {
+    const categoryGroupsDup = [
+      {
+        id: 10,
+        labelFr: 'Catégorie A',
+        labelEn: 'Category A',
+        articles: [{ id: 2, labelFr: 'Designer', labelEn: 'Designer' }],
+      },
+      {
+        id: 20,
+        labelFr: 'Catégorie B',
+        labelEn: 'Category B',
+        articles: [{ id: 2, labelFr: 'Designer', labelEn: 'Designer' }],
+      },
+    ];
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroupsDup,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('fr-FR', 'light'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: 'Des' });
+    const totalItems = vm.filteredArticles.reduce((sum: number, g: any) => sum + g.items.length, 0);
+    expect(totalItems).toBe(1);
+    const item = vm.filteredArticles[0].items[0];
+    expect(item.categoryLabels).toContain('Catégorie A');
+    expect(item.categoryLabels).toContain('Catégorie B');
+  });
+
+  it('déduplique les items et expose categoryLabels en anglais', async () => {
+    const categoryGroupsDup = [
+      {
+        id: 10,
+        labelFr: 'Catégorie A',
+        labelEn: 'Category A',
+        articles: [{ id: 1, labelFr: 'Developer', labelEn: 'Developer' }],
+      },
+      {
+        id: 20,
+        labelFr: 'Catégorie B',
+        labelEn: 'Category B',
+        articles: [{ id: 1, labelFr: 'Developer', labelEn: 'Developer' }],
+      },
+    ];
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroupsDup,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions('en-US', 'dark'));
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.search({ query: 'Dev' });
+    const totalItems = vm.filteredArticles.reduce((sum: number, g: any) => sum + g.items.length, 0);
+    expect(totalItems).toBe(1);
+    const item = vm.filteredArticles[0].items[0];
+    expect(item.categoryLabels).toContain('Category A');
+    expect(item.categoryLabels).toContain('Category B');
   });
 
   it('bascule viewArticle selon selectedArticle', async () => {

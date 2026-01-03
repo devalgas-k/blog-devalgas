@@ -8,7 +8,9 @@
           "emailexists": "<strong>Cette adresse e-mail est déjà enregistrée !</strong> Veuillez en choisir un autre."
         },
         "success": {
-          "validEmail": "<strong>Email enregistré !</strong> Merci pour votre abonnement \uD83C\uDF89"
+          "validEmail": "<strong>Email enregistré !</strong> Merci pour votre abonnement \uD83C\uDF89",
+          "subscribeSent": "Votre souscription a été envoyée avec succès.",
+          "sent": "Envoyé"
         }
       },
       "title": "ABONNEZ-VOUS MAINTENANT",

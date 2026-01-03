@@ -4,17 +4,23 @@ import { useI18n } from 'vue-i18n';
 import SubscribeV1Service from './subscribe-v1.service.ts';
 import { type ISubscribe, Subscribe } from '@/shared/model/subscribe.model';
 import { EMAIL_ALREADY_USED_TYPE } from '@/constants';
-import { email, helpers, maxLength, minLength, required } from '@vuelidate/validators';
+import { email, maxLength, minLength, required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
-import Message from 'primevue/message';
-
 import { VueRecaptcha } from 'vue-recaptcha';
 
+import SocialMedia from '@/core/social-media/social-media.vue';
+import { useAlertService } from '@/shared/alert/alert.service';
+
+/**
+ * Composant V1 d’abonnement à la newsletter.
+ * Gère le formulaire, la validation, reCAPTCHA et l’appel API pour créer l’abonné.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'SubscribeV1',
   components: {
     VueRecaptcha,
+    'social-media': SocialMedia,
   },
   validations() {
     return {
@@ -32,6 +38,7 @@ export default defineComponent({
     const error: Ref<string> = ref('');
     const subscribeService = inject('subscribeService', () => new SubscribeV1Service(), true);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+    const alertService = inject('alertService', () => useAlertService(), true);
     const errorEmailExists: Ref<string> = ref('');
     const success: Ref<boolean> = ref(false);
     const emailFormatError: Ref<boolean> = ref(false);
@@ -40,21 +47,17 @@ export default defineComponent({
 
     const subscribe: Ref<ISubscribe> = ref(new Subscribe());
 
-    const handleSuccess = (response: string) => {
+    const handleSuccess = (_response: string) => {
       recaptchaVerified.value = true;
       recaptchaError.value = false;
-      console.log('Recaptcha verified:', response);
     };
 
     const handleError = () => {
       recaptchaVerified.value = false;
       recaptchaError.value = true;
-      console.log('Recaptcha error');
     };
 
-    const siteKey = computed(() => {
-      return '6LcGCEEqAAAAAN4j0K5PEZHZhAMcdLKLFjuSULsn';
-    });
+    const siteKey = computed(() => RECAPTCHA_SITE_KEY);
 
     const validationRules = {
       subscribe: {
@@ -66,6 +69,9 @@ export default defineComponent({
     };
 
     const v$ = useVuelidate(validationRules, { subscribe });
+    const { t: t$ } = useI18n();
+
+    const showRecaptcha = computed(() => v$.value?.$invalid === false);
 
     const subscribeEmail = (): void => {
       error.value = '';
@@ -88,7 +94,18 @@ export default defineComponent({
       subscribeService
         .processSubscribe(subscribe.value)
         .then(() => {
-          success.value = true;
+          alertService.showSuccessCustom(
+            t$('devalgasApp.subscribeV1.messages.success.subscribeSent'),
+            t$('devalgasApp.subscribeV1.messages.success.sent'),
+            'primary',
+          );
+          subscribe.value = new Subscribe();
+          v$.value.$reset();
+          recaptchaVerified.value = false;
+          recaptchaError.value = false;
+          emailFormatError.value = false;
+          errorEmailExists.value = '';
+          success.value = false;
         })
         .catch(error => {
           success.value = false;
@@ -110,15 +127,17 @@ export default defineComponent({
       subscribe,
       currentLanguage,
       subscribeService,
+      alertService,
       errorEmailExists,
       emailFormatError,
-      t$: useI18n().t,
+      t$,
       v$,
       recaptchaError,
       siteKey,
       recaptchaVerified,
       handleSuccess,
       handleError,
+      showRecaptcha,
       subscribeEmail,
       refreshPage,
     };

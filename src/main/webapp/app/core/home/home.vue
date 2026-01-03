@@ -2,16 +2,14 @@
   <div class="row">
     <article-search class="col-12 mt-4"></article-search>
     <articles-home class="col-12 mt-1"></articles-home>
-    <p-separator class="col-12 mt-5" icon="envelopes-bulk"></p-separator>
-    <subscribe-v1 class="mt-3"></subscribe-v1>
   </div>
   <div class="home row d-none">
     <div class="col-md-3">
       <span class="hipster img-fluid rounded"></span>
     </div>
     <div class="col-md-9">
-      <h1 class="display-4" v-text="t$('home.title')"></h1>
-      <p class="lead" v-text="t$('home.subtitle')"></p>
+      <h1 class="display-4 home__title" v-text="t$('home.title')"></h1>
+      <p class="lead home__subtitle" v-text="t$('home.subtitle')"></p>
 
       <div>
         <div class="alert alert-success" v-if="authenticated">
@@ -31,8 +29,16 @@
 
       <p v-text="t$('home.question')"></p>
 
-      <ul>
-        <li><a href="https://www.jhipster.tech/" target="_blank" rel="noopener noreferrer" v-text="t$('home.link.homepage')"></a></li>
+      <ul class="home__links">
+        <li class="home__link-item">
+          <a
+            class="home__link"
+            href="https://www.jhipster.tech/"
+            target="_blank"
+            rel="noopener noreferrer"
+            v-text="t$('home.link.homepage')"
+          ></a>
+        </li>
         <li>
           <a
             href="https://stackoverflow.com/tags/jhipster/info"
@@ -71,3 +77,28 @@
 </template>
 
 <script lang="ts" src="./home.component.ts"></script>
+<style lang="scss" scoped>
+.home {
+  &__title {
+    margin-bottom: 0.5rem;
+  }
+  &__subtitle {
+    margin-bottom: 1rem;
+    color: var(--secondary);
+  }
+  & .alert {
+    margin-top: 0.5rem;
+  }
+  &__links {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+  &__link-item {
+    margin-bottom: 0.25rem;
+  }
+  &__link {
+    text-decoration: underline;
+  }
+}
+</style>

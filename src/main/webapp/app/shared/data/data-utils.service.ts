@@ -89,6 +89,25 @@ const useDataUtils = () => ({
   formatAsBytes(size) {
     return `${size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} bytes`;
   },
+  /**
+   * Method to find the megabyte size of the string provided
+   */
+  byteSizeMb(base64String) {
+    return this.formatAsMegabytes(this.size(base64String));
+  },
+  formatAsMegabytes(size) {
+    const mb = size / (1024 * 1024);
+    return `${mb.toFixed(2)} MB`;
+  },
+  /**
+   * Extract mime subtype from content type string (e.g., 'application/pdf' -> 'pdf')
+   */
+  mimeSubtype(contentType) {
+    const ct = (contentType ?? '').toString();
+    if (!ct) return '';
+    const slash = ct.indexOf('/');
+    return slash >= 0 ? ct.substring(slash + 1) : ct;
+  },
 
   setFileData(event, entity, field, isImage) {
     if (event && event.target.files && event.target.files[0]) {

@@ -142,4 +142,127 @@ class ArticleResourceV1IT {
     void getNonExistingArticleV1() throws Exception {
         restArticleMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
+
+    @Test
+    @Transactional
+    void getAllArticlesV1() throws Exception {
+        insertedArticle = articleRepository.saveAndFlush(article);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(article.getId().intValue())))
+            .andExpect(jsonPath("$.[*].labelEn").value(hasItem(DEFAULT_LABEL_EN)))
+            .andExpect(jsonPath("$.[*].labelFr").value(hasItem(DEFAULT_LABEL_FR)));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1() throws Exception {
+        insertedArticle = articleRepository.saveAndFlush(article);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary?sort=id,asc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(article.getId().intValue())))
+            .andExpect(jsonPath("$.[*].labelEn").value(hasItem(DEFAULT_LABEL_EN)))
+            .andExpect(jsonPath("$.[*].labelFr").value(hasItem(DEFAULT_LABEL_FR)))
+            .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1Headers() throws Exception {
+        Article a1 = createEntity();
+        a1.setLabelEn(DEFAULT_LABEL_EN + "S1");
+        a1.setLabelFr(DEFAULT_LABEL_FR + "S1");
+        articleRepository.saveAndFlush(a1);
+        Article a2 = createEntity();
+        a2.setLabelEn(DEFAULT_LABEL_EN + "S2");
+        a2.setLabelFr(DEFAULT_LABEL_FR + "S2");
+        articleRepository.saveAndFlush(a2);
+        Article a3 = createEntity();
+        a3.setLabelEn(DEFAULT_LABEL_EN + "S3");
+        a3.setLabelFr(DEFAULT_LABEL_FR + "S3");
+        articleRepository.saveAndFlush(a3);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("X-Total-Count", "3"))
+            .andExpect(jsonPath("$.length()").value(3));
+    }
+
+    @Test
+    @Transactional
+    void getArticleSummaryDetailsV1() throws Exception {
+        insertedArticle = articleRepository.saveAndFlush(article);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary/{id}", insertedArticle.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.id").value(insertedArticle.getId().intValue()))
+            .andExpect(jsonPath("$.labelEn").value(DEFAULT_LABEL_EN))
+            .andExpect(jsonPath("$.labelFr").value(DEFAULT_LABEL_FR))
+            .andExpect(jsonPath("$.markdownFrContentType").value(DEFAULT_MARKDOWN_FR_CONTENT_TYPE))
+            .andExpect(jsonPath("$.markdownFr").value(Base64.getEncoder().encodeToString(DEFAULT_MARKDOWN_FR)))
+            .andExpect(jsonPath("$.markdownEnContentType").value(DEFAULT_MARKDOWN_EN_CONTENT_TYPE))
+            .andExpect(jsonPath("$.markdownEn").value(Base64.getEncoder().encodeToString(DEFAULT_MARKDOWN_EN)))
+            .andExpect(jsonPath("$.date").value(sameInstant(DEFAULT_DATE)));
+    }
+
+    @Test
+    @Transactional
+    void getArticleSummaryDetailsV1NotFound() throws Exception {
+        restArticleMockMvc.perform(get(ENTITY_API_URL + "/summary/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesV1PaginationHeaders() throws Exception {
+        Article a1 = createEntity();
+        a1.setLabelEn(DEFAULT_LABEL_EN + "1");
+        a1.setLabelFr(DEFAULT_LABEL_FR + "1");
+        articleRepository.saveAndFlush(a1);
+        Article a2 = createEntity();
+        a2.setLabelEn(DEFAULT_LABEL_EN + "2");
+        a2.setLabelFr(DEFAULT_LABEL_FR + "2");
+        articleRepository.saveAndFlush(a2);
+        Article a3 = createEntity();
+        a3.setLabelEn(DEFAULT_LABEL_EN + "3");
+        a3.setLabelFr(DEFAULT_LABEL_FR + "3");
+        articleRepository.saveAndFlush(a3);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "?page=0&size=2&sort=id,asc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("X-Total-Count", "3"))
+            .andExpect(
+                org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                    .string("Link", org.hamcrest.Matchers.containsString("page=1"))
+            )
+            .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesV1SecondPage() throws Exception {
+        Article a1 = createEntity();
+        a1.setLabelEn(DEFAULT_LABEL_EN + "1");
+        a1.setLabelFr(DEFAULT_LABEL_FR + "1");
+        articleRepository.saveAndFlush(a1);
+        Article a2 = createEntity();
+        a2.setLabelEn(DEFAULT_LABEL_EN + "2");
+        a2.setLabelFr(DEFAULT_LABEL_FR + "2");
+        articleRepository.saveAndFlush(a2);
+        Article a3 = createEntity();
+        a3.setLabelEn(DEFAULT_LABEL_EN + "3");
+        a3.setLabelFr(DEFAULT_LABEL_FR + "3");
+        articleRepository.saveAndFlush(a3);
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "?page=1&size=2&sort=id,asc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.length()").value(1));
+    }
 }

@@ -1,9 +1,22 @@
-import { vitest } from 'vitest';
+import { describe, it, expect, vitest } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import { computed } from 'vue';
 vitest.mock('vue-router', () => ({
   useRouter: () => ({ currentRoute: { value: { path: '/' } } }),
+}));
+vitest.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    t: (msg: string) => {
+      if (msg === 'globalV1.separator.or') {
+        const doc: any = (globalThis as any).document;
+        const lang = (doc?.documentElement?.getAttribute('lang') ?? '').toString();
+        const base = lang.split(/[-_]/)[0]?.toLowerCase();
+        return base === 'fr' ? 'OU' : 'OR';
+      }
+      return msg;
+    },
+  }),
 }));
 
 import Headers from './headers-v1.vue';
@@ -78,5 +91,65 @@ describe('Headers V1', () => {
     const comp = wrapper.vm as any;
     await comp.changeLanguage('en');
     expect(changeLanguage).toHaveBeenCalledWith('en');
+  });
+
+  it('ferme le dropdown après saved', () => {
+    const wrapper = shallowMount(Headers, { global: mountOptions });
+    const hideSpy = vitest.fn();
+    const onContactSaved = (wrapper.vm as any).$options.methods.onContactSaved;
+    onContactSaved.call({ $refs: { contactDropdown: { hide: hideSpy } } });
+    expect(hideSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('separatorLabel vaut OU en fr et OR sinon', () => {
+    (globalThis as any).document.documentElement.setAttribute('lang', 'fr');
+    const wrapperFr = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, currentLanguage: computed(() => 'fr') },
+      },
+    });
+    const compFr = wrapperFr.vm as any;
+    expect(compFr.separatorLabel).toBe('OU');
+
+    (globalThis as any).document.documentElement.setAttribute('lang', 'en');
+    const wrapperEn = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, currentLanguage: computed(() => 'en') },
+      },
+    });
+    const compEn = wrapperEn.vm as any;
+    expect(compEn.separatorLabel).toBe('OR');
+
+    (globalThis as any).document.documentElement.setAttribute('lang', 'fr-FR');
+    const wrapperFrFr = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, currentLanguage: computed(() => 'fr-FR') },
+      },
+    });
+    const compFrFr = wrapperFrFr.vm as any;
+    expect(compFrFr.separatorLabel).toBe('OU');
+
+    (globalThis as any).document.documentElement.setAttribute('lang', 'fr_FR');
+    const wrapperFr_FR = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, currentLanguage: computed(() => 'fr_FR') },
+      },
+    });
+    const compFr_FR = wrapperFr_FR.vm as any;
+    expect(compFr_FR.separatorLabel).toBe('OU');
+
+    (globalThis as any).document.documentElement.setAttribute('lang', 'en-US');
+    const wrapperEnUS = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, currentLanguage: computed(() => 'en-US') },
+      },
+    });
+    const compEnUS = wrapperEnUS.vm as any;
+    expect(compEnUS.separatorLabel).toBe('OR');
   });
 });
