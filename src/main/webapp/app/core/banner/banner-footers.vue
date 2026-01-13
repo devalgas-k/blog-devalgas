@@ -1,6 +1,6 @@
 <template>
-  <footer class="footer-test">
-    <div class="footer-test__parralax">
+  <footer class="footer-test" :style="styleVars">
+    <div v-if="showParallax" class="footer-test__parralax">
       <div class="footer-test__parralax-trees"></div>
       <div class="footer-test__parralax-moto"></div>
       <div class="footer-test__parralax-secondplan"></div>
@@ -30,7 +30,6 @@ $footerText: #fff;
 
 .footer-test {
   position: relative;
-  margin-top: 10px;
   padding: 0.1rem 0;
   color: $footerText;
   background: $footerBg;
@@ -46,9 +45,7 @@ $footerText: #fff;
       text-transform: uppercase;
       display: flex;
       align-items: center;
-      * ~ span {
-        margin-left: 1rem;
-      }
+      gap: 1rem;
     }
   }
   a {
@@ -56,16 +53,12 @@ $footerText: #fff;
     align-items: center;
     color: $footerText;
     text-decoration: none;
-    * ~ span {
-      margin-left: 1rem;
-    }
+    gap: 1rem;
   }
-  &__nav {
-    &-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+  &__nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
   &__copyrights {
     padding-top: 3rem;
@@ -73,9 +66,7 @@ $footerText: #fff;
     border-top: 1px solid rgba($footerText, 0.2);
     p {
       display: flex;
-      a {
-        margin-left: 0.5rem;
-      }
+      gap: 0.5rem;
     }
   }
   @keyframes parralax {
@@ -146,7 +137,7 @@ $footerText: #fff;
       inset: 0;
       background-repeat: repeat-x;
       background-position-y: 100% !important;
-      animation: parralax 600s linear infinite;
+      animation: parralax var(--parallax-duration, 600s) linear infinite;
     }
     &-moto {
       position: absolute;
@@ -158,7 +149,7 @@ $footerText: #fff;
       // background: url('../../../content/images/moto-net.gif');
       background-repeat: no-repeat;
       transform-origin: 50% 80%;
-      animation: moto 5s linear infinite;
+      animation: moto var(--moto-duration, 5s) linear infinite;
     }
     &-voiture {
       position: absolute;
@@ -167,23 +158,23 @@ $footerText: #fff;
       margin-left: 250px;
       height: 114px;
       width: 206px;
-      background: url('../../../content/images/voiture-fumee.gif');
+      background: var(--voiture-image, url('../../../content/images/voiture-fumee.gif'));
       background-repeat: no-repeat;
-      animation: voiture 1s linear infinite;
+      animation: voiture var(--voiture-duration, 1s) linear infinite;
     }
     &-trees {
-      background-image: url('../../../content/images/arbres.png');
+      background-image: var(--trees-image, url('../../../content/images/arbres.png'));
       bottom: -60px;
-      animation-duration: 1000s;
+      animation-duration: var(--trees-duration, 1000s);
     }
     &-premierplan {
-      background-image: url('../../../content/images/premierplanv3.png');
-      animation-duration: 500s;
+      background-image: var(--premierplan-image, url('../../../content/images/premierplanv3.png'));
+      animation-duration: var(--premierplan-duration, 500s);
       //background-position-y: 27px !important;
     }
     &-secondplan {
-      background-image: url('../../../content/images/second-plan.png');
-      animation-duration: 600s;
+      background-image: var(--secondplan-image, url('../../../content/images/second-plan.png'));
+      animation-duration: var(--secondplan-duration, 600s);
     }
   }
 }

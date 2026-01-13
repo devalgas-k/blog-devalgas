@@ -48,6 +48,13 @@ import { faThumbsUp } from '@fortawesome/free-solid-svg-icons/faThumbsUp';
 import { faBorderAll } from '@fortawesome/free-solid-svg-icons/faBorderAll';
 import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faUpRightFromSquare';
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons/faCalendarDays';
+import { faEnvelopesBulk } from '@fortawesome/free-solid-svg-icons/faEnvelopesBulk';
+import { faBlog } from '@fortawesome/free-solid-svg-icons/faBlog';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
+import { faFileUpload } from '@fortawesome/free-solid-svg-icons/faFileUpload';
+import { faMessage } from '@fortawesome/free-solid-svg-icons/faMessage';
+import { faNewspaper } from '@fortawesome/free-solid-svg-icons/faNewspaper';
+import { faInbox } from '@fortawesome/free-solid-svg-icons/faInbox';
 
 const datetimeFormats: IntlDateTimeFormats = {
   fr: {
@@ -153,6 +160,13 @@ export function initFortAwesome(vue) {
     faBorderAll,
     faUpRightFromSquare,
     faCalendarDays,
+    faEnvelopesBulk,
+    faBlog,
+    faPaperPlane,
+    faFileUpload,
+    faMessage,
+    faNewspaper,
+    faInbox,
   );
 }
 export function initI18N(opts: any = {}) {

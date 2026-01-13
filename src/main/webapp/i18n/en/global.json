@@ -12,7 +12,10 @@
         "footers": "Footers",
         "appInfo": "App Info",
         "categoryArticle": "Category Article",
-        "article": "Article"
+        "article": "Article",
+        "subscribe": "Subscribe",
+        "message": "Message",
+        "subject": "Subject"
       },
       "account": {
         "main": "Account",

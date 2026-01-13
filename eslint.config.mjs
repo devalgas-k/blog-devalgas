@@ -18,7 +18,6 @@ export default tseslint.config(
   },
   { ignores: ['src/main/docker/'] },
   { ignores: ['target/classes/static/', 'target/'] },
-  { ignores: ['src/main/webapp/app/core/adsense/lib/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended.map(config =>
     config.name === 'typescript-eslint/base' ? config : { ...config, files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'] },
@@ -47,7 +46,7 @@ export default tseslint.config(
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',

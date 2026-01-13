@@ -10,14 +10,25 @@ import Title from '@/core/title/title.vue';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store.ts';
 import BannerFooters from '@/core/banner/banner-footers.vue';
+import MessageContactV1 from '@/entities/message/v1/message-contact/message-contact-v1.vue';
+import SubscribeV1 from '@/entities/subscribe/v1/subscribe-v1.vue';
+import Separator from '@/core/separator/separator.vue';
 
+/**
+ * Composant V1 de pied de page.
+ * Affiche les liens, informations de contact, intégrer le formulaire de contact et l’abonnement.
+ * Fournit des raccourcis vers les réseaux sociaux et actions rapides.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'FootersV1',
   components: {
+    'p-separator': Separator,
     'entities-menu': EntitiesMenu,
     'dp-title': Title,
     'banner-footers': BannerFooters,
+    'message-contact-v1': MessageContactV1,
+    'subscribe-v1': SubscribeV1,
   },
   setup() {
     const { t: t$ } = useI18n();
@@ -26,7 +37,7 @@ export default defineComponent({
     const alertService = inject('alertService', () => useAlertService(), true);
 
     const itemsPerPage = ref(20);
-    const queryCount: Ref<number> = ref(null);
+    const queryCount: Ref<number | null> = ref(null);
     const page: Ref<number> = ref(1);
     const propOrder = ref('id');
     const reverse = ref(false);
@@ -60,8 +71,8 @@ export default defineComponent({
         totalItems.value = Number(res.headers['x-total-count']);
         queryCount.value = totalItems.value;
         footers.value = res.data;
-      } catch (err) {
-        alertService.showHttpError(err.response);
+      } catch (err: any) {
+        alertService.showHttpError(err?.response);
       } finally {
         isFetching.value = false;
       }
@@ -75,25 +86,34 @@ export default defineComponent({
       await retrieveFooterss();
     });
 
-    const removeId: Ref<number> = ref(null);
+    const removeId: Ref<number | null> = ref(null);
     const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IFooters) => {
-      removeId.value = instance.id;
-      removeEntity.value.show();
+      removeId.value = instance.id ?? null;
+      const modal = removeEntity.value;
+      if (modal && typeof modal.show === 'function') {
+        modal.show();
+      }
     };
     const closeDialog = () => {
-      removeEntity.value.hide();
+      const modal = removeEntity.value;
+      if (modal && typeof modal.hide === 'function') {
+        modal.hide();
+      }
     };
     const removeFooters = async () => {
       try {
+        if (removeId.value == null) {
+          return;
+        }
         await footersService().delete(removeId.value);
         const message = t$('devalgasApp.footers.deleted', { param: removeId.value }).toString();
         alertService.showInfo(message, { variant: 'danger' });
         removeId.value = null;
         retrieveFooterss();
         closeDialog();
-      } catch (error) {
-        alertService.showHttpError(error.response);
+      } catch (error: any) {
+        alertService.showHttpError(error?.response);
       }
     };
 
@@ -129,26 +149,39 @@ export default defineComponent({
     };
 
     const openMailTo = () => {
-      window.location.href = 'mailto:kamgadevalgas@icloud.com';
+      window.location.href = MAIL_TO;
     };
 
     const openPhoneCall = () => {
-      window.location.href = 'tel:+23055040199';
+      window.location.href = PHONE_URL;
     };
 
-    const openSocialLink = (platform: string) => {
+    const openSocialLink = (platform: 'linkedin' | 'twitter' | 'github' | 'medium') => {
       const socialLinks = {
-        linkedin: 'https://www.linkedin.com/in/devalgas',
-        twitter: 'https://twitter.com/devalgas',
-        github: 'https://github.com/devalgas',
-        medium: 'https://medium.com/@devalgas',
+        linkedin: LINKEDIN_URL,
+        twitter: TWITTER_URL,
+        github: GITHUB_URL,
+        medium: MEDIUM_URL,
       };
       window.open(socialLinks[platform], '_blank');
     };
 
+    const showContactDropup = ref(false);
+    const toggleContactDropup = () => {
+      showContactDropup.value = !showContactDropup.value;
+    };
+    const onContactSaved = () => {
+      showContactDropup.value = false;
+    };
+    const openWhatsApp = () => {
+      window.location.href = WHATSAPP_URL;
+    };
+    const separatorLabel = computed(() => t$('globalV1.separator.or').toString());
+
     const store = useStore();
 
     const authenticated = computed(() => store.authenticated);
+    const writingHash = WRITING_HASH;
 
     return {
       footers,
@@ -176,6 +209,12 @@ export default defineComponent({
       openMailTo,
       openPhoneCall,
       openSocialLink,
+      showContactDropup,
+      toggleContactDropup,
+      onContactSaved,
+      openWhatsApp,
+      separatorLabel,
+      writingHash,
     };
   },
 });

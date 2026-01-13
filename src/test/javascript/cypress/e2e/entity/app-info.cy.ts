@@ -160,11 +160,11 @@ describe('AppInfo e2e test', () => {
     });
 
     it('should create an instance of AppInfo', () => {
-      cy.get(`[data-cy="keyInfo"]`).type('ouf récupérer');
-      cy.get(`[data-cy="keyInfo"]`).should('have.value', 'ouf récupérer');
+      cy.get(`[data-cy="keyInfo"]`).type('hisser antagoniste en dépit de');
+      cy.get(`[data-cy="keyInfo"]`).should('have.value', 'hisser antagoniste en dépit de');
 
-      cy.get(`[data-cy="valueInfo"]`).type('supporter hé');
-      cy.get(`[data-cy="valueInfo"]`).should('have.value', 'supporter hé');
+      cy.get(`[data-cy="valueInfo"]`).type('mature lorsque de peur que');
+      cy.get(`[data-cy="valueInfo"]`).should('have.value', 'mature lorsque de peur que');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

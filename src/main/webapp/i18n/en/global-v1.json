@@ -2,8 +2,14 @@
   "globalV1": {
     "headers": {
       "subTitle": "Software engineer",
-      "resources": "Ressources",
-      "theme": "Theme"
+      "blog": "Writing",
+      "theme": "Theme",
+      "newsletter": "Newsletter",
+      "contactUs": "Get in touch",
+      "mailbox": "Contact Us"
+    },
+    "separator": {
+      "or": "OR"
     },
     "themes": {
       "light": "Light",
@@ -11,14 +17,18 @@
     },
     "about": {
       "position": "Software engineer",
-      "placeholder": "\uD83D\uDD0D Discover my articles",
+      "placeholder": " \uD83D\uDD0D Explore",
       "view-article": "View article",
       "no-results-found": "No results found"
+    },
+    "actions": {
+      "reset": "Reset",
+      "sent": "Sent"
     },
     "footer": {
       "links": "Useful links",
       "info": "Contact info",
-      "copyright": "Copyright © 2024, All Right Reserved"
+      "copyright": "Copyright &copy; 2026, All Right Reserved"
     }
   }
 }

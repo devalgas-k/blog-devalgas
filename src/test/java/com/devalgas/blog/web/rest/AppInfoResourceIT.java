@@ -277,8 +277,6 @@ class AppInfoResourceIT {
         AppInfo partialUpdatedAppInfo = new AppInfo();
         partialUpdatedAppInfo.setId(appInfo.getId());
 
-        partialUpdatedAppInfo.keyInfo(UPDATED_KEY_INFO).valueInfo(UPDATED_VALUE_INFO);
-
         restAppInfoMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAppInfo.getId())

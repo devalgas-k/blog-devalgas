@@ -3,10 +3,18 @@ import { useI18n } from 'vue-i18n';
 
 import type { IArticle } from '@/shared/model/article.model';
 import { useDateFormat } from '@/shared/composables';
+import Skeleton from 'primevue/skeleton';
 
+/**
+ * Composant V1 d’info d’article.
+ * Affiche le label localisé, la date publiée et les tags de l’article.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ArticleInfoV1',
+  components: {
+    'p-skeleton': Skeleton,
+  },
   props: {
     article: {
       type: Object as PropType<IArticle>,

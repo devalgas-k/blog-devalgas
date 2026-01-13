@@ -1,28 +1,22 @@
 package com.devalgas.blog.web.rest.v1;
 
-import com.devalgas.blog.repository.ArticleRepository;
 import com.devalgas.blog.service.ArticleService;
 import com.devalgas.blog.service.dto.ArticleDTO;
-import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.devalgas.blog.service.dto.v1.ArticleDetailsBasicDTOV1;
+import com.devalgas.blog.service.dto.v1.ArticleHomeV1DTO;
+import com.devalgas.blog.service.v1.ArticleServiceV1;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.devalgas.blog.domain.Article}.
@@ -33,18 +27,12 @@ public class ArticleResourceV1 {
 
     private static final Logger log = LoggerFactory.getLogger(ArticleResourceV1.class);
 
-    private static final String ENTITY_NAME = "article";
-
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
-
     private final ArticleService articleService;
+    private final ArticleServiceV1 articleServiceV1;
 
-    private final ArticleRepository articleRepository;
-
-    public ArticleResourceV1(ArticleService articleService, ArticleRepository articleRepository) {
+    public ArticleResourceV1(ArticleService articleService, ArticleServiceV1 articleServiceV1) {
         this.articleService = articleService;
-        this.articleRepository = articleRepository;
+        this.articleServiceV1 = articleServiceV1;
     }
 
     /**
@@ -56,96 +44,8 @@ public class ArticleResourceV1 {
     @GetMapping("/{id}")
     public ResponseEntity<ArticleDTO> getArticle(@PathVariable("id") Long id) {
         log.debug("REST request to get Article : {}", id);
-        Optional<ArticleDTO> articleDTO = articleService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(articleDTO);
-    }
-
-    /**
-     * {@code POST  /v1/articles} : Create a new article.
-     *
-     * @param articleDTO the articleDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new articleDTO, or with status {@code 400 (Bad Request)} if the article has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PostMapping("")
-    public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO articleDTO) throws URISyntaxException {
-        log.debug("REST request to save Article : {}", articleDTO);
-        if (articleDTO.getId() != null) {
-            throw new BadRequestAlertException("A new article cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        articleDTO = articleService.save(articleDTO);
-        return ResponseEntity.created(new URI("/api/articles/" + articleDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
-            .body(articleDTO);
-    }
-
-    /**
-     * {@code PUT  /v1/articles/:id} : Updates an existing article.
-     *
-     * @param id the id of the articleDTO to save.
-     * @param articleDTO the articleDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated articleDTO,
-     * or with status {@code 400 (Bad Request)} if the articleDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the articleDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<ArticleDTO> updateArticle(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ArticleDTO articleDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to update Article : {}, {}", id, articleDTO);
-        if (articleDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, articleDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!articleRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        articleDTO = articleService.update(articleDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
-            .body(articleDTO);
-    }
-
-    /**
-     * {@code PATCH  /articles/:id} : Partial updates given fields of an existing article, field will ignore if it is null
-     *
-     * @param id the id of the articleDTO to save.
-     * @param articleDTO the articleDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated articleDTO,
-     * or with status {@code 400 (Bad Request)} if the articleDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the articleDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the articleDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ArticleDTO> partialUpdateArticle(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ArticleDTO articleDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update Article partially : {}, {}", id, articleDTO);
-        if (articleDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, articleDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!articleRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<ArticleDTO> result = articleService.partialUpdate(articleDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString())
-        );
+        ArticleDTO articleDTO = articleService.findOne(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok().body(articleDTO);
     }
 
     /**
@@ -169,5 +69,44 @@ public class ArticleResourceV1 {
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /articles/summary} : get projected summary of articles.
+     *
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projected articles in body.
+     */
+    @GetMapping("/summary")
+    public ResponseEntity<List<ArticleHomeV1DTO>> getAllArticlesV1(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        log.debug("REST request to get a page of optimized Articles V1");
+        Page<ArticleHomeV1DTO> page = articleServiceV1.findAllArticlesHome(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/summary/{id}")
+    /**
+     * {@code GET  /articles/summary/:id} : get optimized article details.
+     *
+     * Retrieves an optimized projection of an article with minimal fields, optionally localized.
+     *
+     * @param id the id of the article to retrieve.
+     * @param lang optional language code ("fr" or "en") to select localized fields.
+     * @param acceptLanguage optional HTTP header used to resolve language when {@code lang} is not provided.
+     * @param ifNoneMatch optional ETag header used to return {@code 304 (Not Modified)} when content hasn't changed.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the optimized article details,
+     *         or with status {@code 304 (Not Modified)} when ETag matches, or {@code 404 (Not Found)} when the article doesn't exist.
+     */
+    public ResponseEntity<ArticleDetailsBasicDTOV1> getArticleV1(
+        @PathVariable("id") Long id,
+        @RequestParam(value = "lang", required = false) String lang,
+        @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage
+    ) {
+        log.debug("REST request to get optimized Article V1 : {}, lang={}", id, lang);
+        ArticleDetailsBasicDTOV1 article = articleServiceV1
+            .findOneDetailsBasicProjectedV1(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return ResponseEntity.ok().body(article);
     }
 }

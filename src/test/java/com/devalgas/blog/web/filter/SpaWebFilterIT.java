@@ -85,4 +85,9 @@ class SpaWebFilterIT {
     void getUnmappedThirdLevelFile() throws Exception {
         mockMvc.perform(get("/foo/another/bar.js")).andExpect(status().isForbidden());
     }
+
+    @Test
+    void getPermittedStaticContentPath() throws Exception {
+        mockMvc.perform(get("/content/images/arbres.png")).andExpect(status().isOk());
+    }
 }

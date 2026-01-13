@@ -88,4 +88,14 @@ export default class AlertService {
     }
     this.showError(errorMessage);
   }
+
+  showSuccessCustom(toastMessage: string, title: string, variant: string) {
+    this.bvToast.toast(toastMessage, {
+      toaster: 'b-toaster-top-center',
+      title: title,
+      variant: variant,
+      solid: true,
+      autoHideDelay: 5000,
+    });
+  }
 }

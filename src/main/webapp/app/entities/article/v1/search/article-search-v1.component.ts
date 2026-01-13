@@ -9,7 +9,13 @@ import type { ICategoryArticle } from '@/shared/model/category-article.model';
 import CategoryArticleService from '@/entities/category-article/v1/category-article-v1.service';
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
+import ArticleInfoV1 from '../info/article-info-v1.vue';
 
+/**
+ * Composant V1 de recherche d’articles.
+ * Précharge les articles groupés par catégories et propose une recherche assistée,
+ * avec optimisation par langue et déduplication des résultats.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ArticleSearchV1',
@@ -17,12 +23,13 @@ export default defineComponent({
     'p-auto-complete': AutoComplete,
     'p-avatar': Avatar,
     'p-input-group': InputGroup,
-    InputGroup,
+    'article-info-v1': ArticleInfoV1,
   },
   setup: function () {
     const dataUtils = useDataUtils();
     const categoryArticleService = inject('categoryArticleService', () => new CategoryArticleService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const loginService = inject<any>('loginService', undefined);
 
     const defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const currentTheme = inject<ComputedRef<string>>(
@@ -33,8 +40,8 @@ export default defineComponent({
     const currentLanguage = inject<ComputedRef<string>>('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
 
     const isFetching = ref(false);
-    const itemsPerPage = ref(20);
-    const queryCount: Ref<number> = ref(null);
+    const itemsPerPage = ref(100);
+    const queryCount: Ref<number> = ref(0);
     const page: Ref<number> = ref(1);
     const totalItems = ref(0);
     const links: Ref<any> = ref({});
@@ -58,28 +65,55 @@ export default defineComponent({
           size: itemsPerPage.value,
           sort: sort(),
         };
-        const res = await categoryArticleService().retrieve(paginationQuery);
+        const res = await categoryArticleService().retrieveHome(paginationQuery);
         totalItems.value = Number(res.headers['x-total-count']);
         queryCount.value = totalItems.value;
         links.value = dataUtils.parseLinks(res.headers?.['link']);
         categoryArticles.value.push(...(res.data ?? []));
-      } catch (err) {
-        alertService.showHttpError(err.response);
+      } catch (err: any) {
+        alertService.showHttpError(err?.response);
       } finally {
         isFetching.value = false;
       }
     };
 
-    const viewArticle = ref(false);
     const selectedArticle = ref();
     const filteredArticles = ref<any[]>([]);
+    const lastQuery = ref<string>('');
 
     const search = (event: any) => {
       const query: string = event?.query ?? '';
+      lastQuery.value = query;
       const newFilteredGroups: any[] = [];
 
       const lang = (currentLanguage.value ?? 'fr').split('-')[0]?.toLowerCase();
       const useFr = lang === 'fr';
+      const seenKeys = new Set<string>();
+      const categoriesByArticleKey = new Map<string, Set<string>>();
+
+      // Precompute categories per article across all groups
+      for (const groupedArticle of categoryArticles.value) {
+        const groupLabel =
+          useFr && (groupedArticle as any).labelFr
+            ? (groupedArticle as any).labelFr
+            : !useFr && (groupedArticle as any).labelEn
+              ? (groupedArticle as any).labelEn
+              : groupedArticle.label;
+        const normalizedAll = (groupedArticle.articles ?? [])
+          .map(article => ({
+            ...article,
+            label: useFr ? article.labelFr : article.labelEn,
+          }))
+          .filter(a => a.label && typeof a.label === 'string');
+        for (const a of normalizedAll) {
+          const id = a.id as number | undefined;
+          const key = typeof id === 'number' ? `id:${id}` : `lbl:${(a.label ?? '').toString().trim().toLocaleLowerCase()}`;
+          if (!key) continue;
+          const set = categoriesByArticleKey.get(key) ?? new Set<string>();
+          if (groupLabel) set.add(groupLabel);
+          categoriesByArticleKey.set(key, set);
+        }
+      }
 
       for (const groupedArticle of categoryArticles.value) {
         const normalized = (groupedArticle.articles ?? [])
@@ -91,10 +125,54 @@ export default defineComponent({
 
         normalized.sort((a, b) => (a.label ?? '').localeCompare(b.label ?? ''));
 
-        const filteredItems = FilterService.filter(normalized, ['label', 'labelFr', 'labelEn'], query, FilterMatchMode.CONTAINS);
+        const filteredItems = FilterService.filter(normalized, ['label'], query, FilterMatchMode.CONTAINS);
 
-        if (filteredItems && filteredItems.length) {
-          newFilteredGroups.push({ ...groupedArticle, items: filteredItems });
+        const groupLabel =
+          useFr && (groupedArticle as any).labelFr
+            ? (groupedArticle as any).labelFr
+            : !useFr && (groupedArticle as any).labelEn
+              ? (groupedArticle as any).labelEn
+              : groupedArticle.label;
+
+        const q = (query ?? '').toLocaleLowerCase();
+        const categoryMatches = !!q && (groupLabel ?? '').toLocaleLowerCase().includes(q);
+
+        const itemsSrc = categoryMatches ? normalized : (filteredItems ?? []);
+        const filteredUnique = itemsSrc
+          .filter(a => {
+            const id = a.id as number | undefined;
+            const key = typeof id === 'number' ? `id:${id}` : `lbl:${(a.label ?? '').toString().trim().toLocaleLowerCase()}`;
+            if (!key) return true;
+            if (seenKeys.has(key)) return false;
+            seenKeys.add(key);
+            return true;
+          })
+          .map(a => {
+            const id = a.id as number | undefined;
+            const key = typeof id === 'number' ? `id:${id}` : `lbl:${(a.label ?? '').toString().trim().toLocaleLowerCase()}`;
+            const cats = Array.from(categoriesByArticleKey.get(key) ?? []);
+            return {
+              ...a,
+              categoryLabels: cats.join(', '),
+              categoryArticles: cats.map(label => ({ label })),
+            };
+          });
+
+        if (filteredUnique.length) {
+          const groupCatsSet = new Set<string>();
+          for (const it of filteredUnique) {
+            const id = it.id as number | undefined;
+            const key = typeof id === 'number' ? `id:${id}` : `lbl:${(it.label ?? '').toString().trim().toLocaleLowerCase()}`;
+            const cats = Array.from(categoriesByArticleKey.get(key) ?? []);
+            for (const c of cats) groupCatsSet.add(c);
+          }
+          const groupCategoryLabels = Array.from(groupCatsSet).join(', ');
+          newFilteredGroups.push({
+            ...groupedArticle,
+            label: groupLabel,
+            items: filteredUnique,
+            groupCategoryLabels,
+          });
         }
       }
 
@@ -103,19 +181,20 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveCategoryArticles();
+      search({ query: '' });
     });
 
-    watch(selectedArticle, value => {
-      if (value.label === undefined) {
-        viewArticle.value = false;
-      } else {
-        viewArticle.value = true;
-      }
+    watch(currentLanguage, () => {
+      search({ query: lastQuery.value });
     });
+
+    const viewArticle = computed(() => !!selectedArticle.value?.label);
 
     const backgroundImageSrc = computed(() =>
       currentTheme.value === 'dark' ? '/content/images/abort-d.jpg' : '/content/images/about.jpg',
     );
+
+    const imageBasePath = computed(() => (import.meta as any).env?.VITE_IMAGE_BASE_PATH ?? '/content/images');
 
     return {
       t$: useI18n().t,
@@ -126,6 +205,13 @@ export default defineComponent({
       currentTheme,
       currentLanguage,
       backgroundImageSrc,
+      imageBasePath,
+      panelMaxHeight: '300px',
+      openLogin: () => {
+        if (loginService && typeof loginService.openLogin === 'function') {
+          loginService.openLogin();
+        }
+      },
     };
   },
 });

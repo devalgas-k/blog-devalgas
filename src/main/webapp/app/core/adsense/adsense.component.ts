@@ -4,8 +4,8 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Adsense',
   props: {
-    client: { type: String, default: 'ca-pub-6181972205565553' },
-    adSlot: { type: String, default: '4433984685' },
+    client: { type: String, default: ADSENSE_CLIENT },
+    adSlot: { type: String, default: ADSENSE_SLOT },
     format: { type: String, default: 'auto' },
     responsive: { type: Boolean, default: true },
     test: { type: Boolean, default: import.meta.env.DEV },

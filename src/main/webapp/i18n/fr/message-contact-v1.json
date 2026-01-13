@@ -1,0 +1,41 @@
+{
+  "devalgasApp": {
+    "messageContactV1": {
+      "title": "Un besoin ? Une idée ? Discutons-en !",
+      "name": "Entrez votre nom *",
+      "mail": "Entrez votre adresse e-mail *",
+      "message": "Saisissez votre message *",
+      "companyName": "Société",
+      "contact": "Contact",
+      "file": "Fichier",
+      "sent": "Envoyer",
+      "subject": "Objet",
+      "phone": "Téléphone",
+      "messages": {
+        "error": {
+          "recaptchaRequired": "Veuillez valider le reCAPTCHA avant d'envoyer"
+        }
+      },
+      "success": {
+        "validEmail": "<strong>Message envoyé !</strong> \uD83D\uDE80",
+        "messageSent": "Votre message a été envoyée avec succès.",
+        "sent": "Envoyé"
+      },
+      "validation": {
+        "email": "La valeur n'est pas une adresse e-mail valide",
+        "file": {
+          "maxsize": "La taille du fichier ne doit pas dépasser 5 Mo"
+        },
+        "phone": {
+          "pattern": "Le format du numéro de téléphone n'est pas valide, Ex: +25055010203"
+        },
+        "name": {
+          "minlength": "This field is required to be at least { min } characters.",
+          "maxlength": "This field cannot be longer than { max } characters.",
+          "min": "This field should be at least { min }.",
+          "max": "This field cannot be more than { max }."
+        }
+      }
+    }
+  }
+}

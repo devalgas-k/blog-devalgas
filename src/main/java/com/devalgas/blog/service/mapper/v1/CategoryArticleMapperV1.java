@@ -9,6 +9,7 @@ import com.devalgas.blog.service.mapper.EntityMapper;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,8 +19,17 @@ import org.mapstruct.Named;
  */
 @Mapper(componentModel = "spring", uses = { ArticleMapper.class })
 public interface CategoryArticleMapperV1 extends EntityMapper<CategoryArticleDTO, CategoryArticle> {
-    @Mapping(target = "articles", source = "articles")
+    @Mapping(target = "articles", source = "articles", qualifiedByName = "articleLabelSet")
+    @Named("categoryArticleToDtoDefault")
     CategoryArticleDTO toDto(CategoryArticle s);
+
+    @Mapping(target = "articles", source = "articles", qualifiedByName = "articleForDetailSet")
+    @Named("categoryArticleToDtoWithArticles")
+    CategoryArticleDTO toDtoWithArticles(CategoryArticle s);
+
+    @Override
+    @IterableMapping(qualifiedByName = "categoryArticleToDtoDefault")
+    java.util.List<CategoryArticleDTO> toDto(java.util.List<CategoryArticle> entityList);
 
     @Mapping(target = "articles", ignore = true)
     @Mapping(target = "removeArticle", ignore = true)

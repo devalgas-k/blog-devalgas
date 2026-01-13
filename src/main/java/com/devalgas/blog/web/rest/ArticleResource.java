@@ -3,6 +3,7 @@ package com.devalgas.blog.web.rest;
 import com.devalgas.blog.repository.ArticleRepository;
 import com.devalgas.blog.service.ArticleService;
 import com.devalgas.blog.service.dto.ArticleDTO;
+import com.devalgas.blog.service.v1.ArticleServiceV1;
 import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -40,10 +41,13 @@ public class ArticleResource {
 
     private final ArticleService articleService;
 
+    private final ArticleServiceV1 articleServiceV1;
+
     private final ArticleRepository articleRepository;
 
-    public ArticleResource(ArticleService articleService, ArticleRepository articleRepository) {
+    public ArticleResource(ArticleService articleService, ArticleServiceV1 articleServiceV1, ArticleRepository articleRepository) {
         this.articleService = articleService;
+        this.articleServiceV1 = articleServiceV1;
         this.articleRepository = articleRepository;
     }
 
@@ -60,7 +64,8 @@ public class ArticleResource {
         if (articleDTO.getId() != null) {
             throw new BadRequestAlertException("A new article cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        articleDTO = articleService.save(articleDTO);
+        // TODO restore articleService
+        articleDTO = articleServiceV1.save(articleDTO);
         return ResponseEntity.created(new URI("/api/articles/" + articleDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
             .body(articleDTO);
@@ -92,8 +97,8 @@ public class ArticleResource {
         if (!articleRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
-        articleDTO = articleService.update(articleDTO);
+        // TODO Restore articleService
+        articleDTO = articleServiceV1.update(articleDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, articleDTO.getId().toString()))
             .body(articleDTO);
@@ -127,7 +132,8 @@ public class ArticleResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ArticleDTO> result = articleService.partialUpdate(articleDTO);
+        // Restore articleService
+        Optional<ArticleDTO> result = articleServiceV1.partialUpdate(articleDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,

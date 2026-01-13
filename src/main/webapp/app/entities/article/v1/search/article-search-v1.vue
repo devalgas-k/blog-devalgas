@@ -1,12 +1,12 @@
 <template>
   <div class="about" id="about">
-    <picture class="">
-      <img :src="backgroundImageSrc" alt="background" />
+    <picture class="about__picture" :style="{ '--matrix-url': `url('${imageBasePath}/matrix.png')` }">
+      <img class="about__image" :src="backgroundImageSrc" alt="background" />
     </picture>
-    <figure>
-      <figcaption>
+    <figure class="about__figure">
+      <figcaption class="about__caption">
         <div class="d-flex justify-content-center">
-          <p-input-group style="height: 55px; width: 40vw; min-width: 250px !important">
+          <p-input-group style="height: 55px; width: 40vw; min-width: 280px !important">
             <p-auto-complete
               icon="pi pi-search"
               severity="contrast"
@@ -14,36 +14,46 @@
               :model-value="selectedArticle"
               @update:model-value="selectedArticle = $event"
               :suggestions="filteredArticles"
-              :input-style="{ width: 35 + 'vw', background: 'rgba(0, 0, 0, 0.5)', border: '2px solid' }"
+              :input-style="{ width: 40 + 'vw', background: 'rgba(0, 0, 0, 0.5)' }"
               :select-on-focus="true"
               @complete="search"
               option-label="label"
               option-group-label="label"
               option-group-children="items"
               :placeholder="t$('globalV1.about.placeholder')"
+              :append-to="'self'"
+              :pt="{ panel: { style: { width: 40 + 'vw', maxHeight: panelMaxHeight, overflowY: 'auto' } } }"
             >
               <template #header>
                 <div></div>
               </template>
               <template #optiongroup="slotProps">
-                <div class="row country-item">
+                <div class="d-none">
                   <p-avatar
                     :image="'data:' + slotProps.item.badgeContentType + ';base64,' + slotProps.item.badge"
                     class="ml-3 mr-2"
                     shape="circle"
                   />
-                  <div class="mt-1">{{ slotProps.item.label }}</div>
+                  <div class="mt-1">
+                    <span>{{ slotProps.item.label }}</span>
+                  </div>
                 </div>
               </template>
               <template #item="slotProps">
-                <router-link
-                  v-if="viewArticle"
-                  :to="{ name: 'ArticleDetailsViewV1', params: { articleId: selectedArticle?.id } }"
-                  custom
-                  v-slot="{ navigate }"
-                >
-                  <div @click="navigate">{{ slotProps.item.label }}</div>
-                </router-link>
+                <template v-if="viewArticle">
+                  <router-link
+                    :to="{ name: 'ArticleDetailsViewV1', params: { articleId: selectedArticle?.id } }"
+                    custom
+                    v-slot="{ navigate }"
+                  >
+                    <div @click="navigate">
+                      <article-info-v1 :article="slotProps.item" class="w-100" />
+                    </div>
+                  </router-link>
+                </template>
+                <template v-else>
+                  <article-info-v1 :article="slotProps.item" class="w-100" />
+                </template>
               </template>
               <template #empty>
                 <div class="text-center p-3">
@@ -59,24 +69,6 @@
       </figcaption>
     </figure>
   </div>
-  <!--TODO  <div class="row">
-      <ul class="list-group offset-1 offset-lg-4 mt-lg-n5 mt-3 mb-5 list-group-horizontal">
-        <li class="list-group-item">
-          <a href="https://github.com/devalgas-k/" target="_blank" rel="noopener noreferrer" v-text="t$('home.link.twitter')"></a>
-        </li>
-        <li class="list-group-item">
-          <a
-            href="https://www.linkedin.com/in/devalgas-kamga/"
-            target="_blank"
-            rel="noopener noreferrer"
-            v-text="t$('home.link.linkedin')"
-          ></a>
-        </li>
-        <li class="list-group-item">
-          <a href="https://x.com/devalgas1/" target="_blank" rel="noopener noreferrer" v-text="t$('home.link.github')"></a>
-        </li>
-      </ul>
-    </div>-->
 </template>
 
 <script lang="ts" src="./article-search-v1.component.ts"></script>
@@ -93,32 +85,80 @@
   justify-content: center;
   overflow: hidden;
   height: 65vh;
-}
 
-picture {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-}
+  &__picture {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
 
-picture img {
-  width: 160%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 30%;
-}
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 25%;
+      background-color: transparent;
+      content: '';
+      animation: a 20s ease infinite;
+    }
 
-picture::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 25%;
-  height: 25%;
-  background-color: transparent;
-  content: '';
-  animation: a 20s ease infinite;
+    &::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 25%;
+      background-image: var(--matrix-url, url('/content/images/matrix.png'));
+      background-repeat: no-repeat;
+      background-position: center center;
+      content: '';
+      animation: b 10s ease infinite;
+    }
+  }
+
+  &__image {
+    width: 160%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 30%;
+  }
+
+  :deep(.p-autocomplete) {
+    & .p-autocomplete-input {
+      &:focus,
+      &:focus-visible {
+        background-color: var(--write);
+        border: 1px solid var(--write);
+        color: var(--white);
+      }
+    }
+  }
+
+  :deep(.p-autocomplete-panel) {
+    background-color: var(--dark);
+    border: 1px solid var(--dark);
+    min-width: 400px;
+    color: var(--white);
+
+    & .p-autocomplete-items {
+      background-color: var(--dark);
+      & .p-autocomplete-item-group {
+        background-color: var(--dark);
+        color: var(--white);
+      }
+      & .p-autocomplete-item {
+        background-color: var(--dark);
+        color: var(--white);
+        &:hover,
+        &.p-highlight {
+          background-color: var(--dark);
+          color: var(--white);
+        }
+      }
+    }
+  }
 }
 
 @keyframes a {
@@ -173,17 +213,6 @@ picture::before {
   }
 }
 
-picture::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 25%;
-  height: 25%;
-  background: url('/content/images/matrix.png') no-repeat center center;
-  content: '';
-  animation: b 10s ease infinite;
-}
-
 @keyframes b {
   0%,
   100% {
@@ -235,19 +264,22 @@ picture::after {
   }
 }
 
-figure {
-  width: 130%;
-  max-width: 950px;
-  border: 2px solid rgba(0, 0, 0, 0.4);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 1;
-  animation: c 10s linear infinite;
-  position: relative;
+.about {
+  &__figure {
+    width: 130%;
+    max-width: 950px;
+    min-width: 380px;
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    animation: c 10s linear infinite;
+    position: relative;
+  }
 }
 
 @keyframes c {
@@ -260,7 +292,7 @@ figure {
   }
 }
 
-figure::after {
+.about__figure::after {
   position: absolute;
   bottom: -10px;
   right: -10px;
@@ -291,7 +323,7 @@ figure::after {
   }
 }
 
-h2 {
+.about h2 {
   font-family: 'Major Mono Display', monospace;
   line-height: 1.5;
   text-wrap: balance;
@@ -299,7 +331,7 @@ h2 {
   margin-bottom: 20px;
 }
 
-figcaption {
+.about__caption {
   font-family: 'Figtree', sans-serif;
   font-size: 18px;
   font-weight: 400;
@@ -318,7 +350,7 @@ figcaption {
     height: auto;
   }
 
-  figure {
+  .about__figure {
     max-width: 90%;
     position: relative;
     margin: 20px;
@@ -326,11 +358,11 @@ figcaption {
 }
 
 @media (max-width: 600px) {
-  h2 {
+  .about h2 {
     font-size: 32px;
   }
 
-  figcaption {
+  .about__caption {
     font-size: 16px;
   }
 }
@@ -344,5 +376,13 @@ figcaption {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   box-shadow: 2px 2px 0 var(--primary);
+}
+.category-labels {
+  color: #fff !important;
+  border: 1px solid #fff;
+  padding: 0 4px;
+  border-radius: 4px;
+  display: inline-block;
+  line-height: 1.4;
 }
 </style>

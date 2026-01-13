@@ -1,6 +1,6 @@
 <template>
   <!--  https://github.com/mazipan/vue-google-adsense-->
-  <div class="adsense-wrapper" :key="adKey">
+  <div class="adsense adsense__wrapper" :key="adKey">
     <ins
       class="adsbygoogle"
       :style="insStyle"
@@ -18,7 +18,9 @@
 <script lang="ts" src="./adsense.component.ts"></script>
 
 <style lang="scss" scoped>
-.adsense-wrapper {
-  min-height: 120px;
+.adsense {
+  &__wrapper {
+    min-height: 120px;
+  }
 }
 </style>

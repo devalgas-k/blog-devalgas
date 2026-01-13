@@ -1,7 +1,7 @@
 <template>
   <div class="d-none row ad-top">
     <div class="col-12">
-      <adsense client="ca-pub-6181972205565553" ad-slot="4433984685" format="auto" />
+      <adsense :client="adsenseClient" :ad-slot="adsenseSlot" format="auto" />
     </div>
   </div>
 
@@ -21,10 +21,9 @@
       </div>
     </p-splitter-panel>
   </p-splitter>
-  <!--  TODO lors du clique dois arriver #articles-->
-  <div class="d-flex justify-content-end mt-5">
+  <div class="d-none justify-content-end mt-5">
     <router-link :to="{ name: 'Home' }" custom v-slot="{ navigate }">
-      <button @click="navigate" id="articles-border-all" class="btn btn-primary">
+      <button @click="navigate" id="articles-border-all" class="btn btn-ark">
         <font-awesome-icon icon="border-all"></font-awesome-icon>
         <span v-text="t$('devalgasApp.articleV1.content.explore')"></span>
       </button>

@@ -1,44 +1,53 @@
 <template>
-  <div class="article-info">
-    <h2 class="article-info__title">{{ label }}</h2>
-    <div class="article-info__body">
-      <div class="article-info__header">
-        <dl class="article-info__meta">
-          <div class="article-info__row">
-            <dt class="article-info__value" v-if="publishedDate">
-              <font-awesome-icon icon="calendar-days" color="var(--primary)" class="mt-n1" /> {{ publishedDate }}
-            </dt>
+  <div class="article-info" :aria-busy="!label">
+    <Transition name="fade">
+      <div v-if="label">
+        <h4 class="article-info__title">{{ label }}</h4>
+        <div class="article-info__body">
+          <div class="article-info__header">
+            <dl class="article-info__meta">
+              <div class="article-info__row">
+                <dt class="article-info__value" v-if="publishedDate">
+                  <font-awesome-icon icon="calendar-days" color="var(--primary)" class="mt-n1" /> {{ publishedDate }}
+                </dt>
+              </div>
+              <div class="article-info__row d-none">
+                <dt class="article-info__value">3 minute</dt>
+                <dd class="article-info__label" v-text="t$('devalgasApp.articleV1.info.readingTime')"></dd>
+              </div>
+            </dl>
           </div>
-          <div class="article-info__row d-none">
-            <dt class="article-info__value">3 minute</dt>
-            <dd class="article-info__label" v-text="t$('devalgasApp.articleV1.info.readingTime')"></dd>
+
+          <div class="article-info__stats d-none">
+            <div class="article-info__row">
+              <dt class="article-info__value" v-if="publishedDate">{{ article.views }}</dt>
+              <dd class="article-info__label" v-if="publishedDate"><font-awesome-icon icon="eye"></font-awesome-icon></dd>
+            </div>
+            <div class="article-info__row">
+              <dt class="article-info__value" v-if="publishedDate">{{ article.stars }}</dt>
+              <dd class="article-info__label" v-if="publishedDate"><font-awesome-icon icon="thumbs-up"></font-awesome-icon></dd>
+            </div>
           </div>
-        </dl>
-      </div>
 
-      <div class="article-info__stats d-none">
-        <div class="article-info__row">
-          <dt class="article-info__value" v-if="publishedDate">{{ article.views }}</dt>
-          <dd class="article-info__label" v-if="publishedDate"><font-awesome-icon icon="eye"></font-awesome-icon></dd>
+          <div class="article-info__share"></div>
+
+          <div class="article-info__tags flex-wrap">
+            <!--        TODO Defini chaque categorie-->
+            <a
+              v-for="cat in article && article.categoryArticles ? article.categoryArticles : []"
+              :key="cat.id ?? cat.label"
+              href="#"
+              v-text="cat.label"
+            ></a>
+          </div>
         </div>
-        <div class="article-info__row">
-          <dt class="article-info__value" v-if="publishedDate">{{ article.stars }}</dt>
-          <dd class="article-info__label" v-if="publishedDate"><font-awesome-icon icon="thumbs-up"></font-awesome-icon></dd>
-        </div>
       </div>
-
-      <div class="article-info__share"></div>
-
-      <div class="article-info__tags">
-        <!--        TODO Defini chaque categorie-->
-        <a
-          v-for="cat in article && article.categoryArticles ? article.categoryArticles : []"
-          :key="cat.id ?? cat.label"
-          href="#"
-          v-text="cat.label"
-        ></a>
-      </div>
-    </div>
+    </Transition>
+    <template v-if="!label">
+      <p-skeleton width="70%" height="28px" class="mb-2" />
+      <p-skeleton width="100%" height="16px" class="mb-2" />
+      <p-skeleton width="60%" height="16px" />
+    </template>
   </div>
 </template>
 
@@ -79,6 +88,7 @@
   &__body {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     width: 100%;
@@ -127,7 +137,6 @@
     margin: 0;
     padding: 0;
     line-height: 1.5;
-
     a {
       font-style: normal;
       font-weight: 700;
@@ -153,6 +162,10 @@
   }
 
   @media (max-width: 765px) {
+    &__title {
+      font-size: 1rem;
+    }
+
     &__body {
       flex-direction: column;
       align-items: flex-start;

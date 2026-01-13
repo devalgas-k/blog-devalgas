@@ -1,7 +1,7 @@
 package com.devalgas.blog.service.v1;
 
-import com.devalgas.blog.service.dto.CategoryArticleDTO;
-import java.util.Optional;
+import com.devalgas.blog.service.dto.v1.CategoryArticleHomeV1DTO;
+import com.devalgas.blog.service.dto.v1.CategoryArticleSummaryDTOV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,26 +10,11 @@ import org.springframework.data.domain.Pageable;
  */
 public interface CategoryArticleServiceV1 {
     /**
-     * Get the "id" categoryArticle.
+     * Get all categories with basic summary objects of their articles.
      *
-     * @param id the id of the entity.
-     * @return the entity.
+     * @return the list of category summaries with minimal article information.
      */
-    Optional<CategoryArticleDTO> findOneV1(Long id);
+    java.util.List<CategoryArticleSummaryDTOV1> findAllSummaryBasicObjectsV1();
 
-    /**
-     * Get all the categoryArticles.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
-    Page<CategoryArticleDTO> findAll(Pageable pageable);
-
-    /**
-     * Get all the categoryArticles with eager load of many-to-many relationships.
-     *
-     * @param pageable the pagination information.
-     * @return the list of entities.
-     */
-    Page<CategoryArticleDTO> findAllWithEagerRelationshipsV1(Pageable pageable);
+    Page<CategoryArticleHomeV1DTO> findAllCategoriesArticleHome(Pageable pageable);
 }

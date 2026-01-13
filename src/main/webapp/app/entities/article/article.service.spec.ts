@@ -132,11 +132,13 @@ describe('Service Tests', () => {
 
       it('should partial update a Article', async () => {
         const patchObject = {
-          descriptionFr: 'BBBBBB',
+          labelFr: 'BBBBBB',
           descriptionEn: 'BBBBBB',
+          markdownFr: 'BBBBBB',
           markdownEn: 'BBBBBB',
           status: 'BBBBBB',
           date: dayjs(currentDate).format(DATE_TIME_FORMAT),
+          badge: 'BBBBBB',
           views: 1,
           ...new Article(),
         };

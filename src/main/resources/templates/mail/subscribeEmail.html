@@ -1,0 +1,97 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+  <head>
+    <title th:text="#{email.subscribe.title}">Newsletter Subscription</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Lato:300,400|Poppins:300,400,800&display=swap');
+
+      body {
+        font-family: 'Lato', sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #073642;
+      }
+
+      .logo-container {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .logo-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 32px;
+        color: #fff;
+        margin: 0;
+        padding: 20px 0;
+        position: relative;
+      }
+
+      .logo-title span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: #b58900;
+        border-radius: 50%;
+        margin-left: 5px;
+        box-shadow: 0 0 4px 4px #073642;
+      }
+
+      .position-text {
+        font-family: 'Lato', sans-serif;
+        font-size: 18px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 7px;
+        margin-top: -25px;
+        opacity: 0.5;
+      }
+
+      .content {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        margin-top: 120px;
+      }
+
+      .signature {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #b58900;
+        font-style: italic;
+        color: #666;
+      }
+
+      .logo-container {
+        width: 100%;
+        background: #b58900;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <div class="logo-container">
+        <h1 class="logo-title">[ Devalgas ]<span></span></h1>
+        <p class="position-text" th:text="#{email.subscribe.position}">Software Engineer</p>
+      </div>
+
+      <p th:text="#{email.subscribe.welcome}">Welcome,</p>
+
+      <p th:text="#{email.subscribe.text1}">Thank you for subscribing to our newsletter!</p>
+
+      <p th:text="#{email.subscribe.text2}">You will now receive our latest updates and news directly in your inbox.</p>
+
+      <div class="signature">
+        <p>
+          <span th:text="#{email.activation.text2}">Regards, </span>
+          <br />
+          <em th:text="#{email.signature}">Devalgas Kamga.</em>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

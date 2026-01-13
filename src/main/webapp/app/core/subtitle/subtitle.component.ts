@@ -1,5 +1,9 @@
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 
+/**
+ * Composant d’affichage d’un sous-titre.
+ * Accepte une prop title et l’expose au template.
+ */
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Subtitle',
@@ -9,7 +13,7 @@ export default defineComponent({
   },
   setup(props) {
     return {
-      subtitle: props.title,
+      subtitle: computed(() => props.title),
     };
   },
 });

@@ -1,0 +1,3 @@
+export AZ_DATABASE_NAME=blog
+export AZ_POSTGRESQL_USERNAME=devalgas
+export AZ_POSTGRESQL_PASSWORD=BonjourAzure01/

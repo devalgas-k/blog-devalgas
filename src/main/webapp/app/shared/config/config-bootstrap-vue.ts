@@ -25,10 +25,17 @@ import {
   BProgressBar,
   ToastPlugin,
   VBModal,
+  FormFilePlugin,
+  BDropdownForm,
+  BDropdownDivider,
+  BDropdownItemButton,
+  BFormFile,
+  BFormSelect,
 } from 'bootstrap-vue';
 
 export function initBootstrapVue(vue) {
   vue.use(ToastPlugin);
+  vue.use(FormFilePlugin);
 
   vue.component('BBadge', BBadge);
   vue.component('BDropdown', BDropdown);
@@ -54,5 +61,11 @@ export function initBootstrapVue(vue) {
   vue.directive('b-modal', VBModal);
   vue.component('BFormDatepicker', BFormDatepicker);
   vue.component('BInputGroup', BInputGroup);
+
+  vue.component('BDropdownForm', BDropdownForm);
   vue.component('BInputGroupPrepend', BInputGroupPrepend);
+  vue.component('BDropdownDivider', BDropdownDivider);
+  vue.component('BDropdownItemButton', BDropdownItemButton);
+  vue.component('BFormFile', BFormFile);
+  vue.component('BFormSelect', BFormSelect);
 }

@@ -501,13 +501,9 @@ class ArticleResourceIT {
         partialUpdatedArticle
             .labelEn(UPDATED_LABEL_EN)
             .labelFr(UPDATED_LABEL_FR)
-            .descriptionFr(UPDATED_DESCRIPTION_FR)
-            .markdownFr(UPDATED_MARKDOWN_FR)
-            .markdownFrContentType(UPDATED_MARKDOWN_FR_CONTENT_TYPE)
-            .date(UPDATED_DATE)
-            .banner(UPDATED_BANNER)
-            .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
-            .stars(UPDATED_STARS);
+            .markdownEn(UPDATED_MARKDOWN_EN)
+            .markdownEnContentType(UPDATED_MARKDOWN_EN_CONTENT_TYPE)
+            .status(UPDATED_STATUS);
 
         restArticleMockMvc
             .perform(

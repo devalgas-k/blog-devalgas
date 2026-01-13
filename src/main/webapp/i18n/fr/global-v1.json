@@ -2,8 +2,14 @@
   "globalV1": {
     "headers": {
       "subTitle": "Ingenieur logiciel",
-      "resources": "Ressources",
-      "theme": "Thème"
+      "blog": "Ce que j’écris",
+      "theme": "Thème",
+      "newsletter": "Infolettre",
+      "contactUs": "Me contacter",
+      "mailbox": "Prise de contact"
+    },
+    "separator": {
+      "or": "OU"
     },
     "themes": {
       "light": "Clair",
@@ -11,14 +17,18 @@
     },
     "about": {
       "position": "Ingénieur logiciel",
-      "placeholder": "\uD83D\uDD0D Découvrez mes articles",
+      "placeholder": " \uD83D\uDD0D Explorez",
       "view-article": "Voir l'article",
       "no-results-found": "Aucun résultat trouvé"
+    },
+    "actions": {
+      "reset": "Réinitialisez",
+      "sent": "Envoyez"
     },
     "footer": {
       "links": "Liens utiles",
       "info": "Contact info",
-      "copyright": "Copyright © 2024, Tous droits réservés"
+      "copyright": "Copyright &copy; 2026, Tous droits réservés"
     }
   }
 }

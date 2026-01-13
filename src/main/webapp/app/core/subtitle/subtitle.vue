@@ -52,12 +52,8 @@
       font-size: 30px;
       line-height: 40px;
 
-      -webkit-animation-name: opacity;
-      -webkit-animation-duration: 2s;
-      -webkit-animation-iteration-count: infinite;
-      animation-name: opacity;
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
+      -webkit-animation: opacity 2s infinite;
+      animation: opacity 2s infinite;
     }
 
     &__text {

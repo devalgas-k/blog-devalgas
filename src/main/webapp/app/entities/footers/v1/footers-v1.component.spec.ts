@@ -1,9 +1,10 @@
-import { vitest } from 'vitest';
+import { describe, it, expect, beforeEach, vitest } from 'vitest';
 import { type MountingOptions, shallowMount } from '@vue/test-utils';
 import sinon, { type SinonStubbedInstance } from 'sinon';
+import { createTestingPinia } from '@pinia/testing';
 
-import Footers from './footers.vue';
-import FootersService from './footers.service';
+import Footers from './footers-v1.vue';
+import FootersService from '../footers.service';
 import AlertService from '@/shared/alert/alert.service';
 
 type FootersComponentType = InstanceType<typeof Footers>;
@@ -44,6 +45,11 @@ describe('Component Tests', () => {
           'jhi-sort-indicator': true,
           'b-button': true,
           'router-link': true,
+          'b-link': true,
+          'message-contact-v1': true,
+          'p-separator': true,
+          'banner-footers': true,
+          'subscribe-v1': true,
         },
         directives: {
           'b-modal': {},
@@ -52,6 +58,7 @@ describe('Component Tests', () => {
           alertService,
           footersService: () => footersServiceStub,
         },
+        plugins: [createTestingPinia()],
       };
     });
 
@@ -158,6 +165,25 @@ describe('Component Tests', () => {
         // THEN
         await comp.$nextTick(); // handle component clear watch
         expect(footersServiceStub.retrieve.callCount).toEqual(1);
+      });
+
+      it('toggleContactDropup bascule la visibilité du dropup', async () => {
+        expect(comp.showContactDropup).toBeFalsy();
+        comp.toggleContactDropup();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeTruthy();
+        comp.toggleContactDropup();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeFalsy();
+      });
+
+      it('onContactSaved ferme le dropup', async () => {
+        comp.toggleContactDropup();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeTruthy();
+        comp.onContactSaved();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeFalsy();
       });
     });
   });

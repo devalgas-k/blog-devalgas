@@ -5,7 +5,7 @@ import ArticleInfoV1 from './article-info-v1.vue';
 import { useDateFormat } from '@/shared/composables';
 
 vitest.mock('vue-i18n', () => ({
-  useI18n: () => ({ t: vitest.fn() }),
+  useI18n: () => ({ t: vitest.fn(), d: vitest.fn((ts: number) => ts.toString()) }),
 }));
 
 describe('ArticleInfoV1', () => {
@@ -38,7 +38,7 @@ describe('ArticleInfoV1', () => {
     const value = wrapper.find('.article-info__value').text();
     expect(title).toBe('Titre FR');
     expect(tags.length).toBe(2);
-    expect(value).toBe(dateFormat.formatDate(article.date));
+    expect(value).toBe(dateFormat.formatDateShort(article.date));
   });
 
   it('affiche le titre en anglais quand la langue est en', async () => {
@@ -82,5 +82,21 @@ describe('ArticleInfoV1', () => {
     await wrapper.vm.$nextTick();
     const values = wrapper.findAll('.article-info__row:not(.d-none) .article-info__value');
     expect(values.length).toBe(0);
+  });
+
+  it("affiche le skeleton si l'article est absent", async () => {
+    const wrapper = shallowMount(ArticleInfoV1, {
+      global: {
+        stubs: { 'font-awesome-icon': true },
+        provide: {
+          loginService: { openLogin: vitest.fn() },
+          authenticated: computed(() => true),
+          currentLanguage: computed(() => 'fr'),
+        },
+      },
+    });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('p-skeleton-stub').exists()).toBe(true);
+    expect(wrapper.find('.article-info__title').exists()).toBe(false);
   });
 });
