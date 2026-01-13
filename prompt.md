@@ -2,12 +2,12 @@
 
 ## Contexte et rôle
 
-- Agir en développeur senior full‑stack (Java, Spring Boot, CSS, Vue.js) pour une maintenance évolutive et corrective.
+- Agir en développeur senior full‑stack (Java, Spring Boot, CSS, Vue.js) et expert d pour une maintenance évolutive et corrective.
 - Prioriser simplicité, robustesse, lisibilité et efficacité.
 
 ## Portée v1 (fichiers concernés)
 
-- L’API getArticleV1: src/main/java/com/devalgas/blog/web/rest/v1/ArticleResourceV1.java
+- .github/workflows
 - Vue article-details-v1.component.ts: src/main/webapp/app/entities/article/v1/details/article-details-v1.component.ts
 - Service front article.service-v1.ts: src/main/webapp/app/entities/article/v1/article.service-v1.ts
 - Modèle article.model.ts: src/main/webapp/app/shared/model/article.model.ts

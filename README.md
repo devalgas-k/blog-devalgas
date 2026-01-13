@@ -274,3 +274,95 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [Cypress]: https://www.cypress.io/
 [Leaflet]: https://leafletjs.com/
 [DefinitelyTyped]: https://definitelytyped.org/
+
+## Déploiement Azure (GitOps)
+
+Cette application est déployée sur Azure App Service via un pipeline GitHub Actions GitOps et une infrastructure gérée par Terraform.
+
+### Recommandations JHipster pour la production
+
+- Profil prod:
+  - `SPRING_PROFILES_ACTIVE=prod` côté plateforme (ex. App Service).
+- Build et artefacts:
+  - Build prod: `./mvnw -Pprod clean verify` ou `./mvnw -Pprod -DskipTests package`.
+  - Déploiement jar: `java -jar target/*.jar` avec variables d’environnement définies.
+  - Alternative container: `npm run java:docker:prod` (plugin Jib), déployer l’image sur une plateforme conteneurs.
+- Variables d’environnement (obligatoires/recommandées):
+  - Sécurité JWT: `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` (clé Base64 ≥256 bits).
+  - Base de données: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` (SSL recommandé, ex. `?sslmode=require`).
+  - Mail (optionnel): `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `JHIPSTER_MAIL_FROM`.
+- Secrets:
+  - Ne jamais committer de secrets; utiliser un vault (ex. Azure Key Vault) et/ou des variables d’environnement.
+- TLS:
+  - Activer TLS via `server.ssl.*` ou placer l’app derrière un reverse proxy/managed certificates (ex. Azure Managed Certificates + HTTPS-only).
+- Observabilité et sécurité:
+  - Désactiver devtools en prod (déjà désactivé).
+  - Adapter les endpoints Actuator/Prometheus selon besoins; limiter l’exposition publique.
+- Frontend/Node en CI:
+  - Installer de manière déterministe: `npm ci`.
+  - Avec npm 11, garantir les dépendances optionnelles (Rollup): `npm ci --include=optional`.
+  - Exécuter les tests front (Vitest) avant packaging.
+
+### Prérequis
+
+- Secrets du dépôt GitHub:
+  - `AZURE_WEBAPP_PUBLISH_PROFILE` pour publier le package sur l’App Service.
+  - Authentification Azure:
+    - OIDC: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+    - ou Service Principal: `AZURE_CREDENTIALS` (JSON avec `clientId`, `clientSecret`, `tenantId`, `subscriptionId`)
+  - Secrets applicatifs pour l’infra: `JWT_SECRET`, `DB_PASSWORD` et optionnel `MAIL_PASSWORD`
+- Variable de dépôt:
+  - `RUN_TERRAFORM_APPLY` (recommandé à `false` pendant la phase build/deploy)
+
+### Déclenchement
+
+- La branche `env-prod` déclenche le workflow GitOps.
+- Un déclenchement manuel est possible via `workflow_dispatch` (avec l’input `run_apply` si vous souhaitez appliquer Terraform).
+
+### Jobs du pipeline
+
+- Manage infrastructure
+  - Authentifie sur Azure (OIDC ou Service Principal).
+  - Initialise Terraform, importe les ressources existantes (Resource Group, App Service Plan, Web App, PostgreSQL, Key Vault, Alertes).
+  - Crée/réconcilie les secrets Key Vault si disponibles.
+  - Exécute `terraform apply` uniquement si `RUN_TERRAFORM_APPLY=true` ou via input manuel `run_apply=true`.
+- Build
+  - Node 20, Java 17.
+  - Tests front: `npm run vitest-run`
+  - Tests back: `npm run backend:unit:test`
+  - Build prod: `./mvnw -ntp --batch-mode -Pprod -DskipTests package`
+  - Archive: `target/*.jar`
+- Deploy
+  - Publie le jar vers Azure App Service via `azure/webapps-deploy@v3` en utilisant `AZURE_WEBAPP_PUBLISH_PROFILE`.
+
+### Variables d’environnement de production (App Service)
+
+Ces variables sont positionnées par Terraform sur l’App Service et consommées par Spring Boot (profil `prod`):
+
+- `SPRING_PROFILES_ACTIVE=prod`
+- Base de données:
+  - `SPRING_DATASOURCE_URL`
+  - `SPRING_DATASOURCE_USERNAME`
+  - `SPRING_DATASOURCE_PASSWORD`
+- Sécurité (JWT):
+  - `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET`
+- Mail (si activé):
+  - `SPRING_MAIL_HOST`
+  - `SPRING_MAIL_PORT`
+  - `SPRING_MAIL_USERNAME`
+  - `SPRING_MAIL_PASSWORD`
+  - `JHIPSTER_MAIL_FROM`
+
+### Vérifier le déploiement
+
+- URL par défaut: `https://app-springboot-blog-devalgas.azurewebsites.net`
+- Consulter les logs du workflow GitHub Actions pour suivre `manage-infrastructure`, `build`, puis `deploy`.
+
+### Commandes de test locales
+
+- Tests frontend:
+  - `npm run vitest-run`
+- Tests backend:
+  - `npm run backend:unit:test`
+- Build prod local:
+  - `./mvnw -ntp --batch-mode -Pprod -DskipTests package`

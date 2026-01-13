@@ -1,52 +1,615 @@
-#name: GitOps
-#
-####
-## GitOps - automatic infrastructure management GitHub Action
-##
-## See https://docs.nubesgen.com/gitops/gitops-quick-start/
-## for more information about using GitOps with NubesGen.
-####
-#
-#on:
-#  push:
-#    branches:
-#      - 'env-*'
-#
-#jobs:
-#  manage-infrastructure:
-#    runs-on: ubuntu-22.04
-#    outputs:
-#      application_name: ${{ steps.infrastructure-deployment.outputs.application_name }}
-#      application_url: ${{ steps.infrastructure-deployment.outputs.application_url }}
-#      resource_group: ${{ steps.infrastructure-deployment.outputs.resource_group }}
-#    steps:
-#      - name: Apply Terraform configuration
-#        id: infrastructure-deployment
-#        uses: microsoft/nubesgen-actions/gitops-apply-terraform@v0.13.0
-#        with:
-#          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-#          tf_storage_account: ${{ secrets.TF_STORAGE_ACCOUNT }}
-#  build:
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - name: Build a Java project using Maven
-#        uses: microsoft/nubesgen-actions/gitops-build-java-maven@v0.13.0
-#  deploy:
-#    needs: [manage-infrastructure, build]
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - name: Deploy a Java application to Azure App Service
-#        uses: microsoft/nubesgen-actions/gitops-deploy-to-app-service-java@v0.13.0
-#        with:
-#          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-#          application_name: ${{ needs.manage-infrastructure.outputs.application_name }}
-#  display-information:
-#    needs: [manage-infrastructure]
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - name: Display Azure infrastructure information
-#        uses: microsoft/nubesgen-actions/gitops-display-information@v0.13.0
-#        with:
-#          application_name: ${{ needs.manage-infrastructure.outputs.application_name }}
-#          application_url: ${{ needs.manage-infrastructure.outputs.application_url }}
-#          resource_group: ${{ needs.manage-infrastructure.outputs.resource_group }}
+name: GitOps
+on:
+  push:
+    branches:
+      - env-prod
+  workflow_dispatch:
+    inputs:
+      run_apply:
+        description: Run Terraform apply
+        type: boolean
+        default: false
+        required: false
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  manage-infrastructure:
+    runs-on: ubuntu-22.04
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+      TF_VAR_mail_password: ${{ secrets.MAIL_PASSWORD }}
+      RUN_TERRAFORM_APPLY: ${{ vars.RUN_TERRAFORM_APPLY }}
+      APP_NAME: app-springboot-blog-devalgas
+      RESOURCE_GROUP: rg-devalgas-springboot-azure
+      PLAN_NAME: asp-springboot
+      DB_NAME: db-postgres-blog-devalgas
+      KEY_VAULT_NAME: kv-devalgas-blog
+      ADMIN_OBJECT_ID: ${{ vars.ADMIN_OBJECT_ID }}
+      ADMIN_UPN: kamgadevalgas@gmail.com
+    outputs:
+      application_name: ${{ steps.set-outputs.outputs.application_name }}
+      application_url: ${{ steps.set-outputs.outputs.application_url }}
+      resource_group: ${{ steps.set-outputs.outputs.resource_group }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Detect Service Principal secret
+        id: detect-sp
+        shell: bash
+        env:
+          AZ_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          if [ -n "$AZ_CREDS" ]; then
+            echo "HAS_SP=true" >> "$GITHUB_ENV"
+            echo "TF_VAR_use_oidc=false" >> "$GITHUB_ENV"
+          else
+            echo "HAS_SP=false" >> "$GITHUB_ENV"
+            echo "TF_VAR_use_oidc=true" >> "$GITHUB_ENV"
+          fi
+      - name: Populate Terraform variables from secrets
+        shell: bash
+        env:
+          S_JWT_1: ${{ secrets.JWT_SECRET }}
+          S_JWT_2: ${{ secrets.jwt_secret }}
+          S_DB_1: ${{ secrets.DB_PASSWORD }}
+          S_DB_2: ${{ secrets.db_password }}
+          S_DB_3: ${{ secrets.TF_VAR_db_password }}
+          S_MAIL_1: ${{ secrets.MAIL_PASSWORD }}
+          S_MAIL_2: ${{ secrets.mail_password }}
+        run: |
+          if [ -z "${TF_VAR_jwt_secret}" ]; then
+            v="${S_JWT_1:-${S_JWT_2}}"
+            if [ -n "$v" ]; then echo "TF_VAR_jwt_secret=$v" >> "$GITHUB_ENV"; fi
+          fi
+          if [ -z "${TF_VAR_db_password}" ]; then
+            v="${S_DB_1:-${S_DB_2:-${S_DB_3}}}"
+            if [ -n "$v" ]; then echo "TF_VAR_db_password=$v" >> "$GITHUB_ENV"; fi
+          fi
+          if [ -z "${TF_VAR_mail_password}" ]; then
+            v="${S_MAIL_1:-${S_MAIL_2}}"
+            if [ -n "$v" ]; then echo "TF_VAR_mail_password=$v" >> "$GITHUB_ENV"; fi
+          fi
+      - name: Detect Terraform variables
+        id: detect-tfvars
+        shell: bash
+        run: |
+          ok=true
+          for v in TF_VAR_jwt_secret TF_VAR_db_password; do
+            if [ -z "${!v}" ]; then ok=false; fi
+          done
+          if [ "$ok" = "true" ]; then
+            echo "HAS_TF_SECRETS=true" >> "$GITHUB_ENV"
+          else
+            echo "HAS_TF_SECRETS=false" >> "$GITHUB_ENV"
+          fi
+      - name: Debug apply conditions
+        shell: bash
+        run: |
+          echo "RUN_TERRAFORM_APPLY=${RUN_TERRAFORM_APPLY}"
+          echo "EVENT_NAME=${{ github.event_name }}"
+          echo "RUN_APPLY_INPUT=${{ github.event.inputs.run_apply }}"
+          echo "HAS_TF_SECRETS=${HAS_TF_SECRETS}"
+          echo "HAS_SP=${HAS_SP}"
+          echo "ACTOR=${{ github.actor }}"
+          echo "REPO_OWNER=${{ github.repository_owner }}"
+      - name: Azure login (Service Principal)
+        if: ${{ env.HAS_SP == 'true' }}
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure login (OIDC)
+        if: ${{ env.HAS_SP == 'false' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Resolve admin user object id
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            if [ -z "${ADMIN_OBJECT_ID}" ] && [ -n "${ADMIN_UPN}" ]; then
+              oid=$(az ad user show --id "${ADMIN_UPN}" --query "id" -o tsv 2>/dev/null || true)
+              if [ -n "$oid" ]; then
+                echo "TF_VAR_admin_user_object_id=${oid}" >> "$GITHUB_ENV"
+              fi
+            fi
+            if [ -z "${TF_VAR_admin_user_object_id}" ] && [ "${HAS_SP}" = "true" ]; then
+              oid=$(az ad sp show --id "${ARM_CLIENT_ID}" --query "id" -o tsv 2>/dev/null || true)
+              if [ -n "$oid" ]; then
+                echo "TF_VAR_admin_user_object_id=${oid}" >> "$GITHUB_ENV"
+              fi
+            fi
+      - name: Configure Service Principal env for Terraform
+        if: ${{ env.HAS_SP == 'true' }}
+        shell: bash
+        env:
+          AZ_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          python3 - <<'PY' | while read line; do echo "$line" >> "$GITHUB_ENV"; done
+          import os, json
+          creds = json.loads(os.environ["AZ_CREDS"])
+          print(f"ARM_CLIENT_ID={creds['clientId']}")
+          print(f"ARM_CLIENT_SECRET={creds['clientSecret']}")
+          print(f"ARM_SUBSCRIPTION_ID={creds['subscriptionId']}")
+          print(f"ARM_TENANT_ID={creds['tenantId']}")
+          PY
+      - name: Terraform fmt
+        working-directory: ./terraform
+        run: terraform fmt -check
+      - name: Terraform init
+        working-directory: ./terraform
+        run: terraform init -upgrade -input=false
+      - name: Register required Azure Resource Providers
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            for ns in Microsoft.KeyVault Microsoft.Web Microsoft.DBforPostgreSQL; do
+              echo "Registering provider: $ns"
+              az provider register --namespace "$ns" || true
+              for i in $(seq 1 12); do
+                state=$(az provider show -n "$ns" --query "registrationState" -o tsv || echo "Unknown")
+                echo "$ns state: $state"
+                if [ "$state" = "Registered" ]; then break; fi
+                sleep 5
+              done
+            done
+      - name: Compute Key Vault name
+        shell: bash
+        run: |
+          KV_CALC="${KEY_VAULT_NAME}"
+          echo "KV_NAME_CALC=${KV_CALC}" >> "$GITHUB_ENV"
+      - name: Delete legacy Key Vault if present
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            LEGACY="kv-app-springboot-blog-d"
+            if [ "${LEGACY}" != "${KEY_VAULT_NAME}" ]; then
+              if az keyvault show -n "${LEGACY}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+                echo "Deleting legacy Key Vault: ${LEGACY}"
+                az keyvault delete -n "${LEGACY}" -g "${RESOURCE_GROUP}" || true
+                RG_LOC=$(az group show -n "${RESOURCE_GROUP}" --query "location" -o tsv || echo "")
+                if [ -n "${RG_LOC}" ]; then
+                  az keyvault purge -n "${LEGACY}" -l "${RG_LOC}" || true
+                fi
+              fi
+            fi
+      - name: Set TF_VAR_key_vault_name
+        shell: bash
+        run: |
+          echo "TF_VAR_key_vault_name=${KEY_VAULT_NAME}" >> "$GITHUB_ENV"
+      - name: Set TF_VAR_admin_user_object_id
+        shell: bash
+        run: |
+          if [ -n "${ADMIN_OBJECT_ID}" ]; then
+            echo "TF_VAR_admin_user_object_id=${ADMIN_OBJECT_ID}" >> "$GITHUB_ENV"
+          fi
+      - name: Detect existing Key Vault
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            if az keyvault show -n "${KEY_VAULT_NAME}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              echo "KV_NAME_EXISTING=${KEY_VAULT_NAME}" >> "$GITHUB_ENV"
+            fi
+      - name: Detect existing Azure resources (WebApp, Plan, Postgres, ActionGroup)
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            if az webapp show -n "${APP_NAME}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              echo "HAS_APP=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_APP=false" >> "$GITHUB_ENV"
+            fi
+            if az appservice plan show -n "${PLAN_NAME}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              echo "HAS_PLAN=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_PLAN=false" >> "$GITHUB_ENV"
+            fi
+            if az postgres flexible-server show -n "${DB_NAME}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              echo "HAS_DB=true" >> "$GITHUB_ENV"
+              # Check DB child resources
+              if az postgres flexible-server db show -g "${RESOURCE_GROUP}" --server-name "${DB_NAME}" --name "appdb" &>/dev/null; then
+                echo "HAS_DB_DATABASE=true" >> "$GITHUB_ENV"
+              else
+                echo "HAS_DB_DATABASE=false" >> "$GITHUB_ENV"
+              fi
+              if az postgres flexible-server firewall-rule show -g "${RESOURCE_GROUP}" --name "allow-azure-services" --server-name "${DB_NAME}" &>/dev/null; then
+                echo "HAS_DB_FIREWALL_RULE=true" >> "$GITHUB_ENV"
+              else
+                echo "HAS_DB_FIREWALL_RULE=false" >> "$GITHUB_ENV"
+              fi
+            else
+              echo "HAS_DB=false" >> "$GITHUB_ENV"
+              echo "HAS_DB_DATABASE=false" >> "$GITHUB_ENV"
+              echo "HAS_DB_FIREWALL_RULE=false" >> "$GITHUB_ENV"
+            fi
+            if az monitor action-group show -n "ag-springboot-alerts" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              echo "HAS_ACTION_GROUP=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ACTION_GROUP=false" >> "$GITHUB_ENV"
+            fi
+            # Metric alerts (DB CPU)
+            if az monitor metrics alert show -g "${RESOURCE_GROUP}" -n "alert-db-high-cpu" &>/dev/null; then
+              echo "HAS_ALERT_DB_HIGH_CPU=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ALERT_DB_HIGH_CPU=false" >> "$GITHUB_ENV"
+            fi
+            if az monitor metrics alert show -g "${RESOURCE_GROUP}" -n "alert-db-low-cpu" &>/dev/null; then
+              echo "HAS_ALERT_DB_LOW_CPU=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ALERT_DB_LOW_CPU=false" >> "$GITHUB_ENV"
+            fi
+            if az monitor metrics alert show -g "${RESOURCE_GROUP}" -n "alert-high-memory" &>/dev/null; then
+              echo "HAS_ALERT_HIGH_MEMORY=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ALERT_HIGH_MEMORY=false" >> "$GITHUB_ENV"
+            fi
+            if az monitor metrics alert show -g "${RESOURCE_GROUP}" -n "alert-low-memory" &>/dev/null; then
+              echo "HAS_ALERT_LOW_MEMORY=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ALERT_LOW_MEMORY=false" >> "$GITHUB_ENV"
+            fi
+      - name: Assert provider registration and Key Vault readiness
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            state=$(az provider show -n "Microsoft.KeyVault" --query "registrationState" -o tsv || echo "Unknown")
+            echo "KV_PROVIDER_STATE=${state}" >> "$GITHUB_ENV"
+            if [ -n "${KV_NAME_EXISTING}" ]; then
+              echo "KV_READY=true" >> "$GITHUB_ENV"
+            else
+              if [ "${state}" = "Registered" ]; then
+                echo "KV_READY=true" >> "$GITHUB_ENV"
+              else
+                echo "KV_READY=false" >> "$GITHUB_ENV"
+              fi
+            fi
+      - name: Set Terraform var enable_keyvault from readiness
+        shell: bash
+        run: |
+          if [ "${KV_READY}" = "true" ]; then
+            echo "TF_VAR_enable_keyvault=true" >> "$GITHUB_ENV"
+          else
+            echo "TF_VAR_enable_keyvault=false" >> "$GITHUB_ENV"
+          fi
+      - name: Detect Key Vault secrets
+        if: ${{ env.TF_VAR_enable_keyvault == 'true' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            KV="${KV_NAME_EXISTING:-${KV_NAME_CALC}}"
+            dbid=$(az keyvault secret show --vault-name "$KV" -n "db-password" --query "id" -o tsv 2>/dev/null || true)
+            jwtid=$(az keyvault secret show --vault-name "$KV" -n "jwt-secret" --query "id" -o tsv 2>/dev/null || true)
+            smtid=$(az keyvault secret show --vault-name "$KV" -n "smtp-password" --query "id" -o tsv 2>/dev/null || true)
+            if [ -n "$dbid" ]; then echo "KV_SECRET_DB_ID=$dbid" >> "$GITHUB_ENV"; fi
+            if [ -n "$jwtid" ]; then echo "KV_SECRET_JWT_ID=$jwtid" >> "$GITHUB_ENV"; fi
+            if [ -n "$smtid" ]; then echo "KV_SECRET_SMTP_ID=$smtid" >> "$GITHUB_ENV"; fi
+      - name: Ensure Key Vault secrets exist
+        if: ${{ env.TF_VAR_enable_keyvault == 'true' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            KV="${KV_NAME_EXISTING:-${KV_NAME_CALC}}"
+            if az keyvault show -n "$KV" -g "${RESOURCE_GROUP}" &>/dev/null; then
+              if [ -n "${TF_VAR_db_password}" ] && [ -z "${KV_SECRET_DB_ID}" ]; then
+                az keyvault secret set --vault-name "$KV" -n "db-password" --value "${TF_VAR_db_password}" >/dev/null
+              fi
+              if [ -n "${TF_VAR_jwt_secret}" ] && [ -z "${KV_SECRET_JWT_ID}" ]; then
+                az keyvault secret set --vault-name "$KV" -n "jwt-secret" --value "${TF_VAR_jwt_secret}" >/dev/null
+              fi
+              if [ -n "${TF_VAR_mail_password}" ] && [ -z "${KV_SECRET_SMTP_ID}" ]; then
+                az keyvault secret set --vault-name "$KV" -n "smtp-password" --value "${TF_VAR_mail_password}" >/dev/null
+              fi
+            else
+              echo "Key Vault $KV not found; skipping secret creation (handled by Terraform if created)"
+            fi
+      - name: Terraform import existing Resource Group
+        working-directory: ./terraform
+        shell: bash
+        run: |
+          if ! terraform state list | grep -q '^azurerm_resource_group.rg$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}"
+            set +e
+            terraform import azurerm_resource_group.rg "$ID"
+            rc=$?
+            set -e
+            if [ $rc -eq 0 ]; then
+              echo "Imported Resource Group into state: $ID"
+            else
+              echo "Resource Group not imported; Terraform will create it if absent"
+            fi
+          else
+            echo "Resource Group already in state"
+          fi
+      - name: Terraform import existing resources
+        working-directory: ./terraform
+        shell: bash
+        run: |
+          set +e
+          if ! terraform state list | grep -q '^azurerm_service_plan.asp$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/serverFarms/${PLAN_NAME}"
+            terraform import azurerm_service_plan.asp "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_linux_web_app.app$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/sites/${APP_NAME}"
+            terraform import azurerm_linux_web_app.app "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_postgresql_flexible_server.db$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.DBforPostgreSQL/flexibleServers/${DB_NAME}"
+            terraform import azurerm_postgresql_flexible_server.db "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_postgresql_flexible_server_database.app_db$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.DBforPostgreSQL/flexibleServers/${DB_NAME}/databases/appdb"
+            terraform import azurerm_postgresql_flexible_server_database.app_db "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_postgresql_flexible_server_firewall_rule.allow_azure_services$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.DBforPostgreSQL/flexibleServers/${DB_NAME}/firewallRules/allow-azure-services"
+            terraform import azurerm_postgresql_flexible_server_firewall_rule.allow_azure_services "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_monitor_action_group.main$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Insights/actionGroups/ag-springboot-alerts"
+            terraform import azurerm_monitor_action_group.main "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_monitor_metric_alert.db_high_cpu$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Insights/metricAlerts/alert-db-high-cpu"
+            terraform import azurerm_monitor_metric_alert.db_high_cpu "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_monitor_metric_alert.db_low_cpu$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Insights/metricAlerts/alert-db-low-cpu"
+            terraform import azurerm_monitor_metric_alert.db_low_cpu "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_monitor_metric_alert.high_memory$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Insights/metricAlerts/alert-high-memory"
+            terraform import azurerm_monitor_metric_alert.high_memory "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_monitor_metric_alert.low_memory$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Insights/metricAlerts/alert-low-memory"
+            terraform import azurerm_monitor_metric_alert.low_memory "$ID" || true
+          fi
+          if [ "${TF_VAR_enable_keyvault}" = "true" ]; then
+            if ! terraform state list | grep -q '^azurerm_key_vault.kv\[0\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.KeyVault/vaults/${KEY_VAULT_NAME}"
+              terraform import "azurerm_key_vault.kv[0]" "$ID" || true
+            fi
+            if ! terraform state list | grep -q '^azurerm_key_vault_secret.db_password\[0\]$'; then
+              if [ -n "${KV_SECRET_DB_ID}" ]; then
+                terraform import "azurerm_key_vault_secret.db_password[0]" "${KV_SECRET_DB_ID}" || true
+              fi
+            fi
+            if ! terraform state list | grep -q '^azurerm_key_vault_secret.jwt_secret\[0\]$'; then
+              if [ -n "${KV_SECRET_JWT_ID}" ]; then
+                terraform import "azurerm_key_vault_secret.jwt_secret[0]" "${KV_SECRET_JWT_ID}" || true
+              fi
+            fi
+          else
+            echo "Key Vault disabled; skipping import"
+          fi
+          set -e
+      - name: Terraform validate
+        working-directory: ./terraform
+        run: terraform validate
+      - name: Terraform apply
+        if: ${{ env.RUN_TERRAFORM_APPLY == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_apply == 'true') }}
+        working-directory: ./terraform
+        run: terraform apply -auto-approve -input=false
+      - name: Set outputs
+        id: set-outputs
+        run: |
+          echo "application_name=${APP_NAME}" >> "$GITHUB_OUTPUT"
+          echo "resource_group=${RESOURCE_GROUP}" >> "$GITHUB_OUTPUT"
+          echo "application_url=https://${APP_NAME}.azurewebsites.net" >> "$GITHUB_OUTPUT"
+          echo "key_vault_name=${KEY_VAULT_NAME}" >> "$GITHUB_OUTPUT"
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+          cache: 'npm'
+      - name: Install frontend dependencies
+        shell: bash
+        run: |
+          rm -rf node_modules
+          npm cache clean --force
+          npm ci --include=optional
+      - name: Frontend tests
+        shell: bash
+        run: |
+          set +e
+          npm run vitest-run
+          rc=$?
+          if [ $rc -ne 0 ]; then
+            echo "Vitest failed, attempting recovery install with optional deps"
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm ci --include=optional
+            npm run vitest-run
+          fi
+          set -e
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Backend tests
+        run: npm run backend:unit:test
+      - name: Build Maven prod
+        run: ./mvnw -ntp --batch-mode -Pprod -DskipTests package
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: target/*.jar
+  deploy:
+    runs-on: ubuntu-22.04
+    needs:
+      - manage-infrastructure
+      - build
+    steps:
+      - name: Detect publish profile secret
+        shell: bash
+        env:
+          PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        run: |
+          if [ -n "$PUBLISH_PROFILE" ]; then
+            echo "HAS_PUBLISH_PROFILE=true" >> "$GITHUB_ENV"
+          else
+            echo "HAS_PUBLISH_PROFILE=false" >> "$GITHUB_ENV"
+          fi
+      - name: Detect Service Principal secret (deploy)
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        id: detect-sp-deploy
+        shell: bash
+        env:
+          AZ_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          if [ -n "$AZ_CREDS" ]; then
+            echo "HAS_SP=true" >> "$GITHUB_ENV"
+          else
+            echo "HAS_SP=false" >> "$GITHUB_ENV"
+          fi
+      - name: Azure login (OIDC) for deploy
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' && env.HAS_SP == 'false' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          auth-type: OIDC
+          allow-no-subscriptions: false
+        env:
+          AZURE_CORE_OUTPUT: none
+      - name: Azure login (Service Principal) for deploy
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' && env.HAS_SP == 'true' }}
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          auth-type: SERVICE_PRINCIPAL
+        env:
+          AZURE_CORE_OUTPUT: none
+      - name: Download package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: package
+          path: target
+      - name: Configure Java startup command (no publish profile)
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            APP="${{ needs.manage-infrastructure.outputs.application_name }}"
+            JAR=$(ls -1 target/*.jar | head -n 1)
+            NAME=$(basename "$JAR")
+            echo "Setting startup-file to: java -jar /home/site/wwwroot/$NAME"
+            az webapp config set -g "$RG" -n "$APP" --startup-file "java -jar /home/site/wwwroot/$NAME"
+      - name: Deploy to Azure App Service (publish profile)
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'true' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ needs.manage-infrastructure.outputs.application_name }}
+          package: target/*.jar
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      - name: Deploy to Azure App Service (Azure login)
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ needs.manage-infrastructure.outputs.application_name }}
+          package: target/*.jar
+      - name: Restart Web App (no publish profile)
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            APP="${{ needs.manage-infrastructure.outputs.application_name }}"
+            az webapp restart -g "$RG" -n "$APP"
+  display-information:
+    runs-on: ubuntu-22.04
+    needs:
+      - manage-infrastructure
+    steps:
+      - name: Detect Service Principal secret (display)
+        id: detect-sp-display
+        shell: bash
+        env:
+          AZ_CREDS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          if [ -n "$AZ_CREDS" ]; then
+            echo "HAS_SP=true" >> "$GITHUB_ENV"
+          else
+            echo "HAS_SP=false" >> "$GITHUB_ENV"
+          fi
+      - name: Azure login (OIDC)
+        if: ${{ env.HAS_SP == 'false' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          auth-type: OIDC
+          allow-no-subscriptions: false
+        env:
+          AZURE_CORE_OUTPUT: none
+      - name: Azure login (Service Principal)
+        if: ${{ env.HAS_SP == 'true' }}
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          auth-type: SERVICE_PRINCIPAL
+        env:
+          AZURE_CORE_OUTPUT: none
+      - name: Display Azure infrastructure information
+        run: |
+          echo "application_name=${{ needs.manage-infrastructure.outputs.application_name }}"
+          echo "application_url=${{ needs.manage-infrastructure.outputs.application_url }}"
+          echo "resource_group=${{ needs.manage-infrastructure.outputs.resource_group }}"
+      - name: Show Key Vault details
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            KV_CALC="${{ needs.manage-infrastructure.outputs.key_vault_name }}"
+            echo "Expected Key Vault name: ${KV_CALC}"
+            echo "Listing Key Vaults in resource group: ${RG}"
+            az keyvault list -g "${RG}" -o table || true
+            name=$(az keyvault list -g "${RG}" --query "[0].name" -o tsv)
+            if [ -n "$name" ]; then
+              echo "Detected Key Vault: $name"
+              az keyvault show -n "$name" -g "${RG}" -o json | jq '{name: .name, location: .location, tenantId: .properties.tenantId, uri: .properties.vaultUri}'
+            else
+              echo "No Key Vault found in resource group ${RG}"
+            fi

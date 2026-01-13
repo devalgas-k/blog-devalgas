@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://${AZURE_POSTGRES_FLEXIBLE_HOST:localhost}:${AZURE_POSTGRES_FLEXIBLE_PORT:5432}/${AZURE_POSTGRES_FLEXIBLE_DB:devalgas}?sslmode=require
-    username: ${AZURE_POSTGRES_FLEXIBLE_USER:devalgas}
-    password: ${AZURE_POSTGRES_FLEXIBLE_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/devalgas?sslmode=disable}
+    username: ${SPRING_DATASOURCE_USERNAME:devalgas}
+    password: ${SPRING_DATASOURCE_PASSWORD:changeme}
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -43,10 +43,10 @@ spring:
   liquibase:
     contexts: prod
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:25}
-    username: ${MAIL_USER:}
-    password: ${MAIL_PASSWORD:}
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:noreply@example.com}
+    password: ${SPRING_MAIL_PASSWORD:changeme}
   thymeleaf:
     cache: true
 
@@ -99,7 +99,7 @@ jhipster:
         # - In the Consul configserver
         # - In a separate `application-prod.yml` file, in the same folder as your executable JAR file
         # - In the `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` environment variable
-        base64-secret: YjRmYTBmYzhjNDc0OTA2NTZjZDJmYTA3Y2RkNjZjZWU2YWRiMDdlOGE5MjU1Zjg1YzdmM2EyODA5OGE3MjI1OWE3NjZkYjdjODU4OGU2NjhkY2Q3YWQyMGJiNjhkYjMyNWFkNThlN2QxZGZmOGMzNjM3YzM0NjBlZTFkYTdiYjM=
+        base64-secret: ${JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET:YjRmYTBmYzhjNDc0OTA2NTZjZDJmYTA3Y2RkNjZjZWU2YWRiMDdlOGE5MjU1Zjg1YzdmM2EyODA5OGE3MjI1OWE3NjZkYjdjODU4OGU2NjhkY2Q3YWQyMGJiNjhkYjMyNWFkNThlN2QxZGZmOGMzNjM3YzM0NjBlZTFkYTdiYjM=}
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000

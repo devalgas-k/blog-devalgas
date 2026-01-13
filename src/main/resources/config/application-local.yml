@@ -36,6 +36,9 @@ spring:
       indent-output: true
   mvc:
     log-request-details: true
+  docker:
+    compose:
+      enabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5436/devalgas
