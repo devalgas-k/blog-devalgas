@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" style="margin-top: 12rem !important">
       <div class="col-md-8">
         <h1 v-text="t$('reset.request.title')"></h1>
 
-        <div class="alert alert-warning" v-if="!success">
+        <div class="alert alert-primary text-dark font-weight-bold" v-if="!success">
           <p v-text="t$('reset.request.messages.info')"></p>
         </div>
 

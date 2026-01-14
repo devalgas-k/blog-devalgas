@@ -42,9 +42,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://blog.postgres.database.azure.com:5432/devalgas
+    url: jdbc:postgresql://db-postgres-blog-devalgas.postgres.database.azure.com:5432/devalgas
     username: devalgas
-    password: BonjourAzure01/
+    password: Bonjour01@
     hikari:
       poolName: Hikari
       auto-commit: false

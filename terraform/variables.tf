@@ -113,6 +113,14 @@ variable "enable_keyvault" {
   type    = bool
   default = true
 }
+variable "enable_keyvault_rbac" {
+  type    = bool
+  default = true
+  validation {
+    condition     = var.enable_keyvault_rbac == false || var.enable_keyvault == true
+    error_message = "enable_keyvault must be true when enable_keyvault_rbac is true."
+  }
+}
 variable "key_vault_name" {
   type    = string
   default = "kv-devalgas-blog"

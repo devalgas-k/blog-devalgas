@@ -13,6 +13,7 @@
 <script lang="ts" src="./separator.component.ts"></script>
 
 <style lang="scss" scoped>
+@use 'sass:math';
 .or-spacer {
   width: 100%;
   position: relative;
@@ -36,9 +37,9 @@
     height: $size;
     position: absolute;
     bottom: 100%;
-    margin-bottom: -$size/4;
+    margin-bottom: math.div(-$size, 4);
     left: 50%;
-    margin-left: -$size/2;
+    margin-left: math.div(-$size, 2);
     border-radius: 100%;
     box-shadow: 0 2px 4px var(--primary);
     background: var(--dark);
