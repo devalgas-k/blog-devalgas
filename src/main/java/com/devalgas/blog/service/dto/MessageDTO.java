@@ -47,6 +47,8 @@ public class MessageDTO implements Serializable {
     @NotNull
     private SubjectDTO subject;
 
+    private String recaptchaToken;
+
     public Long getId() {
         return id;
     }
@@ -135,6 +137,14 @@ public class MessageDTO implements Serializable {
         this.subject = subject;
     }
 
+    public String getRecaptchaToken() {
+        return recaptchaToken;
+    }
+
+    public void setRecaptchaToken(String recaptchaToken) {
+        this.recaptchaToken = recaptchaToken;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -170,6 +180,7 @@ public class MessageDTO implements Serializable {
             ", langKey='" + getLangKey() + "'" +
             ", countryKey='" + getCountryKey() + "'" +
             ", subject=" + getSubject() +
+            ", recaptchaToken='" + getRecaptchaToken() + "'" +
             "}";
     }
 }

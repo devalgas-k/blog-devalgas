@@ -23,7 +23,19 @@ jobs:
       TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
       TF_VAR_mail_password: ${{ secrets.MAIL_PASSWORD }}
+      TF_VAR_fallback_mail_password: ${{ secrets.FALLBACK_MAIL_PASSWORD }}
+      TF_VAR_recaptcha_site_key: ${{ vars.RECAPTCHA_SITE_KEY }}
+      TF_VAR_recaptcha_secret: ${{ secrets.RECAPTCHA_SECRET }}
       RUN_TERRAFORM_APPLY: ${{ vars.RUN_TERRAFORM_APPLY }}
+      TF_VAR_fallback_mail_enabled: ${{ vars.FALLBACK_MAIL_ENABLED == 'false' }}
+      TF_VAR_fallback_mail_host: ${{ vars.FALLBACK_MAIL_HOST }}
+      TF_VAR_fallback_mail_port: ${{ vars.FALLBACK_MAIL_PORT }}
+      TF_VAR_fallback_mail_username: ${{ vars.FALLBACK_MAIL_USERNAME }}
+      TF_VAR_mail_host: ${{ vars.MAIL_HOST || 'smtp-relay.brevo.com' }}
+      TF_VAR_mail_port: ${{ vars.MAIL_PORT || '587' }}
+      TF_VAR_mail_username: ${{ vars.MAIL_USERNAME }}
+      TF_VAR_mail_from: ${{ vars.MAIL_FROM || 'noreply@devalgas.net' }}
+      TF_VAR_mail_base_url: ${{ vars.MAIL_BASE_URL || 'https://devalgas.net' }}
       APP_NAME: app-springboot-blog-devalgas
       RESOURCE_GROUP: rg-devalgas-springboot-azure
       PLAN_NAME: asp-springboot
@@ -63,6 +75,8 @@ jobs:
           S_DB_3: ${{ secrets.TF_VAR_db_password }}
           S_MAIL_1: ${{ secrets.MAIL_PASSWORD }}
           S_MAIL_2: ${{ secrets.mail_password }}
+          S_FB_MAIL_1: ${{ secrets.FALLBACK_MAIL_PASSWORD }}
+          S_FB_MAIL_2: ${{ secrets.fallback_mail_password }}
         run: |
           if [ -z "${TF_VAR_jwt_secret}" ]; then
             v="${S_JWT_1:-${S_JWT_2}}"
@@ -75,6 +89,10 @@ jobs:
           if [ -z "${TF_VAR_mail_password}" ]; then
             v="${S_MAIL_1:-${S_MAIL_2}}"
             if [ -n "$v" ]; then echo "TF_VAR_mail_password=$v" >> "$GITHUB_ENV"; fi
+          fi
+          if [ -z "${TF_VAR_fallback_mail_password}" ]; then
+            v="${S_FB_MAIL_1:-${S_FB_MAIL_2}}"
+            if [ -n "$v" ]; then echo "TF_VAR_fallback_mail_password=$v" >> "$GITHUB_ENV"; fi
           fi
       - name: Detect Terraform variables
         id: detect-tfvars
@@ -308,9 +326,11 @@ jobs:
             dbid=$(az keyvault secret show --vault-name "$KV" -n "db-password" --query "id" -o tsv 2>/dev/null || true)
             jwtid=$(az keyvault secret show --vault-name "$KV" -n "jwt-secret" --query "id" -o tsv 2>/dev/null || true)
             smtid=$(az keyvault secret show --vault-name "$KV" -n "smtp-password" --query "id" -o tsv 2>/dev/null || true)
+            fbsmtid=$(az keyvault secret show --vault-name "$KV" -n "fallback-smtp-password" --query "id" -o tsv 2>/dev/null || true)
             if [ -n "$dbid" ]; then echo "KV_SECRET_DB_ID=$dbid" >> "$GITHUB_ENV"; fi
             if [ -n "$jwtid" ]; then echo "KV_SECRET_JWT_ID=$jwtid" >> "$GITHUB_ENV"; fi
             if [ -n "$smtid" ]; then echo "KV_SECRET_SMTP_ID=$smtid" >> "$GITHUB_ENV"; fi
+            if [ -n "$fbsmtid" ]; then echo "KV_SECRET_FB_SMTP_ID=$fbsmtid" >> "$GITHUB_ENV"; fi
       - name: Ensure Key Vault secrets exist
         if: ${{ env.TF_VAR_enable_keyvault == 'true' }}
         uses: azure/cli@v1
@@ -328,6 +348,9 @@ jobs:
               fi
               if [ -n "${TF_VAR_mail_password}" ] && [ -z "${KV_SECRET_SMTP_ID}" ]; then
                 az keyvault secret set --vault-name "$KV" -n "smtp-password" --value "${TF_VAR_mail_password}" >/dev/null
+              fi
+              if [ "${TF_VAR_fallback_mail_enabled}" = "true" ] && [ -n "${TF_VAR_fallback_mail_password}" ] && [ -z "${KV_SECRET_FB_SMTP_ID}" ]; then
+                az keyvault secret set --vault-name "$KV" -n "fallback-smtp-password" --value "${TF_VAR_fallback_mail_password}" >/dev/null
               fi
             else
               echo "Key Vault $KV not found; skipping secret creation (handled by Terraform if created)"
@@ -410,6 +433,11 @@ jobs:
                 terraform import "azurerm_key_vault_secret.jwt_secret[0]" "${KV_SECRET_JWT_ID}" || true
               fi
             fi
+            if ! terraform state list | grep -q '^azurerm_key_vault_secret.fallback_smtp_password\[0\]$'; then
+              if [ -n "${KV_SECRET_FB_SMTP_ID}" ]; then
+                terraform import "azurerm_key_vault_secret.fallback_smtp_password[0]" "${KV_SECRET_FB_SMTP_ID}" || true
+              fi
+            fi
           else
             echo "Key Vault disabled; skipping import"
           fi
@@ -487,6 +515,7 @@ jobs:
         shell: bash
         env:
           NODE_ENV: development
+          RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
         run: |
           rm -rf target/classes/static
           NODE_ENV=development npm run webapp:build:prod --

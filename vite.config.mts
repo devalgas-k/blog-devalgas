@@ -14,22 +14,32 @@ let config = defineConfig(({ mode }) => {
   return {
     plugins: [
       vue(),
-      viteStaticCopy({
-        targets: [
-          {
-            src: [
-              `${normalizePath(swaggerUiPath)}/*.{js,css,html,png}`,
-              `!${normalizePath(swaggerUiPath)}/**/index.html`,
-              normalizePath(fileURLToPath(new URL('./dist/axios.min.js', import.meta.resolve('axios/package.json')))),
-              normalizePath(fileURLToPath(new URL('./src/main/webapp/swagger-ui/index.html', import.meta.url))),
-            ],
-            dest: 'swagger-ui',
-          },
-        ],
-      }),
+      ...(mode !== 'development'
+        ? [
+            viteStaticCopy({
+              targets: [
+                {
+                  src: [
+                    `${normalizePath(swaggerUiPath)}/*.{js,css,html,png}`,
+                    `!${normalizePath(swaggerUiPath)}/**/index.html`,
+                    normalizePath(fileURLToPath(new URL('./dist/axios.min.js', import.meta.resolve('axios/package.json')))),
+                    normalizePath(fileURLToPath(new URL('./src/main/webapp/swagger-ui/index.html', import.meta.url))),
+                  ],
+                  dest: 'swagger-ui',
+                },
+                {
+                  src: [
+                    normalizePath(fileURLToPath(new URL('./src/main/webapp/content/images/*.{png,jpg,jpeg,gif,svg,ico}', import.meta.url))),
+                  ],
+                  dest: 'content/images',
+                },
+              ],
+            }),
+          ]
+        : []),
     ],
     root: fileURLToPath(new URL('./src/main/webapp/', import.meta.url)),
-    publicDir: fileURLToPath(new URL('./target/classes/static/public', import.meta.url)),
+    publicDir: mode === 'development' ? undefined : fileURLToPath(new URL('./target/classes/static/public', import.meta.url)),
     cacheDir: fileURLToPath(new URL('./target/.vite-cache', import.meta.url)),
     build: {
       emptyOutDir: true,
@@ -51,7 +61,7 @@ let config = defineConfig(({ mode }) => {
       I18N_HASH: '"generated_hash"',
       SERVER_API_URL: '"/"',
       APP_VERSION: `"${env.APP_VERSION ? env.APP_VERSION : 'DEV'}"`,
-      RECAPTCHA_SITE_KEY: `"${env.RECAPTCHA_SITE_KEY ? env.RECAPTCHA_SITE_KEY : '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}"`,
+      RECAPTCHA_SITE_KEY: `"${env.RECAPTCHA_SITE_KEY ? env.RECAPTCHA_SITE_KEY : '6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK'}"`,
       ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-6181972205565553'}"`,
       ADSENSE_SLOT: `"${env.ADSENSE_SLOT ? env.ADSENSE_SLOT : '4433984685'}"`,
       IMAGE_BASE_PATH: `"${env.IMAGE_BASE_PATH ? env.IMAGE_BASE_PATH : '/content/images'}"`,

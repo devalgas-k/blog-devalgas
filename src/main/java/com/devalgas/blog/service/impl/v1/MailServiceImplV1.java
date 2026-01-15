@@ -1,4 +1,4 @@
-package com.devalgas.blog.service.v1;
+package com.devalgas.blog.service.impl.v1;
 
 import com.devalgas.blog.service.dto.SubscribeDTO;
 import jakarta.mail.MessagingException;
@@ -23,11 +23,12 @@ import tech.jhipster.config.JHipsterProperties;
  * We use the {@link Async} annotation to send emails asynchronously.
  */
 @Service
-public class MailServiceV1 {
+public class MailServiceImplV1 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MailServiceV1.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MailServiceImplV1.class);
 
     private static final String SUBSCRIBE = "subscribe";
+    private static final String BASE_URL = "baseUrl";
 
     private final JHipsterProperties jHipsterProperties;
 
@@ -36,17 +37,20 @@ public class MailServiceV1 {
     private final MessageSource messageSource;
 
     private final SpringTemplateEngine templateEngine;
+    private final FailoverMailSenderV1 failoverMailSender;
 
-    public MailServiceV1(
+    public MailServiceImplV1(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
-        SpringTemplateEngine templateEngine
+        SpringTemplateEngine templateEngine,
+        FailoverMailSenderV1 failoverMailSender
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.failoverMailSender = failoverMailSender;
     }
 
     @Async
@@ -81,7 +85,7 @@ public class MailServiceV1 {
             message.setFrom(jHipsterProperties.getMail().getFrom());
             message.setSubject(subject);
             message.setText(content, isHtml);
-            javaMailSender.send(mimeMessage);
+            failoverMailSender.send(mimeMessage);
             LOG.debug("Sent email to User '{}'", to);
         } catch (MailException | MessagingException e) {
             LOG.warn("Email could not be sent to user '{}'", to, e);
@@ -96,7 +100,7 @@ public class MailServiceV1 {
      */
     public void sendEmailNewSubscribe(SubscribeDTO subscribe) {
         LOG.debug("Sending confirmation email to '{}'", subscribe.getEmail());
-        this.sendEmailFromTemplateSync(subscribe, "/mail/subscribeEmail.html", "email.subscribe.title");
+        this.sendEmailFromTemplateSync(subscribe, "mail/subscribeEmail", "email.subscribe.title");
     }
 
     @Async
@@ -120,6 +124,7 @@ public class MailServiceV1 {
         Locale locale = Locale.forLanguageTag(subscribe.getLangKey());
         Context context = new Context(locale);
         context.setVariable(SUBSCRIBE, subscribe);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         this.sendEmailSync(subscribe.getEmail(), subject, content, false, true);

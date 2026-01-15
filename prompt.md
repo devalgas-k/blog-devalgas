@@ -2,16 +2,15 @@
 
 ## Contexte et rôle
 
-- Agir en développeur senior full‑stack (Java, Spring Boot, CSS, Vue.js) et expert d pour une maintenance évolutive et corrective.
+- Agir en architecte logiciel et développeur senior full‑stack (Java, Spring Boot, CSS, Vue.js) et expert d pour une maintenance évolutive et corrective.
 - Prioriser simplicité, robustesse, lisibilité et efficacité.
 
 ## Portée v1 (fichiers concernés)
 
-- src/main/webapp/app/core/title/title.vue
-- src/main/webapp/content/css/loading.css
-- src/main/webapp/index.html
-
-## Tâche prioritaire
+- src/main/java/com/devalgas/blog/service/impl/v1/MailServiceImplV1.java
+- src/main/resources/config/application-prod.yml
+- .github/workflows/gitops.yml
+- terraform
 
 ## Contraintes et interdits
 
@@ -24,8 +23,6 @@
 ## Plan d’action recommandé
 
 1. Analyse ciblée: comprendre l’usage des éléments listés
-2. Stratégie: choisir la solution parmis plussieurs solutions la plus simple et efficace; formaliser brièvement le plan
-3. Implémentation frontend
-
-- le css de <span></span> de '<h1 class="container-title__heading">[ Devalgas ]<span></span></h1>' dans title.vue doit etre
-  le app-loading le remplacer dans loading.css, index.html notamment dans la classe css app-loading
+2. Faire une conception technique detaillee \*.md dans le 'docs' pour intergrer un stmp pour l'envoi des mails avec
+   avec SMTP2GO et gmail. Dans la conception touver des stategie sur comment les deux SMTP2GO et gmail peuvent communiquer
+   ensemble SMTP2GO etant le favori. La conception doit pouvoir se limiter au plan gratuit

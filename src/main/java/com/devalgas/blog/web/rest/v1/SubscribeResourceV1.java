@@ -1,7 +1,8 @@
 package com.devalgas.blog.web.rest.v1;
 
 import com.devalgas.blog.service.dto.SubscribeDTO;
-import com.devalgas.blog.service.v1.MailServiceV1;
+import com.devalgas.blog.service.impl.v1.MailServiceImplV1;
+import com.devalgas.blog.service.security.RecaptchaService;
 import com.devalgas.blog.service.v1.SubscribeServiceV1;
 import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -33,11 +34,13 @@ public class SubscribeResourceV1 {
 
     private final SubscribeServiceV1 subscribeService;
 
-    private final MailServiceV1 mailService;
+    private final MailServiceImplV1 mailService;
+    private final RecaptchaService recaptchaService;
 
-    public SubscribeResourceV1(SubscribeServiceV1 subscribeService, MailServiceV1 mailService) {
+    public SubscribeResourceV1(SubscribeServiceV1 subscribeService, MailServiceImplV1 mailService, RecaptchaService recaptchaService) {
         this.subscribeService = subscribeService;
         this.mailService = mailService;
+        this.recaptchaService = recaptchaService;
     }
 
     /**
@@ -52,6 +55,9 @@ public class SubscribeResourceV1 {
         LOG.debug("REST request to save Subscribe : {}", subscribeDTO);
         if (subscribeDTO.getId() != null) {
             throw new BadRequestAlertException("A new subscribe cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (!recaptchaService.verify(subscribeDTO.getRecaptchaToken())) {
+            throw new BadRequestAlertException("Invalid reCAPTCHA", ENTITY_NAME, "recaptchaInvalid");
         }
         subscribeDTO = subscribeService.registerSubscribe(subscribeDTO);
         mailService.sendEmailNewSubscribe(subscribeDTO);

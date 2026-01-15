@@ -6,17 +6,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devalgas.blog.IntegrationTest;
 import com.devalgas.blog.repository.SubscribeRepository;
 import com.devalgas.blog.service.dto.SubscribeDTO;
-import com.devalgas.blog.service.v1.MailServiceV1;
+import com.devalgas.blog.service.impl.v1.MailServiceImplV1;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,7 +36,7 @@ class SubscribeResourceV1IT {
     private MockMvc restSubscribeV1MockMvc;
 
     @MockitoBean
-    private MailServiceV1 mailServiceV1;
+    private MailServiceImplV1 mailServiceV1;
 
     private SubscribeDTO subscribeDTO;
 

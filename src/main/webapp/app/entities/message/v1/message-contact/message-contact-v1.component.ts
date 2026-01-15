@@ -92,13 +92,16 @@ export default defineComponent({
 
     const recaptchaError: Ref<boolean> = ref(false);
     const recaptchaVerified: Ref<boolean> = ref(false);
+    const recaptchaToken: Ref<string> = ref('');
     const handleSuccess = (_response: string) => {
       recaptchaVerified.value = true;
       recaptchaError.value = false;
+      recaptchaToken.value = _response;
     };
     const handleError = () => {
       recaptchaVerified.value = false;
       recaptchaError.value = true;
+      recaptchaToken.value = '';
     };
     const siteKey = computed(() => RECAPTCHA_SITE_KEY);
     const showRecaptcha = computed(() => v$.value?.$invalid === false);
@@ -144,6 +147,7 @@ export default defineComponent({
       disableSubmit,
       handleSuccess,
       handleError,
+      recaptchaToken,
     };
   },
   created(): void {},
@@ -165,6 +169,7 @@ export default defineComponent({
       this.v$.$reset();
       this.recaptchaVerified = false;
       this.recaptchaError = false;
+      this.recaptchaToken = '';
     },
     clearFile(event?: Event): void {
       event?.preventDefault();
@@ -179,6 +184,7 @@ export default defineComponent({
       }
       this.$emit('saved');
       this.isSaving = true;
+      this.message.recaptchaToken = this.recaptchaToken;
       this.messageService()
         .create(this.message)
         .then(_param => {

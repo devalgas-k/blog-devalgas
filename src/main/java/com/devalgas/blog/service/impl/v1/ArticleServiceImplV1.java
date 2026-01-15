@@ -1,7 +1,6 @@
 package com.devalgas.blog.service.impl.v1;
 
 import com.devalgas.blog.domain.Article;
-import com.devalgas.blog.domain.v1.ArticleDetailV1;
 import com.devalgas.blog.repository.v1.ArticleDetailRepositoryV1;
 import com.devalgas.blog.repository.v1.ArticleHomeRepositoryV1;
 import com.devalgas.blog.repository.v1.ArticleRepositoryV1;
@@ -35,9 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Service Implementation for managing {@link Article}.
  */
 @Service
-public class ArticleServiceV1Impl implements ArticleServiceV1 {
+public class ArticleServiceImplV1 implements ArticleServiceV1 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ArticleServiceV1Impl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ArticleServiceImplV1.class);
 
     private final ArticleRepositoryV1 articleRepository;
     private final ArticleHomeRepositoryV1 articleHomeRepositoryV1;
@@ -51,7 +50,7 @@ public class ArticleServiceV1Impl implements ArticleServiceV1 {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ArticleServiceV1Impl(
+    public ArticleServiceImplV1(
         ArticleRepositoryV1 articleRepository,
         ArticleHomeRepositoryV1 articleHomeRepositoryV1,
         ArticleDetailRepositoryV1 articleDetailRepositoryV1,

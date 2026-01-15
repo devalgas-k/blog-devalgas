@@ -15,7 +15,7 @@ export default defineConfig({
     I18N_HASH: '"generated_hash"',
     SERVER_API_URL: '"/"',
     APP_VERSION: '"TEST"',
-    RECAPTCHA_SITE_KEY: '""',
+    RECAPTCHA_SITE_KEY: '"6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK"',
     ADSENSE_CLIENT: '""',
     ADSENSE_SLOT: '""',
     IMAGE_BASE_PATH: '"/content/images"',

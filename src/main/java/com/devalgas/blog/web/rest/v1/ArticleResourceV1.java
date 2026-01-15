@@ -68,6 +68,7 @@ public class ArticleResourceV1 {
             page = articleService.findAll(pageable);
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        // Thread.getAllStackTraces();
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 

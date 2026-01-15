@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
+    private final Recaptcha recaptcha = new Recaptcha();
 
     // jhipster-needle-application-properties-property
 
@@ -20,6 +21,9 @@ public class ApplicationProperties {
     }
 
     // jhipster-needle-application-properties-property-getter
+    public Recaptcha getRecaptcha() {
+        return recaptcha;
+    }
 
     public static class Liquibase {
 
@@ -33,5 +37,28 @@ public class ApplicationProperties {
             this.asyncStart = asyncStart;
         }
     }
+
     // jhipster-needle-application-properties-property-class
+
+    public static class Recaptcha {
+
+        private Boolean enabled = true;
+        private String secret;
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getSecret() {
+            return secret;
+        }
+
+        public void setSecret(String secret) {
+            this.secret = secret;
+        }
+    }
 }

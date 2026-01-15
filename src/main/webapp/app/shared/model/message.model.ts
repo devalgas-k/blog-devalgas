@@ -12,6 +12,7 @@ export interface IMessage {
   langKey?: string | null;
   countryKey?: string | null;
   subject?: ISubject;
+  recaptchaToken?: string | null;
 }
 
 export class Message implements IMessage {
@@ -27,5 +28,6 @@ export class Message implements IMessage {
     public langKey?: string | null,
     public countryKey?: string | null,
     public subject?: ISubject,
+    public recaptchaToken?: string | null,
   ) {}
 }

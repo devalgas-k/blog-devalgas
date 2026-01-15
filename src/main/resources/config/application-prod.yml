@@ -20,6 +20,9 @@ logging:
     com.devalgas.blog: INFO
 
 management:
+  health:
+    mail:
+      enabled: true
   prometheus:
     metrics:
       export:
@@ -43,10 +46,16 @@ spring:
   liquibase:
     contexts: prod
   mail:
-    host: ${SPRING_MAIL_HOST:localhost}
+    host: ${SPRING_MAIL_HOST:smtp-relay.brevo.com}
     port: ${SPRING_MAIL_PORT:587}
-    username: ${SPRING_MAIL_USERNAME:noreply@example.com}
-    password: ${SPRING_MAIL_PASSWORD:changeme}
+    username: ${SPRING_MAIL_USERNAME:a05512001@smtp-brevo.com}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}
   thymeleaf:
     cache: true
 
@@ -104,7 +113,8 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://my-server-url-to-change # Modify according to your server's URL
+    base-url: ${JHIPSTER_MAIL_BASE_URL:https://devalgas.com}
+    from: ${JHIPSTER_MAIL_FROM:noreply@devalgas.com}
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -121,4 +131,15 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  recaptcha:
+    enabled: true
+    secret: ${RECAPTCHA_SECRET:}
+
+fallback:
+  mail:
+    enabled: ${FALLBACK_MAIL_ENABLED:false}
+    host: ${FALLBACK_MAIL_HOST:}
+    port: ${FALLBACK_MAIL_PORT:587}
+    username: ${FALLBACK_MAIL_USERNAME:}
+    password: ${FALLBACK_MAIL_PASSWORD:}

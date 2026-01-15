@@ -16,11 +16,12 @@ export default defineComponent({
     secondplanDuration: { type: String, default: '600s' },
   },
   setup(props) {
+    const imageBasePath = computed(() => props.imageBasePath || ((import.meta as any).env?.VITE_IMAGE_BASE_PATH ?? '/content/images'));
     const styleVars = computed(() => ({
-      '--trees-image': `url('${props.imageBasePath}/arbres.png')`,
-      '--premierplan-image': `url('${props.imageBasePath}/premierplanv3.png')`,
-      '--secondplan-image': `url('${props.imageBasePath}/second-plan.png')`,
-      '--voiture-image': `url('${props.imageBasePath}/voiture-fumee.gif')`,
+      '--trees-image': `url('${imageBasePath.value}/arbres.png')`,
+      '--premierplan-image': `url('${imageBasePath.value}/premierplanv3.png')`,
+      '--secondplan-image': `url('${imageBasePath.value}/second-plan.png')`,
+      '--voiture-image': `url('${imageBasePath.value}/voiture-fumee.gif')`,
       '--parallax-duration': props.parallaxDuration,
       '--moto-duration': props.motoDuration,
       '--voiture-duration': props.voitureDuration,

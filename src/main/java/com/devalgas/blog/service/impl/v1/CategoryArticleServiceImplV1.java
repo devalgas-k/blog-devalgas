@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CategoryArticleServiceV1Impl implements CategoryArticleServiceV1 {
+public class CategoryArticleServiceImplV1 implements CategoryArticleServiceV1 {
 
-    private static final Logger log = LoggerFactory.getLogger(CategoryArticleServiceV1Impl.class);
+    private static final Logger log = LoggerFactory.getLogger(CategoryArticleServiceImplV1.class);
 
     private final CategoryArticleRepositoryV1 categoryArticleRepository;
 
@@ -36,7 +36,7 @@ public class CategoryArticleServiceV1Impl implements CategoryArticleServiceV1 {
 
     private final Environment environment;
 
-    public CategoryArticleServiceV1Impl(
+    public CategoryArticleServiceImplV1(
         CategoryArticleRepositoryV1 categoryArticleRepository,
         CategoryArticleHomeRepositoryV1 categoryArticleHomeRepositoryV1,
         ArticleProjectionMapperV1 articleProjectionMapperV1,

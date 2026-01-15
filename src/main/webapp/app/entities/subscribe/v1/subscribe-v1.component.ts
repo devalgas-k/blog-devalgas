@@ -44,17 +44,20 @@ export default defineComponent({
     const emailFormatError: Ref<boolean> = ref(false);
     const recaptchaError: Ref<boolean> = ref(false);
     const recaptchaVerified: Ref<boolean> = ref(false);
+    const recaptchaToken: Ref<string> = ref('');
 
     const subscribe: Ref<ISubscribe> = ref(new Subscribe());
 
     const handleSuccess = (_response: string) => {
       recaptchaVerified.value = true;
       recaptchaError.value = false;
+      recaptchaToken.value = _response;
     };
 
     const handleError = () => {
       recaptchaVerified.value = false;
       recaptchaError.value = true;
+      recaptchaToken.value = '';
     };
 
     const siteKey = computed(() => RECAPTCHA_SITE_KEY);
@@ -91,6 +94,7 @@ export default defineComponent({
       }
 
       subscribe.value.langKey = currentLanguage.value;
+      subscribe.value.recaptchaToken = recaptchaToken.value;
       subscribeService
         .processSubscribe(subscribe.value)
         .then(() => {
@@ -103,6 +107,7 @@ export default defineComponent({
           v$.value.$reset();
           recaptchaVerified.value = false;
           recaptchaError.value = false;
+          recaptchaToken.value = '';
           emailFormatError.value = false;
           errorEmailExists.value = '';
           success.value = false;

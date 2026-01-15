@@ -47,7 +47,13 @@ variable "db_password" {
 
 variable "recaptcha_site_key" {
   type    = string
-  default = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+  default = "6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK"
+}
+
+variable "recaptcha_secret" {
+  type      = string
+  sensitive = true
+  default   = "6LewAUwsAAAAABLATqSXUf-MHblYcvuXwKZlLWCJ"
 }
 
 variable "social_urls" {
@@ -70,6 +76,11 @@ variable "contact_info" {
 }
 
 variable "enable_email_service" {
+  type    = bool
+  default = true
+}
+
+variable "fallback_mail_enabled" {
   type    = bool
   default = false
 }
@@ -103,6 +114,31 @@ variable "mail_password" {
 variable "mail_from" {
   type    = string
   default = "donotreply@example.com"
+}
+
+variable "mail_base_url" {
+  type    = string
+  default = ""
+}
+variable "fallback_mail_host" {
+  type    = string
+  default = ""
+}
+
+variable "fallback_mail_port" {
+  type    = string
+  default = "587"
+}
+
+variable "fallback_mail_username" {
+  type    = string
+  default = ""
+}
+
+variable "fallback_mail_password" {
+  type      = string
+  sensitive = true
+  default   = ""
 }
 
 variable "use_oidc" {

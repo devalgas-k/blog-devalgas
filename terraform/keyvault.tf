@@ -89,3 +89,11 @@ resource "azurerm_key_vault_secret" "smtp_password" {
   key_vault_id = azurerm_key_vault.kv[0].id
   depends_on   = [azurerm_role_assignment.kv_current_client_secrets_officer]
 }
+
+resource "azurerm_key_vault_secret" "fallback_smtp_password" {
+  count        = var.enable_email_service && var.enable_keyvault && var.fallback_mail_enabled ? 1 : 0
+  name         = "fallback-smtp-password"
+  value        = var.fallback_mail_password
+  key_vault_id = azurerm_key_vault.kv[0].id
+  depends_on   = [azurerm_role_assignment.kv_current_client_secrets_officer]
+}

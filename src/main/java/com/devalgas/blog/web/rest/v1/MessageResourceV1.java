@@ -2,6 +2,7 @@ package com.devalgas.blog.web.rest.v1;
 
 import com.devalgas.blog.service.MessageService;
 import com.devalgas.blog.service.dto.MessageDTO;
+import com.devalgas.blog.service.security.RecaptchaService;
 import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -28,9 +29,11 @@ public class MessageResourceV1 {
     private String applicationName;
 
     private final MessageService messageService;
+    private final RecaptchaService recaptchaService;
 
-    public MessageResourceV1(MessageService messageService) {
+    public MessageResourceV1(MessageService messageService, RecaptchaService recaptchaService) {
         this.messageService = messageService;
+        this.recaptchaService = recaptchaService;
     }
 
     /**
@@ -45,6 +48,9 @@ public class MessageResourceV1 {
         LOG.debug("REST request to save Message : {}", messageDTO);
         if (messageDTO.getId() != null) {
             throw new BadRequestAlertException("A new message cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (!recaptchaService.verify(messageDTO.getRecaptchaToken())) {
+            throw new BadRequestAlertException("Invalid reCAPTCHA", ENTITY_NAME, "recaptchaInvalid");
         }
         messageDTO = messageService.save(messageDTO);
         return ResponseEntity.created(new URI("/api/messages/" + messageDTO.getId()))

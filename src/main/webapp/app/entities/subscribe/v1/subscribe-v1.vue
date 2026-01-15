@@ -30,6 +30,7 @@
               v-text="t$('devalgasApp.subscribeV1.messages.error.invalidEmail')"
             ></h6>
             <div class="d-flex justify-content-center my-3">
+              <!--              https://www.google.com/recaptcha/admin/create-->
               <VueRecaptcha
                 :sitekey="siteKey"
                 :load-recaptcha-script="true"

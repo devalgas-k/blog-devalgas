@@ -1,3 +1,6 @@
-export AZ_DATABASE_NAME=blog
-export AZ_POSTGRESQL_USERNAME=devalgas
-export AZ_POSTGRESQL_PASSWORD=BonjourAzure01/
+#!/bin/sh
+
+export SPRING_MAIL_PASSWORD=
+
+echo "$SPRING_MAIL_PASSWORD"
+

@@ -34,6 +34,7 @@ resource "azurerm_linux_web_app" "app" {
 
       # App Configs (from .env.example)
       "RECAPTCHA_SITE_KEY" = var.recaptcha_site_key
+      "RECAPTCHA_SECRET"   = var.recaptcha_secret
       "LINKEDIN_URL"       = var.social_urls["linkedin"]
       "TWITTER_URL"        = var.social_urls["twitter"]
       "GITHUB_URL"         = var.social_urls["github"]
@@ -51,6 +52,15 @@ resource "azurerm_linux_web_app" "app" {
       "SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH"            = "true"
       "SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE" = "true"
       "JHIPSTER_MAIL_FROM"                               = var.mail_from
+      "JHIPSTER_MAIL_BASE_URL"                           = var.mail_base_url
+    } : {},
+    var.enable_email_service && var.fallback_mail_enabled ? {
+      # Mail fallback (optionnel)
+      "FALLBACK_MAIL_ENABLED"  = "true"
+      "FALLBACK_MAIL_HOST"     = var.fallback_mail_host
+      "FALLBACK_MAIL_PORT"     = var.fallback_mail_port
+      "FALLBACK_MAIL_USERNAME" = var.fallback_mail_username
+      "FALLBACK_MAIL_PASSWORD" = var.enable_keyvault ? "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.fallback_smtp_password[0].id})" : var.fallback_mail_password
     } : {}
   )
 
