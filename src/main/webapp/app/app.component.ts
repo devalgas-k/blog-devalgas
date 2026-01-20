@@ -1,4 +1,4 @@
-import { defineComponent, provide } from 'vue';
+import { defineComponent, provide, inject, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 
@@ -26,9 +26,11 @@ export default defineComponent({
   setup() {
     provide('alertService', useAlertService());
     const { loginModalOpen } = storeToRefs(useLoginModal());
+    const i18nReady = inject('i18nReady', () => computed(() => false), true);
 
     return {
       loginModalOpen,
+      i18nReady,
       t$: useI18n().t,
     };
   },

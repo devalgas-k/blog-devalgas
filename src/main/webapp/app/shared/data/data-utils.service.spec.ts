@@ -1,4 +1,4 @@
-import { vitest } from 'vitest';
+import { vitest, describe, it, expect } from 'vitest';
 import useDataUtils from './data-utils.service';
 
 describe('Formatter i18n', () => {
@@ -113,5 +113,14 @@ describe('Formatter i18n', () => {
     );
 
     expect(result).toStrictEqual({});
+  });
+
+  it('decodeMarkdownContent should preserve external https img and add lazy loading', () => {
+    const toBase64 = (text: string) => btoa(unescape(encodeURIComponent(text)));
+    const mediumUrl = 'https://miro.medium.com/v2/resize:fit:4800/format:webp/1*LCFFrubnUTU0C8MFnyUh3Q.png';
+    const md = `![alt text](${mediumUrl})`;
+    const res = dataUtilsService.decodeMarkdownContent(toBase64(md), 'text/markdown');
+    expect(res.html).toContain(`<img src="${mediumUrl}"`);
+    expect(res.html).toContain('loading="lazy"');
   });
 });

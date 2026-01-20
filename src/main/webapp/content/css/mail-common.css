@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400|Poppins:300,400,800&display=swap');
+
+body {
+  font-family: 'Lato', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #073642;
+}
+
+.logo-header {
+  text-align: center;
+  width: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.container-title {
+  display: flex;
+  justify-content: center;
+}
+
+.container-title__box,
+.container-title .box {
+  width: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.container-title__title,
+.container-title .title {
+  width: 75%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  margin-left: 15px;
+}
+
+.container-title__title-block,
+.container-title .title .block {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to left, #b58900, #002b36);
+  position: absolute;
+}
+
+.container-title__heading {
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  font-size: 29px;
+  display: flex;
+  align-items: baseline;
+  position: relative;
+  margin: 0;
+}
+
+.container-title__heading span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b58900;
+  margin-left: 5px;
+  position: absolute;
+  bottom: 5px;
+  right: -12px;
+  box-shadow: 0 0 3px 3px #002b36;
+}
+
+.container-title__role,
+.container-title .role {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.container-title__role-block,
+.container-title .role .block {
+  width: 100%;
+  height: 20px;
+  background: #002b36;
+  position: absolute;
+}
+
+.container-title__role p,
+.container-title .role p {
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  font-weight: 800;
+  opacity: 0.5;
+}
+
+.logo-title-row {
+  width: 75%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  margin-left: 15px;
+}
+
+.logo-title-block {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to left, #b58900, #002b36);
+  position: absolute;
+}
+
+.logo-role-row {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.logo-role-block {
+  width: 100%;
+  height: 20px;
+  background: #002b36;
+  position: absolute;
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+  width: 100%;
+  background: #002b36;
+}
+
+.logo-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 29px;
+  color: #fff;
+  margin: 0;
+  padding: 20px 0;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+}
+
+.logo-title span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b58900;
+  margin-left: 5px;
+  position: absolute;
+  bottom: 5px;
+  right: -12px;
+  box-shadow: 0 0 3px 3px #002b36;
+}
+
+.position-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  font-weight: 800;
+  opacity: 0.5;
+}
+
+.content {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.signature {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #b58900;
+  font-style: italic;
+  color: #666;
+}
+
+.details p {
+  margin: 6px 0;
+}
+
+.label {
+  font-weight: bold;
+}

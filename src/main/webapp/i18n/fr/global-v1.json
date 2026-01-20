@@ -2,10 +2,10 @@
   "globalV1": {
     "headers": {
       "subTitle": "Ingenieur logiciel",
-      "blog": "Ce que j’écris",
+      "blog": "Devlogs",
       "theme": "Thème",
-      "newsletter": "Infolettre",
-      "contactUs": "Me contacter",
+      "newsletter": "Newsletter",
+      "contactUs": "Contact",
       "mailbox": "Prise de contact"
     },
     "separator": {

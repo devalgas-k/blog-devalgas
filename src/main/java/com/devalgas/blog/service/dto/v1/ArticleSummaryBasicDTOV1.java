@@ -1,6 +1,5 @@
 package com.devalgas.blog.service.dto.v1;
 
-import com.devalgas.blog.service.dto.v1.CategoryLabelBasicDTOV1;
 import java.time.ZonedDateTime;
 import java.util.Set;
 

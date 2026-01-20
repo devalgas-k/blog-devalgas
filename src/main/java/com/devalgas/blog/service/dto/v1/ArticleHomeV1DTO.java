@@ -1,6 +1,7 @@
 package com.devalgas.blog.service.dto.v1;
 
 import com.devalgas.blog.domain.enumeration.Status;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +17,7 @@ import java.util.Set;
  */
 @Schema(description = "Article entity\n@author Devalgas")
 @SuppressWarnings("common-java:DuplicatedBlocks")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArticleHomeV1DTO implements Serializable {
 
     private Long id;

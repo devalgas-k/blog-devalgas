@@ -47,31 +47,31 @@ variable "db_password" {
 
 variable "recaptcha_site_key" {
   type    = string
-  default = ""
+  default = "6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK"
 }
 
 variable "recaptcha_secret" {
   type      = string
   sensitive = true
-  default   = ""
+  default   = "6LewAUwsAAAAABLATqSXUf-MHblYcvuXwKZlLWCJ"
 }
 
 variable "social_urls" {
   type = map(string)
   default = {
-    linkedin = ""
-    twitter  = ""
-    github   = ""
-    medium   = ""
-    whatsapp = ""
+    linkedin = "https://www.linkedin.com/in/devalgas-kamga/"
+    twitter  = "https://x.com/devalgas1/"
+    github   = "https://github.com/devalgas-k/"
+    medium   = "https://medium.com/@kamgadevalgas"
+    whatsapp = "https://wa.me/23055040199"
   }
 }
 
 variable "contact_info" {
   type = map(string)
   default = {
-    contact_email = ""
-    contact_phone = ""
+    contact_email = "contact@devalgas.net"
+    contact_phone = "tel:+23055040199"
   }
 }
 
@@ -119,6 +119,11 @@ variable "mail_password" {
 variable "mail_from" {
   type    = string
   default = "donotreply@example.com"
+}
+
+variable "mail_from_contact" {
+  type    = string
+  default = "contact@devalgas.net"
 }
 
 variable "mail_base_url" {

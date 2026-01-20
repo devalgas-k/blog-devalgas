@@ -1,4 +1,4 @@
-import { type ComputedRef, computed, defineComponent, inject, onMounted, type Ref, ref, watch } from 'vue';
+import { type ComputedRef, computed, defineComponent, inject, onMounted, type Ref, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import InputGroup from 'primevue/inputgroup';
@@ -189,6 +189,33 @@ export default defineComponent({
     });
 
     const viewArticle = computed(() => !!selectedArticle.value?.label);
+    const inFocus = ref(false);
+    const justSelected = ref(false);
+    const onAutoBlur = () => {
+      inFocus.value = false;
+      if (!justSelected.value) {
+        selectedArticle.value = '';
+      }
+    };
+    const onAutoFocus = () => {
+      inFocus.value = true;
+    };
+    const onPanelHide = () => {
+      if (!inFocus.value && !justSelected.value) {
+        selectedArticle.value = '';
+      }
+    };
+    const onItemSelect = () => {
+      justSelected.value = true;
+      nextTick(() => {
+        justSelected.value = false;
+      });
+    };
+    watch(filteredArticles, newVal => {
+      if ((!newVal || newVal.length === 0) && typeof selectedArticle.value === 'string') {
+        selectedArticle.value = '';
+      }
+    });
 
     const backgroundImageSrc = computed(() =>
       currentTheme.value === 'dark' ? '/content/images/abort-d.jpg' : '/content/images/about.jpg',
@@ -202,6 +229,10 @@ export default defineComponent({
       selectedArticle,
       filteredArticles,
       viewArticle,
+      onAutoFocus,
+      onAutoBlur,
+      onPanelHide,
+      onItemSelect,
       currentTheme,
       currentLanguage,
       backgroundImageSrc,

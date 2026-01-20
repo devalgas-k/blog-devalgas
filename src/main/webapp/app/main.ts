@@ -75,6 +75,7 @@ const app = createApp({
     const i18n = useI18n();
     const translationStore = useTranslationStore();
     const translationService = new TranslationService(i18n);
+    const i18nReady = ref(false);
     const applyTheme = (theme: string) => {
       const root = document.documentElement;
       root.classList.remove('theme-light', 'theme-dark');
@@ -93,13 +94,19 @@ const app = createApp({
 
     const changeLanguage = async (newLanguage: string) => {
       if (i18n.locale.value !== newLanguage) {
+        i18nReady.value = false;
         await translationService.refreshTranslation(newLanguage);
         translationStore.setCurrentLanguage(newLanguage);
+        i18nReady.value = true;
       }
     };
 
     provide('currentLanguage', i18n.locale);
     provide('changeLanguage', changeLanguage);
+    provide(
+      'i18nReady',
+      computed(() => i18nReady.value),
+    );
     provide(
       'currentTheme',
       computed(() => themeRef.value),

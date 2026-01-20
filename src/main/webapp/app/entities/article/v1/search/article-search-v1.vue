@@ -23,6 +23,10 @@
               :placeholder="t$('globalV1.about.placeholder')"
               :append-to="'self'"
               :pt="{ panel: { style: { width: 40 + 'vw', maxHeight: panelMaxHeight, overflowY: 'auto' } } }"
+              @blur="onAutoBlur"
+              @focus="onAutoFocus"
+              @hide="onPanelHide"
+              @item-select="onItemSelect"
             >
               <template #header>
                 <div></div>
@@ -40,20 +44,11 @@
                 </div>
               </template>
               <template #item="slotProps">
-                <template v-if="viewArticle">
-                  <router-link
-                    :to="{ name: 'ArticleDetailsViewV1', params: { articleId: selectedArticle?.id } }"
-                    custom
-                    v-slot="{ navigate }"
-                  >
-                    <div @click="navigate">
-                      <article-info-v1 :article="slotProps.item" class="w-100" />
-                    </div>
-                  </router-link>
-                </template>
-                <template v-else>
-                  <article-info-v1 :article="slotProps.item" class="w-100" />
-                </template>
+                <router-link :to="{ name: 'ArticleDetailsViewV1', params: { articleId: slotProps.item?.id } }" custom v-slot="{ navigate }">
+                  <div @click="navigate">
+                    <article-info-v1 :article="slotProps.item" class="w-100" />
+                  </div>
+                </router-link>
               </template>
               <template #empty>
                 <div class="text-center p-3">

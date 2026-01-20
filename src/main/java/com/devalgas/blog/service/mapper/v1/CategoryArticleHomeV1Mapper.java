@@ -31,6 +31,9 @@ public interface CategoryArticleHomeV1Mapper extends EntityMapper<CategoryArticl
     @Mapping(target = "id", source = "id")
     @Mapping(target = "labelEn", source = "labelEn")
     @Mapping(target = "labelFr", source = "labelFr")
+    @Mapping(target = "descriptionFr", source = "descriptionFr")
+    @Mapping(target = "descriptionEn", source = "descriptionEn")
+    @Mapping(target = "date", source = "date")
     ArticleHomeV1DTO toDtoArticleId(ArticleHomeV1 article);
 
     @Named("articleIdSet")

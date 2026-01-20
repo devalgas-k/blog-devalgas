@@ -12,7 +12,6 @@ import com.devalgas.blog.service.dto.v1.CategoryLabelBasicDTOV1;
 import java.time.ZonedDateTime;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ArticleProjectionMapperV1 {

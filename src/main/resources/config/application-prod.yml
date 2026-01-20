@@ -113,8 +113,8 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: ${JHIPSTER_MAIL_BASE_URL:https://devalgas.com}
-    from: ${JHIPSTER_MAIL_FROM:noreply@devalgas.com}
+    base-url: ${JHIPSTER_MAIL_BASE_URL:https://devalgas.net}
+    from: ${JHIPSTER_MAIL_FROM:newsletter@devalgas.net}
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -135,6 +135,10 @@ application:
   recaptcha:
     enabled: true
     secret: ${RECAPTCHA_SECRET:}
+  mail:
+    contact-from: ${MAIL_FROM_CONTACT:contact@devalgas.net}
+  contact:
+    email: ${CONTACT_EMAIL:info@devalgas.net}
 
 fallback:
   mail:

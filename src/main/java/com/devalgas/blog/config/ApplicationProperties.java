@@ -13,6 +13,8 @@ public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
     private final Recaptcha recaptcha = new Recaptcha();
+    private final Mail mail = new Mail();
+    private final Contact contact = new Contact();
 
     // jhipster-needle-application-properties-property
 
@@ -23,6 +25,14 @@ public class ApplicationProperties {
     // jhipster-needle-application-properties-property-getter
     public Recaptcha getRecaptcha() {
         return recaptcha;
+    }
+
+    public Mail getMail() {
+        return mail;
+    }
+
+    public Contact getContact() {
+        return contact;
     }
 
     public static class Liquibase {
@@ -59,6 +69,32 @@ public class ApplicationProperties {
 
         public void setSecret(String secret) {
             this.secret = secret;
+        }
+    }
+
+    public static class Mail {
+
+        private String contactFrom;
+
+        public String getContactFrom() {
+            return contactFrom;
+        }
+
+        public void setContactFrom(String contactFrom) {
+            this.contactFrom = contactFrom;
+        }
+    }
+
+    public static class Contact {
+
+        private String email;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 }

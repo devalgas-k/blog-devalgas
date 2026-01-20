@@ -108,7 +108,7 @@ jhipster:
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://127.0.0.1:8080
-    from: ${JHIPSTER_MAIL_FROM:noreply@devalgas.com}
+    from: ${JHIPSTER_MAIL_FROM:newsletter@devalgas.net}
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -125,4 +125,8 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  mail:
+    contact-from: ${MAIL_FROM_CONTACT:contact@devalgas.net}
+  contact:
+    email: ${CONTACT_EMAIL:info@devalgas.net}

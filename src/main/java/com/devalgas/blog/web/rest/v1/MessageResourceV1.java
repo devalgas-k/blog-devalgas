@@ -2,6 +2,7 @@ package com.devalgas.blog.web.rest.v1;
 
 import com.devalgas.blog.service.MessageService;
 import com.devalgas.blog.service.dto.MessageDTO;
+import com.devalgas.blog.service.impl.v1.MailServiceImplV1;
 import com.devalgas.blog.service.security.RecaptchaService;
 import com.devalgas.blog.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -30,10 +31,12 @@ public class MessageResourceV1 {
 
     private final MessageService messageService;
     private final RecaptchaService recaptchaService;
+    private final MailServiceImplV1 mailService;
 
-    public MessageResourceV1(MessageService messageService, RecaptchaService recaptchaService) {
+    public MessageResourceV1(MessageService messageService, RecaptchaService recaptchaService, MailServiceImplV1 mailService) {
         this.messageService = messageService;
         this.recaptchaService = recaptchaService;
+        this.mailService = mailService;
     }
 
     /**
@@ -52,7 +55,28 @@ public class MessageResourceV1 {
         if (!recaptchaService.verify(messageDTO.getRecaptchaToken())) {
             throw new BadRequestAlertException("Invalid reCAPTCHA", ENTITY_NAME, "recaptchaInvalid");
         }
+        String acceptLanguage = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes() instanceof
+            org.springframework.web.context.request.ServletRequestAttributes attrs
+            ? attrs.getRequest().getHeader("Accept-Language")
+            : null;
+        if (messageDTO.getLangKey() == null || messageDTO.getLangKey().isBlank()) {
+            String resolved = null;
+            if (acceptLanguage != null && !acceptLanguage.isBlank()) {
+                String first = acceptLanguage.split(",")[0];
+                String base = first.split("[-_]")[0].toLowerCase();
+                if ("fr".equals(base)) {
+                    resolved = "fr";
+                } else if ("en".equals(base)) {
+                    resolved = "en";
+                }
+            }
+            if (resolved != null) {
+                messageDTO.setLangKey(resolved);
+            }
+        }
         messageDTO = messageService.save(messageDTO);
+        mailService.sendEmailNewMessage(messageDTO);
+        mailService.sendEmailNewMessageNotification(messageDTO);
         return ResponseEntity.created(new URI("/api/messages/" + messageDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, messageDTO.getId().toString()))
             .body(messageDTO);

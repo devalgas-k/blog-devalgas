@@ -11,6 +11,7 @@ import com.devalgas.blog.domain.Subject;
 import com.devalgas.blog.repository.MessageRepository;
 import com.devalgas.blog.service.dto.MessageDTO;
 import com.devalgas.blog.service.dto.SubjectDTO;
+import com.devalgas.blog.service.impl.v1.MailServiceImplV1;
 import com.devalgas.blog.service.mapper.MessageMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +63,9 @@ class MessageResourceV1IT {
     private Message message;
     private Message insertedMessage;
 
+    @MockitoBean
+    private MailServiceImplV1 mailServiceV1;
+
     public static Message createEntity(EntityManager em) {
         Message message = new Message()
             .name(DEFAULT_NAME)
@@ -80,6 +85,7 @@ class MessageResourceV1IT {
     @BeforeEach
     void initTest() {
         message = createEntity(em);
+        org.mockito.Mockito.doNothing().when(mailServiceV1).sendEmailNewMessage(org.mockito.ArgumentMatchers.any(MessageDTO.class));
     }
 
     @AfterEach
@@ -116,6 +122,26 @@ class MessageResourceV1IT {
         insertedMessage = messageMapper.toEntity(returnedMessageDTO);
         assert (databaseSizeBeforeCreate + 1 == messageRepository.count());
         assert (sameInstant(DEFAULT_DATE).matches(returnedMessageDTO.getDate().toString()));
+    }
+
+    @Test
+    @Transactional
+    void createMessageV1VerifiesEmailSend() throws Exception {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setName(DEFAULT_NAME);
+        messageDTO.setEmail(DEFAULT_EMAIL);
+        messageDTO.setMessage(DEFAULT_MESSAGE);
+        messageDTO.setDate(DEFAULT_DATE);
+        SubjectDTO subjectDTO = new SubjectDTO();
+        subjectDTO.setId(message.getSubject().getId());
+        messageDTO.setSubject(subjectDTO);
+        restMessageV1MockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(messageDTO)))
+            .andDo(print())
+            .andExpect(status().isCreated());
+        org.mockito.Mockito.verify(mailServiceV1, org.mockito.Mockito.times(1)).sendEmailNewMessage(
+            org.mockito.ArgumentMatchers.any(MessageDTO.class)
+        );
     }
 
     @Test

@@ -34,6 +34,11 @@ eg $input-color: red;
   .dropdown-item {
     padding: 0.5rem 0px;
   }
+
+  .navbar-dark .navbar-nav .nav-link {
+    color: var(--white);
+  }
+
   @media screen and (min-width: 768px) {
     .row.jh-entity-details {
       grid-template-columns: minmax(180px, 30%) 1fr;

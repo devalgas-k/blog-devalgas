@@ -9,6 +9,8 @@ public class ArticleDetailsBasicDTOV1 {
     private Long id;
     private String labelFr;
     private String labelEn;
+    private String descriptionFr;
+    private String descriptionEn;
     private byte[] markdownFr;
     private String markdownFrContentType;
     private byte[] markdownEn;
@@ -38,6 +40,22 @@ public class ArticleDetailsBasicDTOV1 {
 
     public void setLabelEn(String labelEn) {
         this.labelEn = labelEn;
+    }
+
+    public String getDescriptionFr() {
+        return descriptionFr;
+    }
+
+    public void setDescriptionFr(String descriptionFr) {
+        this.descriptionFr = descriptionFr;
+    }
+
+    public String getDescriptionEn() {
+        return descriptionEn;
+    }
+
+    public void setDescriptionEn(String descriptionEn) {
+        this.descriptionEn = descriptionEn;
     }
 
     public byte[] getMarkdownFr() {

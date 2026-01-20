@@ -6,6 +6,11 @@ resource "azurerm_service_plan" "asp" {
   sku_name            = "B1" # 1.75 GB RAM, ~13$/month (Base)
 }
 
+locals {
+  smtp_secret_uri    = var.enable_keyvault && length(azurerm_key_vault_secret.smtp_password) > 0 ? azurerm_key_vault_secret.smtp_password[0].id : ""
+  fb_smtp_secret_uri = var.enable_keyvault && length(azurerm_key_vault_secret.fallback_smtp_password) > 0 ? azurerm_key_vault_secret.fallback_smtp_password[0].id : ""
+}
+
 resource "azurerm_linux_web_app" "app" {
   name                = var.app_name
   resource_group_name = azurerm_resource_group.rg.name
@@ -31,35 +36,38 @@ resource "azurerm_linux_web_app" "app" {
 
       # Security
       "JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET" = var.enable_keyvault ? "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.jwt_secret[0].id})" : var.jwt_secret
+
+      # App Configs (from .env.example)
+      "RECAPTCHA_SITE_KEY" = var.recaptcha_site_key
+      "RECAPTCHA_SECRET"   = var.recaptcha_secret
+      "LINKEDIN_URL"       = var.social_urls["linkedin"]
+      "TWITTER_URL"        = var.social_urls["twitter"]
+      "GITHUB_URL"         = var.social_urls["github"]
+      "MEDIUM_URL"         = var.social_urls["medium"]
+      "WHATSAPP_URL"       = var.social_urls["whatsapp"]
+      "CONTACT_EMAIL"      = var.contact_info["contact_email"]
+      "CONTACT_PHONE"      = var.contact_info["contact_phone"]
     },
-    merge(
-      var.recaptcha_site_key != "" ? { "RECAPTCHA_SITE_KEY" = var.recaptcha_site_key } : {},
-      var.recaptcha_secret != "" ? { "RECAPTCHA_SECRET" = var.recaptcha_secret } : {},
-      var.social_urls["linkedin"] != "" ? { "LINKEDIN_URL" = var.social_urls["linkedin"] } : {},
-      var.social_urls["twitter"] != "" ? { "TWITTER_URL" = var.social_urls["twitter"] } : {},
-      var.social_urls["github"] != "" ? { "GITHUB_URL" = var.social_urls["github"] } : {},
-      var.social_urls["medium"] != "" ? { "MEDIUM_URL" = var.social_urls["medium"] } : {},
-      var.social_urls["whatsapp"] != "" ? { "WHATSAPP_URL" = var.social_urls["whatsapp"] } : {},
-      var.contact_info["contact_email"] != "" ? { "CONTACT_EMAIL" = var.contact_info["contact_email"] } : {},
-      var.contact_info["contact_phone"] != "" ? { "CONTACT_PHONE" = var.contact_info["contact_phone"] } : {}
-    ),
-    var.enable_email_service ? merge(
-      var.mail_host != "" ? { "SPRING_MAIL_HOST" = var.mail_host } : {},
-      var.mail_port != "" ? { "SPRING_MAIL_PORT" = var.mail_port } : {},
-      var.mail_username != "" ? { "SPRING_MAIL_USERNAME" = var.mail_username } : {},
-      (var.enable_keyvault && var.mail_password != "") ? { "SPRING_MAIL_PASSWORD" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.smtp_password[0].id})" } : (var.mail_password != "" ? { "SPRING_MAIL_PASSWORD" = var.mail_password } : {}),
-      { "SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH" = "true" },
-      { "SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE" = "true" },
-      var.mail_from != "" ? { "JHIPSTER_MAIL_FROM" = var.mail_from } : {},
-      var.mail_base_url != "" ? { "JHIPSTER_MAIL_BASE_URL" = var.mail_base_url } : {}
-    ) : {},
-    var.enable_email_service && var.fallback_mail_enabled ? merge(
-      { "FALLBACK_MAIL_ENABLED" = "true" },
-      var.fallback_mail_host != "" ? { "FALLBACK_MAIL_HOST" = var.fallback_mail_host } : {},
-      var.fallback_mail_port != "" ? { "FALLBACK_MAIL_PORT" = var.fallback_mail_port } : {},
-      var.fallback_mail_username != "" ? { "FALLBACK_MAIL_USERNAME" = var.fallback_mail_username } : {},
-      (var.enable_keyvault && var.fallback_mail_password != "") ? { "FALLBACK_MAIL_PASSWORD" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.fallback_smtp_password[0].id})" } : (var.fallback_mail_password != "" ? { "FALLBACK_MAIL_PASSWORD" = var.fallback_mail_password } : {})
-    ) : {}
+    var.enable_email_service ? {
+      # Mail (optionnel)
+      "SPRING_MAIL_HOST"                                 = var.mail_host
+      "SPRING_MAIL_PORT"                                 = var.mail_port
+      "SPRING_MAIL_USERNAME"                             = var.mail_username
+      "SPRING_MAIL_PASSWORD"                             = local.smtp_secret_uri != "" ? "@Microsoft.KeyVault(SecretUri=${local.smtp_secret_uri})" : var.mail_password
+      "SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH"            = "true"
+      "SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE" = "true"
+      "JHIPSTER_MAIL_FROM"                               = var.mail_from
+      "JHIPSTER_MAIL_BASE_URL"                           = var.mail_base_url
+      "MAIL_FROM_CONTACT"                                = var.mail_from_contact
+    } : {},
+    var.enable_email_service && var.fallback_mail_enabled ? {
+      # Mail fallback (optionnel)
+      "FALLBACK_MAIL_ENABLED"  = "true"
+      "FALLBACK_MAIL_HOST"     = var.fallback_mail_host
+      "FALLBACK_MAIL_PORT"     = var.fallback_mail_port
+      "FALLBACK_MAIL_USERNAME" = var.fallback_mail_username
+      "FALLBACK_MAIL_PASSWORD" = local.fb_smtp_secret_uri != "" ? "@Microsoft.KeyVault(SecretUri=${local.fb_smtp_secret_uri})" : var.fallback_mail_password
+    } : {}
   )
 
   identity {

@@ -3,6 +3,7 @@ package com.devalgas.blog.service;
 import com.devalgas.blog.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import org.slf4j.Logger;

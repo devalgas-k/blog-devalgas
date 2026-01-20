@@ -15,13 +15,6 @@ import org.springframework.data.domain.Pageable;
  */
 public interface ArticleServiceV1 {
     /**
-     * Get a page of articles with basic summary projection.
-     *
-     * @param pageable the pagination information.
-     * @return a page of projected articles with summary fields.
-     */
-    Page<ArticleSummaryBasicDTOV1> findAllSummaryBasicProjectedV1(Pageable pageable);
-    /**
      * Get optimized article details projection for an id, optionally localized.
      *
      * @param id the id of the article to retrieve.

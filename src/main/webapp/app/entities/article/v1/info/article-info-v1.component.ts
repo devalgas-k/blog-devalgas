@@ -37,6 +37,12 @@ export default defineComponent({
       const art = articleData.value;
       return useFr ? art?.labelFr : art?.labelEn;
     });
+    const description = computed(() => {
+      const lang = (currentLanguage?.value ?? 'fr').split('-')[0]?.toLowerCase();
+      const useFr = lang === 'fr';
+      const art = articleData.value;
+      return useFr ? art?.descriptionFr : art?.descriptionEn;
+    });
 
     return {
       t$: useI18n().t,
@@ -44,6 +50,7 @@ export default defineComponent({
       publishedDate,
       currentLanguage,
       label,
+      description,
     };
   },
 });

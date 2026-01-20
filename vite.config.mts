@@ -70,9 +70,9 @@ let config = defineConfig(({ mode }) => {
       TWITTER_URL: `"${env.TWITTER_URL ? env.TWITTER_URL : 'https://x.com/devalgas1/'}"`,
       GITHUB_URL: `"${env.GITHUB_URL ? env.GITHUB_URL : 'https://github.com/devalgas-k/'}"`,
       MEDIUM_URL: `"${env.MEDIUM_URL ? env.MEDIUM_URL : 'https://medium.com/@kamgadevalgas'}"`,
-      MAIL_TO: `"${env.MAIL_TO ? env.MAIL_TO : 'mailto:kamgadevalga@icloud.com'}"`,
+      MAIL_TO: `"${env.MAIL_TO ? env.MAIL_TO : 'mailto:contact@devalgas.net'}"`,
       PHONE_URL: `"${env.PHONE_URL ? env.PHONE_URL : 'tel:+23055040199'}"`,
-      WHATSAPP_URL: `"${env.WHATSAPP_URL ? env.WHATSAPP_URL : 'https://wa.me/237699520388'}"`,
+      WHATSAPP_URL: `"${env.WHATSAPP_URL ? env.WHATSAPP_URL : 'https://wa.me/23055040199'}"`,
     },
     server: {
       host: true,

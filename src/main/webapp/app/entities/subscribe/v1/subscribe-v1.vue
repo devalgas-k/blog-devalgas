@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="content">
-            <h2 v-if="!success" v-text="t$('devalgasApp.subscribeV1.title')"></h2>
+            <h3 v-if="!success" class="text-white" v-text="t$('devalgasApp.subscribeV1.title')"></h3>
             <h6 v-if="!success" class="content-tuned"></h6>
             <h6
               class="alert alert-primary text-dark font-weight-bold"
@@ -134,6 +134,11 @@
 
   :deep(.dp-social-media) {
     justify-content: center !important;
+  }
+}
+@media (max-width: 576px) {
+  .newsletter {
+    background: transparent !important;
   }
 }
 </style>

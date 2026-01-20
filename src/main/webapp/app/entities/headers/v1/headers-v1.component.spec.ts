@@ -25,14 +25,15 @@ describe('Headers V1', () => {
   const mountOptions = {
     stubs: {
       'font-awesome-icon': true,
-      'b-nav-item': true,
-      'b-nav-item-dropdown': true,
+      'b-nav-item': { template: '<div><slot /></div>' },
+      'b-nav-item-dropdown': { template: '<div><slot /></div>' },
       'b-dropdown-item': true,
-      'b-navbar': true,
-      'b-navbar-brand': true,
-      'b-navbar-nav': true,
-      'b-navbar-toggle': true,
-      'b-collapse': true,
+      'b-dropdown-form': { template: '<div><slot /></div>' },
+      'b-navbar': { template: '<div><slot /></div>' },
+      'b-navbar-brand': { template: '<div><slot /></div>' },
+      'b-navbar-nav': { template: '<div><slot /></div>' },
+      'b-navbar-toggle': { template: '<button><slot /></button>' },
+      'b-collapse': { template: '<div><slot /></div>' },
       'router-link': true,
     },
     provide: {
@@ -101,6 +102,25 @@ describe('Headers V1', () => {
     expect(hideSpy).toHaveBeenCalledWith(true);
   });
 
+  it('onContactSaved appelle hideDropdown si ref manquant', () => {
+    const wrapper = shallowMount(Headers, { global: mountOptions });
+    const hideDropdownSpy = vitest.fn();
+    const onContactSaved = (wrapper.vm as any).$options.methods.onContactSaved;
+    onContactSaved.call({ $refs: {}, hideDropdown: hideDropdownSpy });
+    expect(hideDropdownSpy).toHaveBeenCalledWith('contactDropdown');
+  });
+
+  it('hasAnyAuthority retourne false si accountService absent', () => {
+    const wrapper = shallowMount(Headers, {
+      global: {
+        ...mountOptions,
+        provide: { ...mountOptions.provide, accountService: undefined },
+      },
+    });
+    const comp = wrapper.vm as any;
+    expect(comp.hasAnyAuthority('ROLE_ADMIN')).toBe(false);
+  });
+
   it('separatorLabel vaut OU en fr et OR sinon', () => {
     (globalThis as any).document.documentElement.setAttribute('lang', 'fr');
     const wrapperFr = shallowMount(Headers, {
@@ -151,5 +171,21 @@ describe('Headers V1', () => {
     });
     const compEnUS = wrapperEnUS.vm as any;
     expect(compEnUS.separatorLabel).toBe('OR');
+  });
+
+  it('openWhatsApp ferme le dropdown', () => {
+    const wrapper = shallowMount(Headers, { global: mountOptions });
+    const hideSpy = vitest.fn();
+    const openWhatsApp = (wrapper.vm as any).$options.methods.openWhatsApp;
+    openWhatsApp.call({ hideDropdown: hideSpy });
+    expect(hideSpy).toHaveBeenCalledWith('contactDropdown');
+  });
+
+  it('openMailTo ferme le dropdown', () => {
+    const wrapper = shallowMount(Headers, { global: mountOptions });
+    const hideSpy = vitest.fn();
+    const openMailTo = (wrapper.vm as any).$options.methods.openMailTo;
+    openMailTo.call({ hideDropdown: hideSpy });
+    expect(hideSpy).toHaveBeenCalledWith('contactDropdown');
   });
 });

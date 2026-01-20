@@ -6,6 +6,8 @@ public interface ArticleDetailsBasicProjectionV1 {
     Long getId();
     String getLabelFr();
     String getLabelEn();
+    String getDescriptionFr();
+    String getDescriptionEn();
     byte[] getMarkdownFr();
     String getMarkdownFrContentType();
     byte[] getMarkdownEn();

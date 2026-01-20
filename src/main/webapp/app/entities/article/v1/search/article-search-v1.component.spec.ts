@@ -238,4 +238,45 @@ describe('ArticleSearchV1', () => {
     const vmLight = wLight.vm as any;
     expect(vmLight.backgroundImageSrc).toBe('/content/images/about.jpg');
   });
+
+  it("vide l'input au blur lorsque aucune sélection n'est en cours", async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions());
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.selectedArticle = 'Dev';
+    vm.onAutoBlur();
+    expect(vm.selectedArticle).toBe('');
+  });
+
+  it("ne vide pas l'input immédiatement après item-select", async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions());
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.selectedArticle = { label: 'Developer' };
+    vm.onItemSelect();
+    vm.onAutoBlur();
+    expect(vm.selectedArticle).toEqual({ label: 'Developer' });
+  });
+
+  it("vide l'input quand le panel se ferme hors focus", async () => {
+    mockRetrieve.mockResolvedValue({
+      headers: { 'x-total-count': '2', link: '' },
+      data: categoryGroups,
+    });
+    const wrapper = shallowMount(ArticleSearchV1, mountOptions());
+    await nextTick();
+    const vm = wrapper.vm as any;
+    vm.selectedArticle = 'Designer';
+    vm.onAutoBlur();
+    vm.onPanelHide();
+    expect(vm.selectedArticle).toBe('');
+  });
 });

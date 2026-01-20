@@ -41,6 +41,9 @@ public interface ArticleHomeV1Mapper extends EntityMapper<ArticleHomeV1DTO, Arti
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "label", source = "label")
+    @Mapping(target = "code", source = "code")
+    @Mapping(target = "descriptionFr", source = "descriptionFr")
+    @Mapping(target = "descriptionEn", source = "descriptionEn")
     CategoryArticleHomeV1DTO toDtoCategoryArticleLabel(CategoryArticleHomeV1 categoryArticle);
 
     @Named("categoryArticleLabelSet")

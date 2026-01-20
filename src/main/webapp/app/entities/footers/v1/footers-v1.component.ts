@@ -1,10 +1,8 @@
-import { type Ref, defineComponent, inject, onMounted, ref, watch, computed } from 'vue';
+import { type Ref, defineComponent, onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import FootersService from '../footers.service';
 import { type IFooters } from '@/shared/model/footers.model';
 import useDataUtils from '@/shared/data/data-utils.service';
-import { useAlertService } from '@/shared/alert/alert.service';
 import EntitiesMenu from '@/entities/entities-menu.vue';
 import Title from '@/core/title/title.vue';
 import { useRouter } from 'vue-router';
@@ -33,8 +31,6 @@ export default defineComponent({
   setup() {
     const { t: t$ } = useI18n();
     const dataUtils = useDataUtils();
-    const footersService = inject('footersService', () => new FootersService());
-    const alertService = inject('alertService', () => useAlertService(), true);
 
     const itemsPerPage = ref(20);
     const queryCount: Ref<number | null> = ref(null);
@@ -51,41 +47,6 @@ export default defineComponent({
       page.value = 1;
     };
 
-    const sort = (): Array<any> => {
-      const result = [`${propOrder.value},${reverse.value ? 'desc' : 'asc'}`];
-      if (propOrder.value !== 'id') {
-        result.push('id');
-      }
-      return result;
-    };
-
-    const retrieveFooterss = async () => {
-      isFetching.value = true;
-      try {
-        const paginationQuery = {
-          page: page.value - 1,
-          size: itemsPerPage.value,
-          sort: sort(),
-        };
-        const res = await footersService().retrieve(paginationQuery);
-        totalItems.value = Number(res.headers['x-total-count']);
-        queryCount.value = totalItems.value;
-        footers.value = res.data;
-      } catch (err: any) {
-        alertService.showHttpError(err?.response);
-      } finally {
-        isFetching.value = false;
-      }
-    };
-
-    const handleSyncList = () => {
-      retrieveFooterss();
-    };
-
-    onMounted(async () => {
-      await retrieveFooterss();
-    });
-
     const removeId: Ref<number | null> = ref(null);
     const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IFooters) => {
@@ -101,21 +62,6 @@ export default defineComponent({
         modal.hide();
       }
     };
-    const removeFooters = async () => {
-      try {
-        if (removeId.value == null) {
-          return;
-        }
-        await footersService().delete(removeId.value);
-        const message = t$('devalgasApp.footers.deleted', { param: removeId.value }).toString();
-        alertService.showInfo(message, { variant: 'danger' });
-        removeId.value = null;
-        retrieveFooterss();
-        closeDialog();
-      } catch (error: any) {
-        alertService.showHttpError(error?.response);
-      }
-    };
 
     const changeOrder = (newOrder: string) => {
       if (propOrder.value === newOrder) {
@@ -126,22 +72,6 @@ export default defineComponent({
       propOrder.value = newOrder;
     };
 
-    // Whenever order changes, reset the pagination
-    watch([propOrder, reverse], async () => {
-      if (page.value === 1) {
-        // first page, retrieve new data
-        await retrieveFooterss();
-      } else {
-        // reset the pagination
-        clear();
-      }
-    });
-
-    // Whenever page changes, switch to the new page.
-    watch(page, async () => {
-      await retrieveFooterss();
-    });
-
     const router = useRouter();
 
     const navigateTo = (path: string) => {
@@ -149,7 +79,8 @@ export default defineComponent({
     };
 
     const openMailTo = () => {
-      window.location.href = MAIL_TO;
+      showContactDropup.value = false;
+      window.open(MAIL_TO, '_blank');
     };
 
     const openPhoneCall = () => {
@@ -174,7 +105,8 @@ export default defineComponent({
       showContactDropup.value = false;
     };
     const openWhatsApp = () => {
-      window.location.href = WHATSAPP_URL;
+      showContactDropup.value = false;
+      window.open(WHATSAPP_URL, '_blank');
     };
     const separatorLabel = computed(() => t$('globalV1.separator.or').toString());
 
@@ -183,17 +115,30 @@ export default defineComponent({
     const authenticated = computed(() => store.authenticated);
     const writingHash = WRITING_HASH;
 
+    const contactRef: Ref<HTMLElement | null> = ref(null);
+    const onOutsideClick = (e: MouseEvent) => {
+      if (showContactDropup.value) {
+        const el = contactRef.value;
+        if (el && !el.contains(e.target as Node)) {
+          showContactDropup.value = false;
+        }
+      }
+    };
+    onMounted(() => {
+      document.addEventListener('click', onOutsideClick);
+    });
+    onUnmounted(() => {
+      document.removeEventListener('click', onOutsideClick);
+    });
+
     return {
       footers,
-      handleSyncList,
       isFetching,
-      retrieveFooterss,
       clear,
       removeId,
       removeEntity,
       prepareRemove,
       closeDialog,
-      removeFooters,
       itemsPerPage,
       queryCount,
       page,
@@ -215,6 +160,7 @@ export default defineComponent({
       openWhatsApp,
       separatorLabel,
       writingHash,
+      contactRef,
     };
   },
 });

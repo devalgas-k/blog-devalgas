@@ -14,7 +14,5 @@ public interface CategoryArticleServiceV1 {
      *
      * @return the list of category summaries with minimal article information.
      */
-    java.util.List<CategoryArticleSummaryDTOV1> findAllSummaryBasicObjectsV1();
-
     Page<CategoryArticleHomeV1DTO> findAllCategoriesArticleHome(Pageable pageable);
 }

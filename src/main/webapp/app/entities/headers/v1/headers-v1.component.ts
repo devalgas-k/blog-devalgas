@@ -32,6 +32,7 @@ export default defineComponent({
     const { showLogin } = useLoginModal();
     const accountService = inject<AccountService>('accountService');
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+    const i18nReady = inject('i18nReady', () => computed(() => false), true);
     const currentTheme = inject(
       'currentTheme',
       () =>
@@ -91,6 +92,7 @@ export default defineComponent({
       isActiveLanguage,
       version,
       currentLanguage,
+      i18nReady,
       separatorLabel,
       hasAnyAuthorityValues,
       openAPIEnabled,
@@ -133,10 +135,12 @@ export default defineComponent({
       }
     },
     openWhatsApp() {
-      window.location.href = WHATSAPP_URL;
+      this.hideDropdown('contactDropdown');
+      window.open(WHATSAPP_URL, '_blank');
     },
     openMailTo() {
-      window.location.href = MAIL_TO;
+      this.hideDropdown('contactDropdown');
+      window.open(MAIL_TO, '_blank');
     },
   },
 });

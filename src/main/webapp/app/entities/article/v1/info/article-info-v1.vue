@@ -2,7 +2,8 @@
   <div class="article-info" :aria-busy="!label">
     <Transition name="fade">
       <div v-if="label">
-        <h4 class="article-info__title">{{ label }}</h4>
+        <h5 class="article-info__title">{{ label }}</h5>
+        <h6 v-if="description" class="article-info__description">{{ description }}</h6>
         <div class="article-info__body">
           <div class="article-info__header">
             <dl class="article-info__meta">
@@ -75,14 +76,40 @@
   }
 
   &__title {
-    display: block;
+    display: -webkit-box;
     width: 100%;
+    max-width: 100%;
     margin: 0;
-    font-size: 2rem;
-    line-height: 1.2;
+    font-size: clamp(1rem, 2.5vw, 2rem);
+    line-height: 1.25rem;
     color: var(--white);
     text-transform: capitalize !important;
     font-weight: bolder !important;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  &__description {
+    display: -webkit-box;
+    width: 100%;
+    max-width: 100%;
+    margin: 0.25rem 0 0.5rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    line-height: 1.2rem;
+    color: var(--light);
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   &__body {

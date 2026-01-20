@@ -36,6 +36,7 @@ jobs:
       TF_VAR_mail_username: ${{ vars.MAIL_USERNAME }}
       TF_VAR_mail_from: ${{ vars.MAIL_FROM }}
       TF_VAR_mail_base_url: ${{ vars.MAIL_BASE_URL }}
+      TF_VAR_mail_from_contact: ${{ vars.MAIL_FROM_CONTACT }}
       APP_NAME: app-springboot-blog-devalgas
       RESOURCE_GROUP: rg-devalgas-springboot-azure
       PLAN_NAME: asp-springboot
@@ -117,6 +118,16 @@ jobs:
           echo "HAS_SP=${HAS_SP}"
           echo "ACTOR=${{ github.actor }}"
           echo "REPO_OWNER=${{ github.repository_owner }}"
+      - name: Normalize TF_VAR_fallback_mail_enabled
+        shell: bash
+        env:
+          FALLBACK: ${{ vars.FALLBACK_MAIL_ENABLED }}
+        run: |
+          v="$(echo "${FALLBACK}" | tr '[:upper:]' '[:lower:]')"
+          case "$v" in
+            1|true|yes|on) echo "TF_VAR_fallback_mail_enabled=true" >> "$GITHUB_ENV" ;;
+            *) echo "TF_VAR_fallback_mail_enabled=false" >> "$GITHUB_ENV" ;;
+          esac
       - name: Azure login (Service Principal)
         if: ${{ env.HAS_SP == 'true' }}
         uses: azure/login@v2
@@ -264,6 +275,23 @@ jobs:
               echo "HAS_DB_DATABASE=false" >> "$GITHUB_ENV"
               echo "HAS_DB_FIREWALL_RULE=false" >> "$GITHUB_ENV"
             fi
+            ACS_NAME="acs-${APP_NAME}"
+            EMAIL_NAME="email-${APP_NAME}"
+            if az resource show -g "${RESOURCE_GROUP}" -n "${ACS_NAME}" --resource-type "Microsoft.Communication/CommunicationServices" &>/dev/null; then
+              echo "HAS_ACS=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_ACS=false" >> "$GITHUB_ENV"
+            fi
+            if az resource show -g "${RESOURCE_GROUP}" -n "${EMAIL_NAME}" --resource-type "Microsoft.Communication/EmailServices" &>/dev/null; then
+              echo "HAS_EMAIL_SERVICE=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_EMAIL_SERVICE=false" >> "$GITHUB_ENV"
+            fi
+            if az webapp config hostname list -g "${RESOURCE_GROUP}" -n "${APP_NAME}" --query "length(@)" -o tsv 2>/dev/null | grep -q '^[1-9]'; then
+              echo "HAS_CUSTOM_HOSTNAMES=true" >> "$GITHUB_ENV"
+            else
+              echo "HAS_CUSTOM_HOSTNAMES=false" >> "$GITHUB_ENV"
+            fi
             if az monitor action-group show -n "ag-springboot-alerts" -g "${RESOURCE_GROUP}" &>/dev/null; then
               echo "HAS_ACTION_GROUP=true" >> "$GITHUB_ENV"
             else
@@ -289,6 +317,22 @@ jobs:
               echo "HAS_ALERT_LOW_MEMORY=true" >> "$GITHUB_ENV"
             else
               echo "HAS_ALERT_LOW_MEMORY=false" >> "$GITHUB_ENV"
+            fi
+      - name: Ensure DB admin password matches TF_VAR_db_password
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            if [ -n "${TF_VAR_db_password}" ]; then
+              if az postgres flexible-server show -n "${DB_NAME}" -g "${RESOURCE_GROUP}" &>/dev/null; then
+                echo "Updating DB admin password for ${DB_NAME}"
+                az postgres flexible-server update -n "${DB_NAME}" -g "${RESOURCE_GROUP}" --admin-password "${TF_VAR_db_password}"
+              else
+                echo "DB server ${DB_NAME} not found; skipping admin password update"
+              fi
+            else
+              echo "TF_VAR_db_password is empty; skipping admin password update"
             fi
       - name: Assert provider registration and Key Vault readiness
         uses: azure/cli@v1
@@ -340,20 +384,45 @@ jobs:
             set -e
             KV="${KV_NAME_EXISTING:-${KV_NAME_CALC}}"
             if az keyvault show -n "$KV" -g "${RESOURCE_GROUP}" &>/dev/null; then
-              if [ -n "${TF_VAR_db_password}" ] && [ -z "${KV_SECRET_DB_ID}" ]; then
+              cur_db=$(az keyvault secret show --vault-name "$KV" -n "db-password" --query "value" -o tsv 2>/dev/null || echo "")
+              if [ -n "${TF_VAR_db_password}" ] && [ "${cur_db}" != "${TF_VAR_db_password}" ]; then
                 az keyvault secret set --vault-name "$KV" -n "db-password" --value "${TF_VAR_db_password}" >/dev/null
               fi
-              if [ -n "${TF_VAR_jwt_secret}" ] && [ -z "${KV_SECRET_JWT_ID}" ]; then
+              cur_jwt=$(az keyvault secret show --vault-name "$KV" -n "jwt-secret" --query "value" -o tsv 2>/dev/null || echo "")
+              if [ -n "${TF_VAR_jwt_secret}" ] && [ "${cur_jwt}" != "${TF_VAR_jwt_secret}" ]; then
                 az keyvault secret set --vault-name "$KV" -n "jwt-secret" --value "${TF_VAR_jwt_secret}" >/dev/null
               fi
-              if [ -n "${TF_VAR_mail_password}" ] && [ -z "${KV_SECRET_SMTP_ID}" ]; then
+              cur_smtp=$(az keyvault secret show --vault-name "$KV" -n "smtp-password" --query "value" -o tsv 2>/dev/null || echo "")
+              if [ -n "${TF_VAR_mail_password}" ] && [ "${cur_smtp}" != "${TF_VAR_mail_password}" ]; then
                 az keyvault secret set --vault-name "$KV" -n "smtp-password" --value "${TF_VAR_mail_password}" >/dev/null
               fi
-              if [ "${TF_VAR_fallback_mail_enabled}" = "true" ] && [ -n "${TF_VAR_fallback_mail_password}" ] && [ -z "${KV_SECRET_FB_SMTP_ID}" ]; then
+              cur_fb_smtp=$(az keyvault secret show --vault-name "$KV" -n "fallback-smtp-password" --query "value" -o tsv 2>/dev/null || echo "")
+              if [ "${TF_VAR_fallback_mail_enabled}" = "true" ] && [ -n "${TF_VAR_fallback_mail_password}" ] && [ "${cur_fb_smtp}" != "${TF_VAR_fallback_mail_password}" ]; then
                 az keyvault secret set --vault-name "$KV" -n "fallback-smtp-password" --value "${TF_VAR_fallback_mail_password}" >/dev/null
               fi
             else
               echo "Key Vault $KV not found; skipping secret creation (handled by Terraform if created)"
+            fi
+      - name: Ensure Web App MSI has access to Key Vault
+        if: ${{ env.TF_VAR_enable_keyvault == 'true' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            KV="${KV_NAME_EXISTING:-${KV_NAME_CALC}}"
+            APP_MI=$(az webapp show -g "${RESOURCE_GROUP}" -n "${APP_NAME}" --query "identity.principalId" -o tsv 2>/dev/null || echo "")
+            if [ -z "$APP_MI" ]; then
+              echo "Web App managed identity not found; ensure SystemAssigned identity is enabled"
+              exit 0
+            fi
+            if [ "${TF_VAR_enable_keyvault_rbac}" = "true" ]; then
+              KV_ID=$(az keyvault show -n "$KV" -g "${RESOURCE_GROUP}" --query id -o tsv)
+              echo "Assigning RBAC Key Vault Secrets User to Web App MSI on scope $KV_ID"
+              az role assignment create --role "Key Vault Secrets User" --assignee "$APP_MI" --scope "$KV_ID" >/dev/null || true
+            else
+              echo "Setting Access Policy Get/List for Web App MSI"
+              az keyvault set-policy -n "$KV" -g "${RESOURCE_GROUP}" --object-id "$APP_MI" --secret-permissions get list >/dev/null || true
             fi
       - name: Terraform import existing Resource Group
         working-directory: ./terraform
@@ -433,6 +502,11 @@ jobs:
                 terraform import "azurerm_key_vault_secret.jwt_secret[0]" "${KV_SECRET_JWT_ID}" || true
               fi
             fi
+            if ! terraform state list | grep -q '^azurerm_key_vault_secret.smtp_password\[0\]$'; then
+              if [ -n "${KV_SECRET_SMTP_ID}" ]; then
+                terraform import "azurerm_key_vault_secret.smtp_password[0]" "${KV_SECRET_SMTP_ID}" || true
+              fi
+            fi
             if ! terraform state list | grep -q '^azurerm_key_vault_secret.fallback_smtp_password\[0\]$'; then
               if [ -n "${KV_SECRET_FB_SMTP_ID}" ]; then
                 terraform import "azurerm_key_vault_secret.fallback_smtp_password[0]" "${KV_SECRET_FB_SMTP_ID}" || true
@@ -446,7 +520,7 @@ jobs:
         working-directory: ./terraform
         run: terraform validate
       - name: Terraform apply
-        if: ${{ (env.RUN_TERRAFORM_APPLY == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_apply == 'true')) && (github.actor == github.repository_owner) }}
+        if: ${{ env.RUN_TERRAFORM_APPLY == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_apply == 'true') }}
         working-directory: ./terraform
         run: terraform apply -auto-approve -input=false
       - name: Set outputs
@@ -531,8 +605,6 @@ jobs:
     needs:
       - manage-infrastructure
       - build
-    env:
-      OVERRIDE_APP_SETTINGS: ${{ vars.OVERRIDE_APP_SETTINGS }}
     steps:
       - name: Detect publish profile secret
         shell: bash
@@ -608,7 +680,7 @@ jobs:
             az webapp config appsettings set -g "$RG" -n "$APP" --settings WEBSITES_CONTAINER_START_TIME_LIMIT=300
             az webapp log config -g "$RG" -n "$APP" --application-logging filesystem --level information
       - name: Configure App Settings (no publish profile)
-        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' && env.OVERRIDE_APP_SETTINGS == 'true' }}
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
         uses: azure/cli@v1
         with:
           azcliversion: latest
@@ -621,36 +693,163 @@ jobs:
               FQDN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "fullyQualifiedDomainName" -o tsv)
               ADMIN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "administratorLogin" -o tsv)
               DBURL="jdbc:postgresql://${FQDN}:5432/appdb?sslmode=require"
-              DBP="${{ secrets.DB_PASSWORD }}"
-              JWT="${{ secrets.JWT_SECRET }}"
-              KEYS="SPRING_PROFILES_ACTIVE SPRING_DATASOURCE_URL SPRING_DATASOURCE_USERNAME"
-              SETTINGS="SPRING_PROFILES_ACTIVE=prod SPRING_DATASOURCE_URL=$DBURL SPRING_DATASOURCE_USERNAME=$ADMIN"
-              if [ -n "$DBP" ]; then
-                SETTINGS="$SETTINGS SPRING_DATASOURCE_PASSWORD=$DBP"
-                KEYS="$KEYS SPRING_DATASOURCE_PASSWORD"
-              fi
-              if [ -n "$JWT" ]; then
-                SETTINGS="$SETTINGS JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=$JWT"
-                KEYS="$KEYS JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET"
-              fi
-              echo "Applying app settings keys: $KEYS"
-              az webapp config appsettings set -g "$RG" -n "$APP" --settings $SETTINGS
+              echo "Configuring app settings for DB URL: $DBURL"
+              az webapp config appsettings set -g "$RG" -n "$APP" --settings \
+                SPRING_PROFILES_ACTIVE=prod \
+                SPRING_DATASOURCE_URL="$DBURL" \
+                SPRING_DATASOURCE_USERNAME="$ADMIN" \
+                SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+                JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET="${{ secrets.JWT_SECRET }}"
             else
               echo "No PostgreSQL server found in resource group $RG; skipping DB app settings"
             fi
+      - name: Configure Application Settings (idempotent full sync)
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            APP="${{ needs.manage-infrastructure.outputs.application_name }}"
+            DB_NAME=$(az postgres flexible-server list -g "$RG" --query "[0].name" -o tsv || echo "")
+            DBURL=""
+            ADMIN=""
+            if [ -n "$DB_NAME" ]; then
+              FQDN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "fullyQualifiedDomainName" -o tsv)
+              ADMIN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "administratorLogin" -o tsv)
+              DBURL="jdbc:postgresql://${FQDN}:5432/appdb?sslmode=require"
+            fi
+            KV="$(az keyvault list -g "$RG" --query "[0].name" -o tsv || echo "")"
+            KV_SMTP_ID=""
+            KV_FB_SMTP_ID=""
+            KV_DB_ID=""
+            KV_JWT_ID=""
+            if [ -n "$KV" ]; then
+              KV_SMTP_ID=$(az keyvault secret show --vault-name "$KV" -n "smtp-password" --query "id" -o tsv 2>/dev/null || true)
+              KV_FB_SMTP_ID=$(az keyvault secret show --vault-name "$KV" -n "fallback-smtp-password" --query "id" -o tsv 2>/dev/null || true)
+              KV_DB_ID=$(az keyvault secret show --vault-name "$KV" -n "db-password" --query "id" -o tsv 2>/dev/null || true)
+              KV_JWT_ID=$(az keyvault secret show --vault-name "$KV" -n "jwt-secret" --query "id" -o tsv 2>/dev/null || true)
+            fi
+            normalize_bool() {
+              v="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+              case "$v" in
+                1|true|yes|on) echo "true" ;;
+                *) echo "false" ;;
+              esac
+            }
+            FB_ENABLED="$(normalize_bool "${FALLBACK_MAIL_ENABLED}")"
+            get_current() {
+              az webapp config appsettings list -g "$RG" -n "$APP" --query "[?name=='$1'].value | [0]" -o tsv 2>/dev/null || echo ""
+            }
+            set_setting() {
+              k="$1"; v="$2"
+              if [ -z "$v" ]; then return 0; fi
+              cur="$(get_current "$k")"
+              if [ "$cur" != "$v" ]; then
+                az webapp config appsettings set -g "$RG" -n "$APP" --settings "$k=$v" >/dev/null
+              fi
+            }
+            set_setting "SPRING_PROFILES_ACTIVE" "prod"
+            if [ -n "$DBURL" ]; then
+              set_setting "SPRING_DATASOURCE_URL" "$DBURL"
+              set_setting "SPRING_DATASOURCE_USERNAME" "$ADMIN"
+              DB_PWD=""
+              if [ -n "$KV_DB_ID" ]; then DB_PWD="@Microsoft.KeyVault(SecretUri=$KV_DB_ID)"; fi
+              if [ -z "$DB_PWD" ] && [ -n "${DB_PASSWORD}" ]; then DB_PWD="${DB_PASSWORD}"; fi
+              set_setting "SPRING_DATASOURCE_PASSWORD" "$DB_PWD"
+            fi
+            JWT_VAL=""
+            if [ -n "$KV_JWT_ID" ]; then JWT_VAL="@Microsoft.KeyVault(SecretUri=$KV_JWT_ID)"; fi
+            if [ -z "$JWT_VAL" ] && [ -n "${JWT_SECRET}" ]; then JWT_VAL="${JWT_SECRET}"; fi
+            set_setting "JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET" "$JWT_VAL"
+            MAIL_PWD=""
+            if [ -n "$KV_SMTP_ID" ]; then MAIL_PWD="@Microsoft.KeyVault(SecretUri=$KV_SMTP_ID)"; fi
+            if [ -z "$MAIL_PWD" ] && [ -n "${MAIL_PASSWORD}" ]; then MAIL_PWD="${MAIL_PASSWORD}"; fi
+            set_setting "SPRING_MAIL_PASSWORD" "$MAIL_PWD"
+            set_setting "SPRING_MAIL_HOST" "${MAIL_HOST}"
+            set_setting "SPRING_MAIL_PORT" "${MAIL_PORT}"
+            set_setting "SPRING_MAIL_USERNAME" "${MAIL_USERNAME}"
+            set_setting "SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH" "true"
+            set_setting "SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE" "true"
+            set_setting "JHIPSTER_MAIL_FROM" "${MAIL_FROM}"
+            set_setting "MAIL_FROM_CONTACT" "${MAIL_FROM_CONTACT}"
+            BASE_URL="${MAIL_BASE_URL}"
+            if [ -z "$BASE_URL" ]; then
+              BASE_URL="${APPLICATION_URL}"
+            fi
+            set_setting "JHIPSTER_MAIL_BASE_URL" "$BASE_URL"
+            if [ "$FB_ENABLED" = "true" ] || [ -n "$KV_FB_SMTP_ID" ] || [ -n "${FALLBACK_MAIL_PASSWORD}" ]; then
+              FB_PWD=""
+              if [ -n "$KV_FB_SMTP_ID" ]; then FB_PWD="@Microsoft.KeyVault(SecretUri=$KV_FB_SMTP_ID)"; fi
+              if [ -z "$FB_PWD" ] && [ -n "${FALLBACK_MAIL_PASSWORD}" ]; then FB_PWD="${FALLBACK_MAIL_PASSWORD}"; fi
+              set_setting "FALLBACK_MAIL_ENABLED" "true"
+              set_setting "FALLBACK_MAIL_HOST" "${FALLBACK_MAIL_HOST}"
+              set_setting "FALLBACK_MAIL_PORT" "${FALLBACK_MAIL_PORT}"
+              set_setting "FALLBACK_MAIL_USERNAME" "${FALLBACK_MAIL_USERNAME}"
+              set_setting "FALLBACK_MAIL_PASSWORD" "$FB_PWD"
+            fi
+            set_setting "RECAPTCHA_SITE_KEY" "${RECAPTCHA_SITE_KEY}"
+            set_setting "RECAPTCHA_SECRET" "${RECAPTCHA_SECRET}"
+            set_setting "LINKEDIN_URL" "${LINKEDIN_URL}"
+            set_setting "TWITTER_URL" "${TWITTER_URL}"
+            set_setting "GITHUB_URL" "${GITHUB_URL}"
+            set_setting "MEDIUM_URL" "${MEDIUM_URL}"
+            set_setting "WHATSAPP_URL" "${WHATSAPP_URL}"
+            set_setting "CONTACT_EMAIL" "${CONTACT_EMAIL}"
+            set_setting "CONTACT_PHONE" "${CONTACT_PHONE}"
+        env:
+          MAIL_HOST: ${{ vars.MAIL_HOST }}
+          MAIL_PORT: ${{ vars.MAIL_PORT }}
+          MAIL_USERNAME: ${{ vars.MAIL_USERNAME }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          MAIL_BASE_URL: ${{ vars.MAIL_BASE_URL }}
+          MAIL_FROM_CONTACT: ${{ vars.MAIL_FROM_CONTACT }}
+          FALLBACK_MAIL_ENABLED: ${{ vars.FALLBACK_MAIL_ENABLED }}
+          FALLBACK_MAIL_HOST: ${{ vars.FALLBACK_MAIL_HOST }}
+          FALLBACK_MAIL_PORT: ${{ vars.FALLBACK_MAIL_PORT }}
+          FALLBACK_MAIL_USERNAME: ${{ vars.FALLBACK_MAIL_USERNAME }}
+          RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          FALLBACK_MAIL_PASSWORD: ${{ secrets.FALLBACK_MAIL_PASSWORD }}
+          RECAPTCHA_SECRET: ${{ secrets.RECAPTCHA_SECRET }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          LINKEDIN_URL: ${{ vars.LINKEDIN_URL }}
+          TWITTER_URL: ${{ vars.TWITTER_URL }}
+          GITHUB_URL: ${{ vars.GITHUB_URL }}
+          MEDIUM_URL: ${{ vars.MEDIUM_URL }}
+          WHATSAPP_URL: ${{ vars.WHATSAPP_URL }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          CONTACT_PHONE: ${{ vars.CONTACT_PHONE }}
+          APPLICATION_URL: ${{ needs.manage-infrastructure.outputs.application_url }}
       - name: Deploy to Azure App Service (publish profile)
         if: ${{ env.HAS_PUBLISH_PROFILE == 'true' }}
+        id: deploy_pp
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ needs.manage-infrastructure.outputs.application_name }}
+          resource-group: ${{ needs.manage-infrastructure.outputs.resource_group }}
           package: deploy
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
       - name: Deploy to Azure App Service (Azure login)
         if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        id: deploy_login
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ needs.manage-infrastructure.outputs.application_name }}
+          resource-group: ${{ needs.manage-infrastructure.outputs.resource_group }}
           package: deploy
+      - name: Fallback deploy via Azure CLI (config-zip)
+        if: ${{ steps.deploy_pp.outcome == 'failure' || steps.deploy_login.outcome == 'failure' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            APP="${{ needs.manage-infrastructure.outputs.application_name }}"
+            zip -r deploy.zip deploy/
+            az webapp deployment source config-zip -g "$RG" -n "$APP" --src "deploy.zip"
       - name: Restart Web App
         uses: azure/cli@v1
         with:
@@ -663,12 +862,35 @@ jobs:
       - name: Health check application
         shell: bash
         run: |
-          url="${{ needs.manage-infrastructure.outputs.application_url }}"
-          echo "Checking URL: $url"
-          code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-          echo "HTTP status: $code"
-          if [ "$code" -ne 200 ]; then
-            echo "Health check failed"
+          set -e
+          base="${{ needs.manage-infrastructure.outputs.application_url }}"
+          health="$base/management/health"
+          echo "Health check on: $health"
+          attempts=20
+          sleep_seconds=15
+          ok=false
+          for i in $(seq 1 $attempts); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$health" || echo "000")
+            echo "Attempt $i/$attempts => HTTP $code"
+            if [ "$code" -eq 200 ]; then
+              status=$(curl -s "$health" | jq -r '.status' 2>/dev/null || echo "")
+              echo "Actuator status: $status"
+              if [ "$status" = "UP" ] || [ "$status" = "UNKNOWN" ]; then
+                ok=true
+                break
+              fi
+            fi
+            # fallback root check
+            root_code=$(curl -s -o /dev/null -w "%{http_code}" "$base" || echo "000")
+            echo "Root check HTTP: $root_code"
+            if [ "$root_code" -eq 200 ]; then
+              ok=true
+              break
+            fi
+            sleep "$sleep_seconds"
+          done
+          if [ "$ok" != "true" ]; then
+            echo "Health check failed after $attempts attempts"
             exit 1
           fi
       - name: Download logs on failure

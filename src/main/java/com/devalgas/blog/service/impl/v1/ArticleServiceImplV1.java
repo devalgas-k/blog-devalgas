@@ -6,7 +6,7 @@ import com.devalgas.blog.repository.v1.ArticleHomeRepositoryV1;
 import com.devalgas.blog.repository.v1.ArticleRepositoryV1;
 import com.devalgas.blog.repository.v1.CategoryArticleRepositoryV1;
 import com.devalgas.blog.repository.v1.projection.ArticleDetailsBasicProjectionV1;
-import com.devalgas.blog.repository.v1.projection.ArticleSummaryWithCategoriesProjectionV1;
+import com.devalgas.blog.repository.v1.projection.ArticleSummaryBasicProjectionV1;
 import com.devalgas.blog.service.dto.ArticleDTO;
 import com.devalgas.blog.service.dto.v1.*;
 import com.devalgas.blog.service.mapper.ArticleMapper;
@@ -16,9 +16,6 @@ import com.devalgas.blog.service.mapper.v1.ArticleProjectionMapperV1;
 import com.devalgas.blog.service.v1.ArticleServiceV1;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +23,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,41 +67,6 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
         this.articleHomeV1Mapper = articleHomeV1Mapper;
         this.articleDetailV1Mapper = articleDetailV1Mapper;
         this.categoryArticleRepositoryV1 = categoryArticleRepositoryV1;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @Cacheable(cacheNames = "articlesSummaryV1", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort.toString()")
-    public Page<ArticleSummaryBasicDTOV1> findAllSummaryBasicProjectedV1(Pageable pageable) {
-        LOG.debug("Request to get projected Articles summary basic");
-
-        Page<ArticleSummaryWithCategoriesProjectionV1> resultPage = articleRepository.findAllSummaryWithCategories(pageable);
-
-        Map<Long, ArticleSummaryBasicDTOV1> articleMap = new LinkedHashMap<>();
-
-        resultPage
-            .getContent()
-            .forEach(projection -> {
-                ArticleSummaryBasicDTOV1 article = articleMap.computeIfAbsent(projection.getId(), id -> {
-                    ArticleSummaryBasicDTOV1 a = new ArticleSummaryBasicDTOV1();
-                    a.setId(id);
-                    a.setLabelFr(projection.getLabelFr());
-                    a.setLabelEn(projection.getLabelEn());
-                    a.setDate(projection.getDate());
-                    a.setCategoryArticles(new java.util.HashSet<>());
-                    return a;
-                });
-
-                if (projection.getCategoryId() != null) {
-                    CategoryLabelBasicDTOV1 category = articleProjectionMapperV1.toCategoryLabelDto(
-                        projection.getCategoryId(),
-                        projection.getCategoryLabel()
-                    );
-                    article.getCategoryArticles().add(category);
-                }
-            });
-
-        return new PageImpl<>(new ArrayList<>(articleMap.values()), pageable, resultPage.getTotalElements());
     }
 
     @Override
@@ -185,7 +149,10 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
     @Cacheable(cacheNames = "articlesSummaryV1", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort.toString()")
     public Page<ArticleHomeV1DTO> findAllArticlesHome(Pageable pageable) {
         LOG.debug("Request to get all Articles");
-        return articleHomeRepositoryV1.findAll(pageable).map(articleHomeV1Mapper::toDto);
+
+        return articleHomeRepositoryV1
+            .findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "date")))
+            .map(articleHomeV1Mapper::toDto);
     }
 
     @Override

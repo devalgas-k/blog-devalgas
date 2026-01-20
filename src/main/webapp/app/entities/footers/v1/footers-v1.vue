@@ -32,7 +32,7 @@
                   <li class="d-none"><a href="#">Terms</a></li>
                   <li><a href="#" class="d-none">Privacy</a></li>
                   <li><a href="#" class="d-none">Policy</a></li>
-                  <li class="footer-v1__contact">
+                  <li class="footer-v1__contact" ref="contactRef">
                     <b-link href="#" @click.prevent="toggleContactDropup">
                       <span>
                         <font-awesome-icon icon="inbox"></font-awesome-icon>
@@ -41,7 +41,7 @@
                     </b-link>
                     <div v-if="showContactDropup" class="footer-v1__dropup-menu">
                       <div class="d-flex justify-content-between">
-                        <button class="btn btn-white btn-sm ml-2" @click="openWhatsApp">
+                        <button type="button" class="btn btn-white btn-sm ml-2" @click="openWhatsApp">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="mt-n1"
@@ -56,7 +56,7 @@
                           </svg>
                           Whatsapp
                         </button>
-                        <button class="btn btn-white btn-sm mr-5" @click="openMailTo">
+                        <button type="button" class="btn btn-white btn-sm mr-5" @click="openMailTo">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="mt-n1"

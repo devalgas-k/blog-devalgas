@@ -27,14 +27,3 @@
 - Verifier qu'il existe s'il existe ne pas creer
 
 3. Optimiser les fichiers terraform et gitops pour eviter le genres erreurs ci-dessous:
-
-╷
-│ Error: A resource with the ID "https://kv-devalgas-blog.vault.azure.net/secrets/smtp-password/12b5a5ae049340e6b932959ca36df68b" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
-│
-│ with azurerm_key_vault_secret.smtp_password[0],
-│ on keyvault.tf line 85, in resource "azurerm_key_vault_secret" "smtp_password":
-│ 85: resource "azurerm_key_vault_secret" "smtp_password" \*\*\*
-│
-╵
-Error: Terraform exited with code 1.
-Error: Process completed with exit code 1.
