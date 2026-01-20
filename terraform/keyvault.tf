@@ -83,7 +83,7 @@ resource "azurerm_key_vault_secret" "jwt_secret" {
 }
 
 resource "azurerm_key_vault_secret" "smtp_password" {
-  count        = var.enable_email_service && var.enable_keyvault ? 1 : 0
+  count        = var.enable_email_service && var.enable_keyvault && var.mail_password != "" ? 1 : 0
   name         = "smtp-password"
   value        = var.mail_password
   key_vault_id = azurerm_key_vault.kv[0].id
@@ -91,7 +91,7 @@ resource "azurerm_key_vault_secret" "smtp_password" {
 }
 
 resource "azurerm_key_vault_secret" "fallback_smtp_password" {
-  count        = var.enable_email_service && var.enable_keyvault && var.fallback_mail_enabled ? 1 : 0
+  count        = var.enable_email_service && var.enable_keyvault && var.fallback_mail_enabled && var.fallback_mail_password != "" ? 1 : 0
   name         = "fallback-smtp-password"
   value        = var.fallback_mail_password
   key_vault_id = azurerm_key_vault.kv[0].id

@@ -27,15 +27,15 @@ jobs:
       TF_VAR_recaptcha_site_key: ${{ vars.RECAPTCHA_SITE_KEY }}
       TF_VAR_recaptcha_secret: ${{ secrets.RECAPTCHA_SECRET }}
       RUN_TERRAFORM_APPLY: ${{ vars.RUN_TERRAFORM_APPLY }}
-      TF_VAR_fallback_mail_enabled: ${{ vars.FALLBACK_MAIL_ENABLED == 'false' }}
+      TF_VAR_fallback_mail_enabled: ${{ vars.FALLBACK_MAIL_ENABLED }}
       TF_VAR_fallback_mail_host: ${{ vars.FALLBACK_MAIL_HOST }}
       TF_VAR_fallback_mail_port: ${{ vars.FALLBACK_MAIL_PORT }}
       TF_VAR_fallback_mail_username: ${{ vars.FALLBACK_MAIL_USERNAME }}
-      TF_VAR_mail_host: ${{ vars.MAIL_HOST || 'smtp-relay.brevo.com' }}
-      TF_VAR_mail_port: ${{ vars.MAIL_PORT || '587' }}
+      TF_VAR_mail_host: ${{ vars.MAIL_HOST }}
+      TF_VAR_mail_port: ${{ vars.MAIL_PORT }}
       TF_VAR_mail_username: ${{ vars.MAIL_USERNAME }}
-      TF_VAR_mail_from: ${{ vars.MAIL_FROM || 'noreply@devalgas.net' }}
-      TF_VAR_mail_base_url: ${{ vars.MAIL_BASE_URL || 'https://devalgas.net' }}
+      TF_VAR_mail_from: ${{ vars.MAIL_FROM }}
+      TF_VAR_mail_base_url: ${{ vars.MAIL_BASE_URL }}
       APP_NAME: app-springboot-blog-devalgas
       RESOURCE_GROUP: rg-devalgas-springboot-azure
       PLAN_NAME: asp-springboot
@@ -446,7 +446,7 @@ jobs:
         working-directory: ./terraform
         run: terraform validate
       - name: Terraform apply
-        if: ${{ env.RUN_TERRAFORM_APPLY == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_apply == 'true') }}
+        if: ${{ (env.RUN_TERRAFORM_APPLY == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_apply == 'true')) && (github.actor == github.repository_owner) }}
         working-directory: ./terraform
         run: terraform apply -auto-approve -input=false
       - name: Set outputs
@@ -531,6 +531,8 @@ jobs:
     needs:
       - manage-infrastructure
       - build
+    env:
+      OVERRIDE_APP_SETTINGS: ${{ vars.OVERRIDE_APP_SETTINGS }}
     steps:
       - name: Detect publish profile secret
         shell: bash
@@ -606,7 +608,7 @@ jobs:
             az webapp config appsettings set -g "$RG" -n "$APP" --settings WEBSITES_CONTAINER_START_TIME_LIMIT=300
             az webapp log config -g "$RG" -n "$APP" --application-logging filesystem --level information
       - name: Configure App Settings (no publish profile)
-        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' }}
+        if: ${{ env.HAS_PUBLISH_PROFILE == 'false' && env.OVERRIDE_APP_SETTINGS == 'true' }}
         uses: azure/cli@v1
         with:
           azcliversion: latest
@@ -619,13 +621,20 @@ jobs:
               FQDN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "fullyQualifiedDomainName" -o tsv)
               ADMIN=$(az postgres flexible-server show -g "$RG" -n "$DB_NAME" --query "administratorLogin" -o tsv)
               DBURL="jdbc:postgresql://${FQDN}:5432/appdb?sslmode=require"
-              echo "Configuring app settings for DB URL: $DBURL"
-              az webapp config appsettings set -g "$RG" -n "$APP" --settings \
-                SPRING_PROFILES_ACTIVE=prod \
-                SPRING_DATASOURCE_URL="$DBURL" \
-                SPRING_DATASOURCE_USERNAME="$ADMIN" \
-                SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-                JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET="${{ secrets.JWT_SECRET }}"
+              DBP="${{ secrets.DB_PASSWORD }}"
+              JWT="${{ secrets.JWT_SECRET }}"
+              KEYS="SPRING_PROFILES_ACTIVE SPRING_DATASOURCE_URL SPRING_DATASOURCE_USERNAME"
+              SETTINGS="SPRING_PROFILES_ACTIVE=prod SPRING_DATASOURCE_URL=$DBURL SPRING_DATASOURCE_USERNAME=$ADMIN"
+              if [ -n "$DBP" ]; then
+                SETTINGS="$SETTINGS SPRING_DATASOURCE_PASSWORD=$DBP"
+                KEYS="$KEYS SPRING_DATASOURCE_PASSWORD"
+              fi
+              if [ -n "$JWT" ]; then
+                SETTINGS="$SETTINGS JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=$JWT"
+                KEYS="$KEYS JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET"
+              fi
+              echo "Applying app settings keys: $KEYS"
+              az webapp config appsettings set -g "$RG" -n "$APP" --settings $SETTINGS
             else
               echo "No PostgreSQL server found in resource group $RG; skipping DB app settings"
             fi

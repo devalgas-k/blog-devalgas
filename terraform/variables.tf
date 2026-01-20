@@ -47,37 +47,42 @@ variable "db_password" {
 
 variable "recaptcha_site_key" {
   type    = string
-  default = "6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK"
+  default = ""
 }
 
 variable "recaptcha_secret" {
   type      = string
   sensitive = true
-  default   = "6LewAUwsAAAAABLATqSXUf-MHblYcvuXwKZlLWCJ"
+  default   = ""
 }
 
 variable "social_urls" {
   type = map(string)
   default = {
-    linkedin = "https://www.linkedin.com/in/devalgas-kamga/"
-    twitter  = "https://x.com/devalgas1/"
-    github   = "https://github.com/devalgas-k/"
-    medium   = "https://medium.com/@kamgadevalgas"
-    whatsapp = "https://wa.me/237699520388"
+    linkedin = ""
+    twitter  = ""
+    github   = ""
+    medium   = ""
+    whatsapp = ""
   }
 }
 
 variable "contact_info" {
   type = map(string)
   default = {
-    contact_email = "kamgadevalga@icloud.com"
-    contact_phone = "tel:+23055040199"
+    contact_email = ""
+    contact_phone = ""
   }
 }
 
 variable "enable_email_service" {
   type    = bool
   default = true
+}
+
+variable "use_azure_communication_services" {
+  type    = bool
+  default = false
 }
 
 variable "fallback_mail_enabled" {
@@ -147,13 +152,13 @@ variable "use_oidc" {
 }
 variable "enable_keyvault" {
   type    = bool
-  default = true
+  default = false
 }
 variable "enable_keyvault_rbac" {
   type    = bool
-  default = true
+  default = false
   validation {
-    condition     = var.enable_keyvault_rbac == false || var.enable_keyvault == true
+    condition     = var.enable_keyvault_rbac ? var.enable_keyvault : true
     error_message = "enable_keyvault must be true when enable_keyvault_rbac is true."
   }
 }
