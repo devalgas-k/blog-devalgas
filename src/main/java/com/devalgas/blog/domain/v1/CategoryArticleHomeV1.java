@@ -48,8 +48,8 @@ public class CategoryArticleHomeV1 implements Serializable {
     private String descriptionEn;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categoryArticles")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "categoryArticles" }, allowSetters = true)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<ArticleHomeV1> articles = new HashSet<>();
 
     public Long getId() {

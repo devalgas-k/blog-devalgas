@@ -1,10 +1,8 @@
 package com.devalgas.blog.repository.v1;
 
 import com.devalgas.blog.domain.CategoryArticle;
-import com.devalgas.blog.repository.v1.projection.CategoryArticleLabelProjectionV1;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,6 +25,4 @@ public interface CategoryArticleRepositoryV1 extends CategoryArticleRepositoryWi
     default Page<CategoryArticle> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
     }
-
-    Set<CategoryArticleLabelProjectionV1> findAllByArticles_Id(Long articlesId);
 }

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Repository;
  * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
  */
 @Repository
-public interface ArticleHomeRepositoryV1 extends JpaRepository<ArticleHomeV1, Long> {
+public interface ArticleHomeRepositoryV1 extends ArticleHomeRepositoryWithBagRelationshipsV1, JpaRepository<ArticleHomeV1, Long> {
     Page<ArticleHomeV1> findAll(Pageable pageable);
+
+    default Page<ArticleHomeV1> findAllWithEagerRelationships(Pageable pageable) {
+        return this.fetchBagRelationships(this.findAll(pageable));
+    }
 }

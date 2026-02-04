@@ -64,7 +64,7 @@ public class ArticleHomeV1 implements Serializable {
     @Column(name = "stars")
     private Integer stars;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_article__category_article",
         joinColumns = @JoinColumn(name = "article_id"),

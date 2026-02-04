@@ -1,11 +1,8 @@
 package com.devalgas.blog.service.v1;
 
-import com.devalgas.blog.domain.v1.ArticleDetailV1;
 import com.devalgas.blog.service.dto.ArticleDTO;
 import com.devalgas.blog.service.dto.v1.ArticleDetailV1DTO;
-import com.devalgas.blog.service.dto.v1.ArticleDetailsBasicDTOV1;
 import com.devalgas.blog.service.dto.v1.ArticleHomeV1DTO;
-import com.devalgas.blog.service.dto.v1.ArticleSummaryBasicDTOV1;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +11,6 @@ import org.springframework.data.domain.Pageable;
  * Service Interface for managing {@link com.devalgas.blog.domain.Article}.
  */
 public interface ArticleServiceV1 {
-    /**
-     * Get optimized article details projection for an id, optionally localized.
-     *
-     * @param id the id of the article to retrieve.
-     * @return an optional containing the optimized article details, or empty if not found.
-     */
-    Optional<ArticleDetailsBasicDTOV1> findOneDetailsBasicProjectedV1(Long id);
     /**
      * Delete an article by id and evict related caches.
      *

@@ -12,6 +12,10 @@ import org.springframework.stereotype.Repository;
  * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
  */
 @Repository
-public interface ArticleDetailRepositoryV1 extends JpaRepository<ArticleDetailV1, Long> {
+public interface ArticleDetailRepositoryV1 extends ArticleDetailRepositoryWithBagRelationshipsV1, JpaRepository<ArticleDetailV1, Long> {
     Optional<ArticleDetailV1> findById(Long id);
+
+    default Optional<ArticleDetailV1> findOneWithEagerRelationships(Long id) {
+        return this.fetchBagRelationships(this.findById(id));
+    }
 }

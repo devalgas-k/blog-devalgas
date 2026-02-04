@@ -1,7 +1,6 @@
 package com.devalgas.blog.service.v1;
 
 import com.devalgas.blog.service.dto.v1.CategoryArticleHomeV1DTO;
-import com.devalgas.blog.service.dto.v1.CategoryArticleSummaryDTOV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

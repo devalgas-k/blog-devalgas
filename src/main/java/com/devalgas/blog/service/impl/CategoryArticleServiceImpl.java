@@ -33,7 +33,6 @@ public class CategoryArticleServiceImpl implements CategoryArticleService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "categoryArticlesSummaryAllV1" }, allEntries = true)
     public CategoryArticleDTO save(CategoryArticleDTO categoryArticleDTO) {
         LOG.debug("Request to save CategoryArticle : {}", categoryArticleDTO);
         CategoryArticle categoryArticle = categoryArticleMapper.toEntity(categoryArticleDTO);
@@ -42,7 +41,6 @@ public class CategoryArticleServiceImpl implements CategoryArticleService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "categoryArticlesSummaryAllV1" }, allEntries = true)
     public CategoryArticleDTO update(CategoryArticleDTO categoryArticleDTO) {
         LOG.debug("Request to update CategoryArticle : {}", categoryArticleDTO);
         CategoryArticle categoryArticle = categoryArticleMapper.toEntity(categoryArticleDTO);
@@ -51,7 +49,6 @@ public class CategoryArticleServiceImpl implements CategoryArticleService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "categoryArticlesSummaryAllV1" }, allEntries = true)
     public Optional<CategoryArticleDTO> partialUpdate(CategoryArticleDTO categoryArticleDTO) {
         LOG.debug("Request to partially update CategoryArticle : {}", categoryArticleDTO);
 
@@ -81,7 +78,6 @@ public class CategoryArticleServiceImpl implements CategoryArticleService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "categoryArticlesSummaryAllV1" }, allEntries = true)
     public void delete(Long id) {
         LOG.debug("Request to delete CategoryArticle : {}", id);
         categoryArticleRepository.deleteById(id);

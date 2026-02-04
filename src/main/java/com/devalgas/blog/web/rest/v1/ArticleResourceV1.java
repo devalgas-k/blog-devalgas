@@ -2,7 +2,7 @@ package com.devalgas.blog.web.rest.v1;
 
 import com.devalgas.blog.service.ArticleService;
 import com.devalgas.blog.service.dto.ArticleDTO;
-import com.devalgas.blog.service.dto.v1.ArticleDetailsBasicDTOV1;
+import com.devalgas.blog.service.dto.v1.ArticleDetailV1DTO;
 import com.devalgas.blog.service.dto.v1.ArticleHomeV1DTO;
 import com.devalgas.blog.service.v1.ArticleServiceV1;
 import java.util.List;
@@ -99,14 +99,14 @@ public class ArticleResourceV1 {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the optimized article details,
      *         or with status {@code 304 (Not Modified)} when ETag matches, or {@code 404 (Not Found)} when the article doesn't exist.
      */
-    public ResponseEntity<ArticleDetailsBasicDTOV1> getArticleV1(
+    public ResponseEntity<ArticleDetailV1DTO> getArticleV1(
         @PathVariable("id") Long id,
         @RequestParam(value = "lang", required = false) String lang,
         @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage
     ) {
         log.debug("REST request to get optimized Article V1 : {}, lang={}", id, lang);
-        ArticleDetailsBasicDTOV1 article = articleServiceV1
-            .findOneDetailsBasicProjectedV1(id)
+        ArticleDetailV1DTO article = articleServiceV1
+            .findOneArticleDetails(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok().body(article);
     }

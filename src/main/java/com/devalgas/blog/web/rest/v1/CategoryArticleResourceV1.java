@@ -1,7 +1,6 @@
 package com.devalgas.blog.web.rest.v1;
 
 import com.devalgas.blog.service.dto.v1.CategoryArticleHomeV1DTO;
-import com.devalgas.blog.service.dto.v1.CategoryArticleSummaryDTOV1;
 import com.devalgas.blog.service.v1.CategoryArticleServiceV1;
 import java.util.List;
 import org.slf4j.Logger;

@@ -9,8 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.devalgas.blog.IntegrationTest;
 import com.devalgas.blog.domain.Article;
+import com.devalgas.blog.domain.CategoryArticle;
 import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.repository.ArticleRepository;
+import com.devalgas.blog.repository.CategoryArticleRepository;
 import com.devalgas.blog.service.mapper.ArticleMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -66,6 +68,9 @@ class ArticleResourceV1IT {
     private ArticleRepository articleRepository;
 
     @Autowired
+    private CategoryArticleRepository categoryArticleRepository;
+
+    @Autowired
     private ArticleMapper articleMapper;
 
     @Autowired
@@ -76,6 +81,7 @@ class ArticleResourceV1IT {
 
     private Article article;
     private Article insertedArticle;
+    private CategoryArticle insertedCategory;
 
     public static Article createEntity() {
         return new Article()
@@ -107,6 +113,10 @@ class ArticleResourceV1IT {
         if (insertedArticle != null) {
             articleRepository.delete(insertedArticle);
             insertedArticle = null;
+        }
+        if (insertedCategory != null) {
+            categoryArticleRepository.delete(insertedCategory);
+            insertedCategory = null;
         }
     }
 
@@ -195,6 +205,24 @@ class ArticleResourceV1IT {
 
     @Test
     @Transactional
+    void getAllArticlesSummaryV1IncludesCategories() throws Exception {
+        CategoryArticle category = new CategoryArticle().label("IR1N5d").code("IR").descriptionFr("cat fr").descriptionEn("cat en");
+        insertedCategory = categoryArticleRepository.saveAndFlush(category);
+
+        Article a1 = createEntity();
+        a1.addCategoryArticle(insertedCategory);
+        insertedArticle = articleRepository.saveAndFlush(a1);
+
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary?sort=id,asc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(insertedArticle.getId().intValue())))
+            .andExpect(jsonPath("$.[*].categoryArticles[*].label").value(hasItem("IR1N5d")));
+    }
+
+    @Test
+    @Transactional
     void getArticleSummaryDetailsV1() throws Exception {
         insertedArticle = articleRepository.saveAndFlush(article);
         restArticleMockMvc
@@ -215,6 +243,24 @@ class ArticleResourceV1IT {
     @Transactional
     void getArticleSummaryDetailsV1NotFound() throws Exception {
         restArticleMockMvc.perform(get(ENTITY_API_URL + "/summary/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    void getArticleSummaryDetailsV1IncludesCategories() throws Exception {
+        CategoryArticle category = new CategoryArticle().label("IR1N5d").code("IR").descriptionFr("cat fr").descriptionEn("cat en");
+        insertedCategory = categoryArticleRepository.saveAndFlush(category);
+
+        Article a1 = createEntity();
+        a1.addCategoryArticle(insertedCategory);
+        insertedArticle = articleRepository.saveAndFlush(a1);
+
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary/{id}", insertedArticle.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.id").value(insertedArticle.getId().intValue()))
+            .andExpect(jsonPath("$.categoryArticles[*].label").value(hasItem("IR1N5d")));
     }
 
     @Test

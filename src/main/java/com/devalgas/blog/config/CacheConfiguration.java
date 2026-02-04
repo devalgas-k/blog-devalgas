@@ -62,9 +62,13 @@ public class CacheConfiguration {
             createCache(cm, com.devalgas.blog.domain.Subscribe.class.getName());
             createCache(cm, com.devalgas.blog.domain.Message.class.getName());
             createCache(cm, com.devalgas.blog.domain.Subject.class.getName());
-            createCache(cm, "articlesSummaryV1");
-            createCache(cm, "articleDetailsV1");
-            createCache(cm, "categoryArticlesSummaryAllV1");
+            createCache(cm, com.devalgas.blog.domain.v1.ArticleHomeV1.class.getName());
+            createCache(cm, com.devalgas.blog.domain.v1.ArticleHomeV1.class.getName() + ".categoryArticles");
+            createCache(cm, com.devalgas.blog.domain.v1.ArticleDetailV1.class.getName());
+            createCache(cm, com.devalgas.blog.domain.v1.ArticleDetailV1.class.getName() + ".categoryArticles");
+            createCache(cm, com.devalgas.blog.domain.v1.CategoryArticleHomeV1.class.getName());
+            createCache(cm, com.devalgas.blog.domain.v1.CategoryArticleHomeV1.class.getName() + ".articles");
+            // Simplification: pas de caches spécifiques V1
             // jhipster-needle-ehcache-add-entry
         };
     }
