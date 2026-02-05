@@ -1,18 +1,25 @@
 package com.devalgas.blog.web.rest.v1;
 
-import com.devalgas.blog.service.ArticleService;
-import com.devalgas.blog.service.dto.ArticleDTO;
+import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.service.dto.v1.ArticleDetailV1DTO;
 import com.devalgas.blog.service.dto.v1.ArticleHomeV1DTO;
 import com.devalgas.blog.service.v1.ArticleServiceV1;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.DigestUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,78 +34,24 @@ public class ArticleResourceV1 {
 
     private static final Logger log = LoggerFactory.getLogger(ArticleResourceV1.class);
 
-    private final ArticleService articleService;
     private final ArticleServiceV1 articleServiceV1;
 
-    public ArticleResourceV1(ArticleService articleService, ArticleServiceV1 articleServiceV1) {
-        this.articleService = articleService;
+    public ArticleResourceV1(ArticleServiceV1 articleServiceV1) {
         this.articleServiceV1 = articleServiceV1;
     }
 
-    /**
-     * {@code GET  /v1/articles/:id} : get the "id" article.
-     *
-     * @param id the id of the articleDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the articleDTO, or with status {@code 404 (Not Found)}.
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ArticleDTO> getArticle(@PathVariable("id") Long id) {
-        log.debug("REST request to get Article : {}", id);
-        ArticleDTO articleDTO = articleService.findOne(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ResponseEntity.ok().body(articleDTO);
-    }
-
-    /**
-     * {@code GET  /articles} : get all the articles.
-     *
-     * @param pageable the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of articles in body.
-     */
-    @GetMapping("")
-    public ResponseEntity<List<ArticleDTO>> getAllArticles(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
-    ) {
-        log.debug("REST request to get a page of Articles");
-        Page<ArticleDTO> page;
-        if (eagerload) {
-            page = articleService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = articleService.findAll(pageable);
-        }
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        // Thread.getAllStackTraces();
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /articles/summary} : get projected summary of articles.
-     *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projected articles in body.
-     */
     @GetMapping("/summary")
-    public ResponseEntity<List<ArticleHomeV1DTO>> getAllArticlesV1(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<ArticleHomeV1DTO>> getAllArticlesV1(
+        @ParameterObject Pageable pageable,
+        @RequestParam(name = "status", required = false, defaultValue = "COMPLETED") Status status
+    ) {
         log.debug("REST request to get a page of optimized Articles V1");
-        Page<ArticleHomeV1DTO> page = articleServiceV1.findAllArticlesHome(pageable);
+        Page<ArticleHomeV1DTO> page = articleServiceV1.findAllArticlesHome(status, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     @GetMapping("/summary/{id}")
-    /**
-     * {@code GET  /articles/summary/:id} : get optimized article details.
-     *
-     * Retrieves an optimized projection of an article with minimal fields, optionally localized.
-     *
-     * @param id the id of the article to retrieve.
-     * @param lang optional language code ("fr" or "en") to select localized fields.
-     * @param acceptLanguage optional HTTP header used to resolve language when {@code lang} is not provided.
-     * @param ifNoneMatch optional ETag header used to return {@code 304 (Not Modified)} when content hasn't changed.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the optimized article details,
-     *         or with status {@code 304 (Not Modified)} when ETag matches, or {@code 404 (Not Found)} when the article doesn't exist.
-     */
     public ResponseEntity<ArticleDetailV1DTO> getArticleV1(
         @PathVariable("id") Long id,
         @RequestParam(value = "lang", required = false) String lang,
@@ -109,5 +62,46 @@ public class ArticleResourceV1 {
             .findOneArticleDetails(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok().body(article);
+    }
+
+    @GetMapping(value = "/{id}/og-image")
+    public ResponseEntity<byte[]> getArticleOgImage(@PathVariable("id") Long id) {
+        log.debug("REST request to get OG image for Article V1 : {}", id);
+        ArticleDetailV1DTO article = articleServiceV1
+            .findOneArticleDetails(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        byte[] bytes = null;
+        String contentType = null;
+        if (article.getBanner() != null && article.getBanner().length > 0) {
+            bytes = article.getBanner();
+            contentType = article.getBannerContentType();
+        } else if (article.getBadge() != null && article.getBadge().length > 0) {
+            bytes = article.getBadge();
+            contentType = article.getBadgeContentType();
+        }
+
+        if (bytes != null) {
+            MediaType mt = contentType != null ? MediaType.parseMediaType(contentType) : MediaType.IMAGE_PNG;
+            String etag = "\"" + DigestUtils.md5DigestAsHex(bytes) + "\"";
+            return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).cachePublic())
+                .eTag(etag)
+                .contentType(mt)
+                .body(bytes);
+        }
+
+        try {
+            ClassPathResource resource = new ClassPathResource("static/content/images/logo-app.png");
+            byte[] logo = StreamUtils.copyToByteArray(resource.getInputStream());
+            String etag = "\"" + DigestUtils.md5DigestAsHex(logo) + "\"";
+            return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic())
+                .eTag(etag)
+                .contentType(MediaType.IMAGE_PNG)
+                .body(logo);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "OG image not available");
+        }
     }
 }

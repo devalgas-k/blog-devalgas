@@ -29,6 +29,13 @@
       "links": "Liens utiles",
       "info": "Contact info",
       "copyright": "Copyright &copy; 2026, Tous droits réservés"
+    },
+    "seo": {
+      "description": {
+        "base": "Devalgas — blog d’ingénierie logicielle: Java, Spring Boot, cloud, sécurité, performance, CI/CD, Kubernetes, bonnes pratiques et tutoriels.",
+        "writing": "Devlogs — articles techniques sur Java, Spring Boot, performance, architectures cloud, CI/CD, Kubernetes, bonnes pratiques.",
+        "articleFallback": "Résumé de l’article indisponible."
+      }
     }
   }
 }

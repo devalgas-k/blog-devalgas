@@ -1,6 +1,7 @@
 package com.devalgas.blog.service.impl.v1;
 
 import com.devalgas.blog.domain.Article;
+import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.repository.v1.ArticleDetailRepositoryV1;
 import com.devalgas.blog.repository.v1.ArticleHomeRepositoryV1;
 import com.devalgas.blog.repository.v1.ArticleRepositoryV1;
@@ -95,11 +96,11 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ArticleHomeV1DTO> findAllArticlesHome(Pageable pageable) {
-        LOG.debug("Request to get all Articles");
-
+    public Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, Pageable pageable) {
+        LOG.debug("Request to get all Articles by status {}", status);
         return articleHomeRepositoryV1
-            .findAllWithEagerRelationships(
+            .findByStatusWithEagerRelationships(
+                status,
                 PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "date"))
             )
             .map(articleHomeV1Mapper::toDto);

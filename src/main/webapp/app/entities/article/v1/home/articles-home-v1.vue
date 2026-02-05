@@ -24,7 +24,11 @@
             <tbody>
               <tr v-for="article in articles" :key="article.id" data-cy="entityTable">
                 <td>
-                  <router-link :to="{ name: 'ArticleDetailsViewV1', params: { articleId: article?.id } }" custom v-slot="{ navigate }">
+                  <router-link
+                    :to="{ name: 'ArticleDetailsViewV1Slug', params: { articleId: article?.id, slug: slugForArticle(article) } }"
+                    custom
+                    v-slot="{ navigate }"
+                  >
                     <div @click="navigate" class="clickable writing__link">
                       <article-info :article="article"></article-info>
                     </div>

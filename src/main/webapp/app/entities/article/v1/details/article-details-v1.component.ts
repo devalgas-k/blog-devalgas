@@ -1,6 +1,7 @@
 import { computed, defineAsyncComponent, defineComponent, inject, ref, type Ref, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { useHead } from '@unhead/vue';
 
 import useDataUtils from '@/shared/data/data-utils.service.ts';
 import { type IArticle } from '@/shared/model/article.model.ts';
@@ -42,6 +43,7 @@ export default defineComponent({
 
     const dataUtils = useDataUtils();
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+    const langBase = computed(() => (currentLanguage?.value ?? 'fr').toString().split('-')[0].toLowerCase());
 
     const route = useRoute();
     const router = useRouter();
@@ -62,11 +64,125 @@ export default defineComponent({
       retrieveArticle(Number(route.params.articleId));
     }
     const decodedMarkdownContent = computed(() => {
-      const isFr = currentLanguage.value === 'fr';
+      const isFr = langBase.value === 'fr';
       const base64 = isFr ? (article.value.markdownFr ?? '') : (article.value.markdownEn ?? '');
       const contentType = isFr ? (article.value.markdownFrContentType ?? '') : (article.value.markdownEnContentType ?? '');
       return dataUtils.decodeMarkdownContent(base64, contentType);
     });
+
+    const articleTitle = computed(() => {
+      const isFr = langBase.value === 'fr';
+      const art = article.value;
+      return (isFr ? art?.labelFr : art?.labelEn) ?? '';
+    });
+
+    const descriptionCandidate = computed(() => {
+      const isFr = langBase.value === 'fr';
+      const art = article.value;
+      const desc = (isFr ? art?.descriptionFr : art?.descriptionEn) ?? '';
+      if (desc && desc.trim().length > 0) return desc.trim();
+      const html = decodedMarkdownContent.value.html ?? '';
+      if (!html) return '';
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      const text = (tmp.textContent ?? tmp.innerText ?? '').trim();
+      if (!text) return '';
+      const max = 160;
+      return text.length > max ? text.substring(0, max - 1) + '…' : text;
+    });
+
+    const description = computed(() => {
+      const d = descriptionCandidate.value;
+      if (d && d.trim().length > 0) return d;
+      return useI18n().t('globalV1.seo.description.articleFallback').toString();
+    });
+
+    const canonicalUrl = computed(() => {
+      const origin = window?.location?.origin ?? '';
+      const path = router?.currentRoute?.value?.path ?? route.path;
+      return origin + path;
+    });
+    const ogImage = computed(() => {
+      const origin = window?.location?.origin ?? '';
+      const id = article.value?.id;
+      if (id) {
+        return `${origin}/api/v1/articles/${id}/og-image`;
+      }
+      return `${origin}${IMAGE_BASE_PATH}/logo-app.png`;
+    });
+
+    const ogLocale = computed(() => langBase.value);
+    const siteName = 'Devalgas.net';
+    const twitterSite = '@devalgas';
+    const twitterImageAlt = articleTitle;
+
+    const buildSlug = (s: string) =>
+      (s ?? '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80);
+    const altLinks = computed(() => {
+      const origin = window?.location?.origin ?? '';
+      const id = article.value?.id;
+      if (!id) return [];
+      const frSlug = buildSlug(article.value?.labelFr ?? '');
+      const enSlug = buildSlug(article.value?.labelEn ?? '');
+      return [
+        { rel: 'alternate', hreflang: 'fr', href: `${origin}/v1/articles/${id}-${frSlug}/view` },
+        { rel: 'alternate', hreflang: 'en', href: `${origin}/v1/articles/${id}-${enSlug}/view` },
+        { rel: 'alternate', hreflang: 'x-default', href: `${origin}/v1/articles/${id}-${frSlug}/view` },
+      ];
+    });
+
+    useHead({
+      title: articleTitle,
+      link: [{ rel: 'canonical', href: canonicalUrl }, ...altLinks.value],
+      meta: [
+        { name: 'description', content: description },
+        { property: 'og:title', content: articleTitle },
+        { property: 'og:description', content: description },
+        { property: 'og:url', content: canonicalUrl },
+        { property: 'og:type', content: 'article' },
+        { property: 'og:site_name', content: siteName },
+        { property: 'og:locale', content: ogLocale },
+        { property: 'og:image', content: ogImage },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:site', content: twitterSite },
+        { name: 'twitter:title', content: articleTitle },
+        { name: 'twitter:description', content: description },
+        { name: 'twitter:image', content: ogImage },
+        { name: 'twitter:image:alt', content: twitterImageAlt },
+      ],
+      script: [
+        {
+          type: 'application/ld+json',
+          children: computed(() =>
+            JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              headline: articleTitle.value,
+              description: description.value,
+              inLanguage: langBase.value,
+              mainEntityOfPage: canonicalUrl.value,
+              datePublished: article.value?.date ? new Date(article.value.date).toISOString() : undefined,
+              author: { '@type': 'Person', name: 'Devalgas.net' },
+              publisher: { '@type': 'Organization', name: 'Devalgas.net' },
+              image: ogImage.value,
+              isPartOf: { '@type': 'Blog', name: siteName, url: canonicalUrl.value },
+              keywords: Array.from(article.value?.categoryArticles ?? [])
+                .map((c: any) => c?.code || c?.label)
+                .filter((x: any) => !!x)
+                .join(', '),
+            }),
+          ),
+        },
+      ],
+    });
+
+    // dynamic head handled via Unhead
 
     return {
       ...dateFormat,
@@ -78,6 +194,8 @@ export default defineComponent({
       t$: useI18n().t,
       currentLanguage,
       decodedMarkdownContent,
+      articleTitle,
+      description,
       adsenseClient: ADSENSE_CLIENT,
       adsenseSlot: ADSENSE_SLOT,
     };

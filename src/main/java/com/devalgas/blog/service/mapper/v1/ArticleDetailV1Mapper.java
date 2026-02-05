@@ -20,6 +20,10 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface ArticleDetailV1Mapper extends EntityMapper<ArticleDetailV1DTO, ArticleDetailV1> {
     @Mapping(target = "categoryArticles", source = "categoryArticles", qualifiedByName = "categoryArticleLabelSet")
+    @Mapping(target = "badge", source = "badge")
+    @Mapping(target = "badgeContentType", source = "badgeContentType")
+    @Mapping(target = "banner", source = "banner")
+    @Mapping(target = "bannerContentType", source = "bannerContentType")
     ArticleDetailV1DTO toDto(ArticleDetailV1 s);
 
     ArticleDetailV1 toEntity(ArticleDetailV1 articleDTO);

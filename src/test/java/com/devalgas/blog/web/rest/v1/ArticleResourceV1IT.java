@@ -59,7 +59,8 @@ class ArticleResourceV1IT {
     private static final Integer DEFAULT_STARS = 1;
 
     private static final String ENTITY_API_URL = "/api/v1/articles";
-    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    // Legacy V1 detail route retired: use summary/{id}
 
     @Autowired
     private ObjectMapper om;
@@ -120,51 +121,7 @@ class ArticleResourceV1IT {
         }
     }
 
-    @Test
-    @Transactional
-    void getArticleV1() throws Exception {
-        insertedArticle = articleRepository.saveAndFlush(article);
-        restArticleMockMvc
-            .perform(get(ENTITY_API_URL_ID, article.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(article.getId().intValue()))
-            .andExpect(jsonPath("$.labelEn").value(DEFAULT_LABEL_EN))
-            .andExpect(jsonPath("$.labelFr").value(DEFAULT_LABEL_FR))
-            .andExpect(jsonPath("$.descriptionFr").value(DEFAULT_DESCRIPTION_FR))
-            .andExpect(jsonPath("$.descriptionEn").value(DEFAULT_DESCRIPTION_EN))
-            .andExpect(jsonPath("$.markdownFrContentType").value(DEFAULT_MARKDOWN_FR_CONTENT_TYPE))
-            .andExpect(jsonPath("$.markdownFr").value(Base64.getEncoder().encodeToString(DEFAULT_MARKDOWN_FR)))
-            .andExpect(jsonPath("$.markdownEnContentType").value(DEFAULT_MARKDOWN_EN_CONTENT_TYPE))
-            .andExpect(jsonPath("$.markdownEn").value(Base64.getEncoder().encodeToString(DEFAULT_MARKDOWN_EN)))
-            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
-            .andExpect(jsonPath("$.date").value(sameInstant(DEFAULT_DATE)))
-            .andExpect(jsonPath("$.badgeContentType").value(DEFAULT_BADGE_CONTENT_TYPE))
-            .andExpect(jsonPath("$.badge").value(Base64.getEncoder().encodeToString(DEFAULT_BADGE)))
-            .andExpect(jsonPath("$.bannerContentType").value(DEFAULT_BANNER_CONTENT_TYPE))
-            .andExpect(jsonPath("$.banner").value(Base64.getEncoder().encodeToString(DEFAULT_BANNER)))
-            .andExpect(jsonPath("$.views").value(DEFAULT_VIEWS))
-            .andExpect(jsonPath("$.stars").value(DEFAULT_STARS));
-    }
-
-    @Test
-    @Transactional
-    void getNonExistingArticleV1() throws Exception {
-        restArticleMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Transactional
-    void getAllArticlesV1() throws Exception {
-        insertedArticle = articleRepository.saveAndFlush(article);
-        restArticleMockMvc
-            .perform(get(ENTITY_API_URL))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(article.getId().intValue())))
-            .andExpect(jsonPath("$.[*].labelEn").value(hasItem(DEFAULT_LABEL_EN)))
-            .andExpect(jsonPath("$.[*].labelFr").value(hasItem(DEFAULT_LABEL_FR)));
-    }
+    // Removed: tests for legacy id route on /api/v1/articles/{id}
 
     @Test
     @Transactional
@@ -265,7 +222,7 @@ class ArticleResourceV1IT {
 
     @Test
     @Transactional
-    void getAllArticlesV1PaginationHeaders() throws Exception {
+    void getAllArticlesSummaryV1PaginationHeaders() throws Exception {
         Article a1 = createEntity();
         a1.setLabelEn(DEFAULT_LABEL_EN + "1");
         a1.setLabelFr(DEFAULT_LABEL_FR + "1");
@@ -279,7 +236,7 @@ class ArticleResourceV1IT {
         a3.setLabelFr(DEFAULT_LABEL_FR + "3");
         articleRepository.saveAndFlush(a3);
         restArticleMockMvc
-            .perform(get(ENTITY_API_URL + "?page=0&size=2&sort=id,asc"))
+            .perform(get(ENTITY_API_URL + "/summary?page=0&size=2&sort=id,asc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("X-Total-Count", "3"))
@@ -292,7 +249,7 @@ class ArticleResourceV1IT {
 
     @Test
     @Transactional
-    void getAllArticlesV1SecondPage() throws Exception {
+    void getAllArticlesSummaryV1SecondPage() throws Exception {
         Article a1 = createEntity();
         a1.setLabelEn(DEFAULT_LABEL_EN + "1");
         a1.setLabelFr(DEFAULT_LABEL_FR + "1");
@@ -306,9 +263,97 @@ class ArticleResourceV1IT {
         a3.setLabelFr(DEFAULT_LABEL_FR + "3");
         articleRepository.saveAndFlush(a3);
         restArticleMockMvc
-            .perform(get(ENTITY_API_URL + "?page=1&size=2&sort=id,asc"))
+            .perform(get(ENTITY_API_URL + "/summary?page=1&size=2&sort=id,asc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1DefaultStatusFilter() throws Exception {
+        Article completed1 = createEntity();
+        completed1.setLabelEn(DEFAULT_LABEL_EN + "C1");
+        completed1.setLabelFr(DEFAULT_LABEL_FR + "C1");
+        articleRepository.saveAndFlush(completed1);
+
+        Article completed2 = createEntity();
+        completed2.setLabelEn(DEFAULT_LABEL_EN + "C2");
+        completed2.setLabelFr(DEFAULT_LABEL_FR + "C2");
+        articleRepository.saveAndFlush(completed2);
+
+        Article pending = createEntity();
+        pending.setLabelEn(DEFAULT_LABEL_EN + "P1");
+        pending.setLabelFr(DEFAULT_LABEL_FR + "P1");
+        pending.setStatus(Status.PENDING);
+        articleRepository.saveAndFlush(pending);
+
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("X-Total-Count", "2"))
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$.[*].labelEn").value(hasItem(DEFAULT_LABEL_EN + "C1")))
+            .andExpect(jsonPath("$.[*].labelEn").value(hasItem(DEFAULT_LABEL_EN + "C2")));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1WithStatusParam() throws Exception {
+        Article completed = createEntity();
+        completed.setLabelEn(DEFAULT_LABEL_EN + "C3");
+        completed.setLabelFr(DEFAULT_LABEL_FR + "C3");
+        articleRepository.saveAndFlush(completed);
+
+        Article pending1 = createEntity();
+        pending1.setLabelEn(DEFAULT_LABEL_EN + "P2");
+        pending1.setLabelFr(DEFAULT_LABEL_FR + "P2");
+        pending1.setStatus(Status.PENDING);
+        articleRepository.saveAndFlush(pending1);
+
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary?status=PENDING"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("X-Total-Count", "1"))
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$.[0].labelEn").value(DEFAULT_LABEL_EN + "P2"));
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1InvalidStatusParam() throws Exception {
+        restArticleMockMvc.perform(get(ENTITY_API_URL + "/summary?status=UNKNOWN")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void getAllArticlesSummaryV1SortedByDateDesc() throws Exception {
+        Article aOld = createEntity();
+        aOld.setLabelEn(DEFAULT_LABEL_EN + "OLD");
+        aOld.setLabelFr(DEFAULT_LABEL_FR + "OLD");
+        aOld.setDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC));
+        articleRepository.saveAndFlush(aOld);
+
+        Article aMid = createEntity();
+        aMid.setLabelEn(DEFAULT_LABEL_EN + "MID");
+        aMid.setLabelFr(DEFAULT_LABEL_FR + "MID");
+        aMid.setDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(1000L), ZoneOffset.UTC));
+        articleRepository.saveAndFlush(aMid);
+
+        Article aNew = createEntity();
+        aNew.setLabelEn(DEFAULT_LABEL_EN + "NEW");
+        aNew.setLabelFr(DEFAULT_LABEL_FR + "NEW");
+        aNew.setDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(2000L), ZoneOffset.UTC));
+        articleRepository.saveAndFlush(aNew);
+
+        restArticleMockMvc
+            .perform(get(ENTITY_API_URL + "/summary?sort=id,asc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[0].labelEn").value(DEFAULT_LABEL_EN + "NEW"))
+            .andExpect(jsonPath("$.[1].labelEn").value(DEFAULT_LABEL_EN + "MID"))
+            .andExpect(jsonPath("$.[2].labelEn").value(DEFAULT_LABEL_EN + "OLD"));
     }
 }

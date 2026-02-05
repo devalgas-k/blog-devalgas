@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
 
 import AppInfoService from './app-info.service';
-import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
 
 import HeadersService from '@/entities/headers/headers.service';
@@ -66,7 +65,6 @@ export default defineComponent({
     initRelationships();
 
     const { t: t$ } = useI18n();
-    const validations = useValidation();
     const validationRules = {
       keyInfo: {},
       valueInfo: {},

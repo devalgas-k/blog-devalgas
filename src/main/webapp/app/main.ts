@@ -27,6 +27,7 @@ import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/bootstrap4-dark-blue/theme.css';
 import ScrollTop from 'primevue/scrolltop';
 
+import { createHead, useHead } from '@unhead/vue';
 const pinia = createPinia();
 
 // jhipster-needle-add-entity-service-to-main-import - JHipster will import entities services here
@@ -200,11 +201,18 @@ const app = createApp({
     // jhipster-needle-add-entity-service-to-main - JHipster will import entities services here
 
     provide('trackerService', useTrackerService({ authenticated }));
+    useHead({
+      htmlAttrs: {
+        lang: computed(() => i18n.locale.value.toString().split('-')[0].toLowerCase()),
+      },
+    });
   },
   template: '<App/>',
 });
 
 initFortAwesome(app);
+
+const head = createHead();
 
 app
   .component('JhiItemCount', JhiItemCountComponent)
@@ -213,5 +221,6 @@ app
   .use(router)
   .use(pinia)
   .use(i18n)
+  .use(head)
   .use(PrimeVue, { inputStyle: 'filled', ripple: true })
   .mount('#app');

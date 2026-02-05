@@ -55,6 +55,16 @@ public class ArticleDetailV1DTO implements Serializable {
 
     private Integer stars;
 
+    @Lob
+    private byte[] badge;
+
+    private String badgeContentType;
+
+    @Lob
+    private byte[] banner;
+
+    private String bannerContentType;
+
     private Set<CategoryArticleHomeV1DTO> categoryArticles = new HashSet<>();
 
     public Long getId() {
@@ -159,6 +169,38 @@ public class ArticleDetailV1DTO implements Serializable {
 
     public void setStars(Integer stars) {
         this.stars = stars;
+    }
+
+    public byte[] getBadge() {
+        return badge;
+    }
+
+    public void setBadge(byte[] badge) {
+        this.badge = badge;
+    }
+
+    public String getBadgeContentType() {
+        return badgeContentType;
+    }
+
+    public void setBadgeContentType(String badgeContentType) {
+        this.badgeContentType = badgeContentType;
+    }
+
+    public byte[] getBanner() {
+        return banner;
+    }
+
+    public void setBanner(byte[] banner) {
+        this.banner = banner;
+    }
+
+    public String getBannerContentType() {
+        return bannerContentType;
+    }
+
+    public void setBannerContentType(String bannerContentType) {
+        this.bannerContentType = bannerContentType;
     }
 
     public Set<CategoryArticleHomeV1DTO> getCategoryArticles() {

@@ -1,5 +1,6 @@
 package com.devalgas.blog.repository.v1;
 
+import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.domain.v1.ArticleHomeV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,5 +19,11 @@ public interface ArticleHomeRepositoryV1 extends ArticleHomeRepositoryWithBagRel
 
     default Page<ArticleHomeV1> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
+    }
+
+    Page<ArticleHomeV1> findByStatus(Status status, Pageable pageable);
+
+    default Page<ArticleHomeV1> findByStatusWithEagerRelationships(Status status, Pageable pageable) {
+        return this.fetchBagRelationships(this.findByStatus(status, pageable));
     }
 }

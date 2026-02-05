@@ -1,5 +1,6 @@
 package com.devalgas.blog.service.v1;
 
+import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.service.dto.ArticleDTO;
 import com.devalgas.blog.service.dto.v1.ArticleDetailV1DTO;
 import com.devalgas.blog.service.dto.v1.ArticleHomeV1DTO;
@@ -39,7 +40,7 @@ public interface ArticleServiceV1 {
      */
     ArticleDTO save(ArticleDTO articleDTO);
 
-    Page<ArticleHomeV1DTO> findAllArticlesHome(Pageable pageable);
+    Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, Pageable pageable);
 
     /**
      * Get the "id" article.

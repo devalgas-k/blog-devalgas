@@ -2,7 +2,7 @@
   <div class="article-info" :aria-busy="!label">
     <Transition name="fade">
       <div v-if="label">
-        <h5 class="article-info__title">{{ label }}</h5>
+        <h5 class="article-info__title mt-3">{{ label }}</h5>
         <h6 v-if="description" class="article-info__description">{{ description }}</h6>
         <div class="article-info__body">
           <div class="article-info__header">
@@ -61,6 +61,7 @@
   flex-direction: column;
   align-items: stretch;
   min-width: 250px;
+  min-height: 140px;
   padding: 1rem;
   border-radius: 16px;
   /*box-shadow: -1rem 0 3rem #00000067;*/
@@ -189,6 +190,7 @@
   }
 
   @media (max-width: 765px) {
+    min-height: 140px;
     &__title {
       font-size: 1rem;
     }

@@ -222,6 +222,20 @@ export default defineComponent({
     );
 
     const imageBasePath = computed(() => (import.meta as any).env?.VITE_IMAGE_BASE_PATH ?? '/content/images');
+    const slugify = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80);
+    const slugForArticle = (a: any) => {
+      const lang = (currentLanguage.value ?? 'fr').split('-')[0]?.toLowerCase();
+      const useFr = lang === 'fr';
+      const title = useFr ? a?.labelFr : a?.labelEn;
+      return slugify(title ?? '');
+    };
 
     return {
       t$: useI18n().t,
@@ -238,6 +252,7 @@ export default defineComponent({
       backgroundImageSrc,
       imageBasePath,
       panelMaxHeight: '300px',
+      slugForArticle,
       openLogin: () => {
         if (loginService && typeof loginService.openLogin === 'function') {
           loginService.openLogin();

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /management/
+Disallow: /swagger-ui/
+Disallow: /v3/api-docs
+Disallow: /api/
+Disallow: /admin/
+Disallow: /error
+Disallow: /h2-console/
+Disallow: /swagger-ui.html
+
+Sitemap: /sitemap.xml

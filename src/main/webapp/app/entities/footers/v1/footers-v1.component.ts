@@ -47,6 +47,18 @@ export default defineComponent({
       page.value = 1;
     };
 
+    const retrieveFooters = async () => {
+      isFetching.value = true;
+      totalItems.value = 0;
+      queryCount.value = 0;
+      footers.value = [];
+      isFetching.value = false;
+    };
+
+    onMounted(async () => {
+      await retrieveFooters();
+    });
+
     const removeId: Ref<number | null> = ref(null);
     const removeEntity = ref<any>(null);
     const prepareRemove = (instance: IFooters) => {
@@ -62,6 +74,9 @@ export default defineComponent({
         modal.hide();
       }
     };
+    const removeFooters = async () => {
+      closeDialog();
+    };
 
     const changeOrder = (newOrder: string) => {
       if (propOrder.value === newOrder) {
@@ -71,6 +86,21 @@ export default defineComponent({
       }
       propOrder.value = newOrder;
     };
+
+    watch([propOrder, reverse], async () => {
+      if (page.value === 1) {
+        await retrieveFooters();
+      } else {
+        clear();
+      }
+    });
+
+    watch(page, async (newVal, oldVal) => {
+      if (newVal === oldVal) {
+        return;
+      }
+      await retrieveFooters();
+    });
 
     const router = useRouter();
 
@@ -139,6 +169,7 @@ export default defineComponent({
       removeEntity,
       prepareRemove,
       closeDialog,
+      removeFooters,
       itemsPerPage,
       queryCount,
       page,

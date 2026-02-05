@@ -1,4 +1,4 @@
-import { type Ref, defineAsyncComponent, defineComponent, inject, onMounted, ref, watch } from 'vue';
+import { type Ref, computed, defineAsyncComponent, defineComponent, inject, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { type IArticle } from '@/shared/model/article.model';
@@ -29,6 +29,8 @@ export default defineComponent({
     const dataUtils = useDataUtils();
     const articleService = inject('articleService', () => new ArticleServiceV1());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+    const langBase = computed(() => (currentLanguage?.value ?? 'fr').toString().split('-')[0].toLowerCase());
 
     const itemsPerPage = ref(10);
     const queryCount: Ref<number | null> = ref(null);
@@ -116,6 +118,19 @@ export default defineComponent({
     });
 
     const filter = null;
+    const slugify = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 80);
+    const slugForArticle = (a: IArticle) => {
+      const isFr = langBase.value === 'fr';
+      const title = (isFr ? (a as any)?.labelFr : (a as any)?.labelEn) ?? '';
+      return slugify(title);
+    };
 
     return {
       articles,
@@ -138,6 +153,7 @@ export default defineComponent({
       filter,
       t$,
       ...dataUtils,
+      slugForArticle,
     };
   },
 });

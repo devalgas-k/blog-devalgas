@@ -5,7 +5,6 @@ import { useVuelidate } from '@vuelidate/core';
 
 import HeadersService from './headers.service';
 import useDataUtils from '@/shared/data/data-utils.service';
-import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
 
 import { Headers, type IHeaders } from '@/shared/model/headers.model';
@@ -46,7 +45,6 @@ export default defineComponent({
     const dataUtils = useDataUtils();
 
     const { t: t$ } = useI18n();
-    const validations = useValidation();
     const validationRules = {
       logoHeaders: {},
       appInfoHeaders: {},

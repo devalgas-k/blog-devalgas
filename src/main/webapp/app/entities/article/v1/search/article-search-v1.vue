@@ -44,7 +44,14 @@
                 </div>
               </template>
               <template #item="slotProps">
-                <router-link :to="{ name: 'ArticleDetailsViewV1', params: { articleId: slotProps.item?.id } }" custom v-slot="{ navigate }">
+                <router-link
+                  :to="{
+                    name: 'ArticleDetailsViewV1Slug',
+                    params: { articleId: slotProps.item?.id, slug: slugForArticle(slotProps.item) },
+                  }"
+                  custom
+                  v-slot="{ navigate }"
+                >
                   <div @click="navigate">
                     <article-info-v1 :article="slotProps.item" class="w-100" />
                   </div>

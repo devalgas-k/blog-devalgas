@@ -9,4 +9,9 @@ export default [
     name: 'ArticleDetailsViewV1',
     component: ArticleDetailsV1,
   },
+  {
+    path: '/v1/articles/:articleId-:slug/view',
+    name: 'ArticleDetailsViewV1Slug',
+    component: ArticleDetailsV1,
+  },
 ];

@@ -78,6 +78,20 @@ public class ArticleDetailV1 implements Serializable {
     @Column(name = "stars")
     private Integer stars;
 
+    @Lob
+    @Column(name = "badge")
+    private byte[] badge;
+
+    @Column(name = "badge_content_type")
+    private String badgeContentType;
+
+    @Lob
+    @Column(name = "banner")
+    private byte[] banner;
+
+    @Column(name = "banner_content_type")
+    private String bannerContentType;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_article__category_article",
@@ -193,6 +207,38 @@ public class ArticleDetailV1 implements Serializable {
 
     public void setStars(Integer stars) {
         this.stars = stars;
+    }
+
+    public byte[] getBadge() {
+        return this.badge;
+    }
+
+    public void setBadge(byte[] badge) {
+        this.badge = badge;
+    }
+
+    public String getBadgeContentType() {
+        return this.badgeContentType;
+    }
+
+    public void setBadgeContentType(String badgeContentType) {
+        this.badgeContentType = badgeContentType;
+    }
+
+    public byte[] getBanner() {
+        return this.banner;
+    }
+
+    public void setBanner(byte[] banner) {
+        this.banner = banner;
+    }
+
+    public String getBannerContentType() {
+        return this.bannerContentType;
+    }
+
+    public void setBannerContentType(String bannerContentType) {
+        this.bannerContentType = bannerContentType;
     }
 
     public Set<CategoryArticleHomeV1> getCategoryArticles() {
