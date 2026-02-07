@@ -323,6 +323,18 @@
             />
           </div>
           <div class="form-group">
+            <label class="form-control-label" v-text="t$('devalgasApp.article.display')" for="article-display"></label>
+            <input
+              type="checkbox"
+              class="form-check"
+              name="display"
+              id="article-display"
+              data-cy="display"
+              :class="{ valid: !v$.display.$invalid, invalid: v$.display.$invalid }"
+              v-model="v$.display.$model"
+            />
+          </div>
+          <div class="form-group">
             <label v-text="t$('devalgasApp.article.categoryArticle')" for="article-categoryArticle"></label>
             <select
               class="form-control"

@@ -19,6 +19,7 @@ export interface IArticle {
   banner?: string | null;
   views?: number | null;
   stars?: number | null;
+  display?: boolean | null;
   categoryArticles?: ICategoryArticle[] | null;
 }
 
@@ -41,6 +42,9 @@ export class Article implements IArticle {
     public banner?: string | null,
     public views?: number | null,
     public stars?: number | null,
+    public display?: boolean | null,
     public categoryArticles?: ICategoryArticle[] | null,
-  ) {}
+  ) {
+    this.display = this.display ?? false;
+  }
 }

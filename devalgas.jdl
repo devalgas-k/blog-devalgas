@@ -53,6 +53,7 @@ entity Article {
   banner ImageBlob
   views Integer
   stars Integer
+  display Boolean
 }
 
 /**

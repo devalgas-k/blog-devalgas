@@ -94,6 +94,9 @@ class ArticleResourceIT {
     private static final Integer DEFAULT_STARS = 1;
     private static final Integer UPDATED_STARS = 2;
 
+    private static final Boolean DEFAULT_DISPLAY = false;
+    private static final Boolean UPDATED_DISPLAY = true;
+
     private static final String ENTITY_API_URL = "/api/articles";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -148,7 +151,8 @@ class ArticleResourceIT {
             .banner(DEFAULT_BANNER)
             .bannerContentType(DEFAULT_BANNER_CONTENT_TYPE)
             .views(DEFAULT_VIEWS)
-            .stars(DEFAULT_STARS);
+            .stars(DEFAULT_STARS)
+            .display(DEFAULT_DISPLAY);
     }
 
     /**
@@ -174,7 +178,8 @@ class ArticleResourceIT {
             .banner(UPDATED_BANNER)
             .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
             .views(UPDATED_VIEWS)
-            .stars(UPDATED_STARS);
+            .stars(UPDATED_STARS)
+            .display(UPDATED_DISPLAY);
     }
 
     @BeforeEach
@@ -327,7 +332,8 @@ class ArticleResourceIT {
             .andExpect(jsonPath("$.[*].bannerContentType").value(hasItem(DEFAULT_BANNER_CONTENT_TYPE)))
             .andExpect(jsonPath("$.[*].banner").value(hasItem(Base64.getEncoder().encodeToString(DEFAULT_BANNER))))
             .andExpect(jsonPath("$.[*].views").value(hasItem(DEFAULT_VIEWS)))
-            .andExpect(jsonPath("$.[*].stars").value(hasItem(DEFAULT_STARS)));
+            .andExpect(jsonPath("$.[*].stars").value(hasItem(DEFAULT_STARS)))
+            .andExpect(jsonPath("$.[*].display").value(hasItem(DEFAULT_DISPLAY)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -374,7 +380,8 @@ class ArticleResourceIT {
             .andExpect(jsonPath("$.bannerContentType").value(DEFAULT_BANNER_CONTENT_TYPE))
             .andExpect(jsonPath("$.banner").value(Base64.getEncoder().encodeToString(DEFAULT_BANNER)))
             .andExpect(jsonPath("$.views").value(DEFAULT_VIEWS))
-            .andExpect(jsonPath("$.stars").value(DEFAULT_STARS));
+            .andExpect(jsonPath("$.stars").value(DEFAULT_STARS))
+            .andExpect(jsonPath("$.display").value(DEFAULT_DISPLAY));
     }
 
     @Test
@@ -412,7 +419,8 @@ class ArticleResourceIT {
             .banner(UPDATED_BANNER)
             .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
             .views(UPDATED_VIEWS)
-            .stars(UPDATED_STARS);
+            .stars(UPDATED_STARS)
+            .display(UPDATED_DISPLAY);
         ArticleDTO articleDTO = articleMapper.toDto(updatedArticle);
 
         restArticleMockMvc
@@ -547,7 +555,8 @@ class ArticleResourceIT {
             .banner(UPDATED_BANNER)
             .bannerContentType(UPDATED_BANNER_CONTENT_TYPE)
             .views(UPDATED_VIEWS)
-            .stars(UPDATED_STARS);
+            .stars(UPDATED_STARS)
+            .display(UPDATED_DISPLAY);
 
         restArticleMockMvc
             .perform(

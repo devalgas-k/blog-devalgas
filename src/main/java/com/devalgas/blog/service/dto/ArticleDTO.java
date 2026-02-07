@@ -63,6 +63,8 @@ public class ArticleDTO implements Serializable {
 
     private Integer stars;
 
+    private Boolean display;
+
     private Set<CategoryArticleDTO> categoryArticles = new HashSet<>();
 
     public Long getId() {
@@ -201,6 +203,14 @@ public class ArticleDTO implements Serializable {
         this.stars = stars;
     }
 
+    public Boolean getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(Boolean display) {
+        this.display = display;
+    }
+
     public Set<CategoryArticleDTO> getCategoryArticles() {
         return categoryArticles;
     }
@@ -247,6 +257,7 @@ public class ArticleDTO implements Serializable {
             ", banner='" + getBanner() + "'" +
             ", views=" + getViews() +
             ", stars=" + getStars() +
+            ", display='" + getDisplay() + "'" +
             ", categoryArticles=" + getCategoryArticles() +
             "}";
     }
