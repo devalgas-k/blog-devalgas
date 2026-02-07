@@ -62,6 +62,9 @@
             <column name="stars" type="integer">
                 <constraints nullable="true" />
             </column>
+            <column name="display" type="boolean">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="article" columnName="date" columnDataType="${datetimeType}"/>
@@ -114,6 +117,7 @@
             <column name="banner_content_type" type="string"/>
             <column name="views" type="numeric"/>
             <column name="stars" type="numeric"/>
+            <column name="display" type="boolean"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
