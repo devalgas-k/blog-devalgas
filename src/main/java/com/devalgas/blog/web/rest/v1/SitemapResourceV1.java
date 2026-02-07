@@ -36,7 +36,7 @@ public class SitemapResourceV1 {
         List<ArticleHomeV1DTO> all = new ArrayList<>();
         int page = 0;
         while (true) {
-            Page<ArticleHomeV1DTO> p = articleServiceV1.findAllArticlesHome(Status.COMPLETED, PageRequest.of(page, PAGE_SIZE));
+            Page<ArticleHomeV1DTO> p = articleServiceV1.findAllArticlesHome(Status.COMPLETED, true, PageRequest.of(page, PAGE_SIZE));
             List<ArticleHomeV1DTO> content = p.getContent();
             if (content.isEmpty()) {
                 break;

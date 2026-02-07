@@ -96,11 +96,12 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, Pageable pageable) {
-        LOG.debug("Request to get all Articles by status {}", status);
+    public Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, boolean display, Pageable pageable) {
+        LOG.debug("Request to get all Articles by status {} and display {}", status, display);
         return articleHomeRepositoryV1
-            .findByStatusWithEagerRelationships(
-                status,
+            .findByStatusAndDisplayWithEagerRelationships(
+                status.name(),
+                display,
                 PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "date"))
             )
             .map(articleHomeV1Mapper::toDto);
