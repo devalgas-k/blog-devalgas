@@ -1,5 +1,5 @@
 <template>
-  <b-navbar data-cy="navbar" toggleable="md" type="dark" class="headers-v1 bg-primary py-0">
+  <b-navbar data-cy="navbar" toggleable="md" type="dark" class="headers-v1 bg-primary py-0 mt-1">
     <b-navbar-brand class="headers-v1__brand headers-v1__logo" b-link to="/">
       <title-app class="text-dark headers-v1__title"></title-app>
     </b-navbar-brand>

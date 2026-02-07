@@ -17,8 +17,6 @@
 <script lang="ts" src="./title.component.ts"></script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400|Poppins:300,400,800&display=swap');
-
 * {
   margin: 0;
   padding: 0;

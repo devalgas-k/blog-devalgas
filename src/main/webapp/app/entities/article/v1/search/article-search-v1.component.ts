@@ -1,4 +1,4 @@
-import { type ComputedRef, computed, defineComponent, inject, onMounted, type Ref, ref, watch, nextTick } from 'vue';
+import { type ComputedRef, computed, defineComponent, inject, onMounted, onUnmounted, type Ref, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import InputGroup from 'primevue/inputgroup';
@@ -221,6 +221,33 @@ export default defineComponent({
       currentTheme.value === 'dark' ? '/content/images/abort-d.jpg' : '/content/images/about.jpg',
     );
 
+    const showBackgroundImage = (() => {
+      try {
+        const mq = window.matchMedia('(min-width: 576px)');
+        const v = ref(mq.matches);
+        const handler = (e: MediaQueryListEvent) => {
+          v.value = e.matches;
+        };
+        onMounted(() => {
+          try {
+            mq.addEventListener('change', handler);
+          } catch (e) {
+            void e;
+          }
+        });
+        onUnmounted(() => {
+          try {
+            mq.removeEventListener('change', handler);
+          } catch (e) {
+            void e;
+          }
+        });
+        return v;
+      } catch {
+        return ref(true);
+      }
+    })();
+
     const imageBasePath = computed(() => (import.meta as any).env?.VITE_IMAGE_BASE_PATH ?? '/content/images');
     const slugify = (s: string) =>
       s
@@ -250,6 +277,7 @@ export default defineComponent({
       currentTheme,
       currentLanguage,
       backgroundImageSrc,
+      showBackgroundImage,
       imageBasePath,
       panelMaxHeight: '300px',
       slugForArticle,

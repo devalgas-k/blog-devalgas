@@ -1,7 +1,17 @@
 <template>
   <div class="about" id="about">
     <picture class="about__picture" :style="{ '--matrix-url': `url('${imageBasePath}/matrix.png')` }">
-      <img class="about__image" :src="backgroundImageSrc" alt="background" />
+      <img
+        v-if="showBackgroundImage"
+        class="about__image"
+        :src="backgroundImageSrc"
+        alt="background"
+        width="960"
+        height="960"
+        loading="lazy"
+        decoding="async"
+        fetchpriority="low"
+      />
     </picture>
     <figure class="about__figure">
       <figcaption class="about__caption">
@@ -125,6 +135,7 @@
     height: 100%;
     object-fit: contain;
     border-radius: 30%;
+    aspect-ratio: 1 / 1;
   }
 
   :deep(.p-autocomplete) {

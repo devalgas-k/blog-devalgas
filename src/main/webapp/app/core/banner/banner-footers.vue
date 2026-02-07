@@ -13,7 +13,6 @@
 <script lang="ts" src="./banner-footers.component.ts"></script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap');
 html,
 body {
   height: 100%;

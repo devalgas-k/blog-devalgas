@@ -26,6 +26,7 @@ import 'primeicons/primeicons.css';
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/bootstrap4-dark-blue/theme.css';
 import ScrollTop from 'primevue/scrolltop';
+import primeiconsWoff2Url from 'primeicons/fonts/primeicons.woff2?url';
 
 import { createHead, useHead } from '@unhead/vue';
 const pinia = createPinia();
@@ -205,7 +206,15 @@ const app = createApp({
       htmlAttrs: {
         lang: computed(() => i18n.locale.value.toString().split('-')[0].toLowerCase()),
       },
+      link: [{ rel: 'preload', as: 'font', href: primeiconsWoff2Url, crossorigin: 'anonymous' }],
     });
+
+    const s = document.createElement('style');
+    s.textContent =
+      "@font-face{font-family:'primeicons';src:url('" +
+      primeiconsWoff2Url +
+      "') format('woff2');font-weight:normal;font-style:normal;font-display:swap}";
+    document.head.appendChild(s);
   },
   template: '<App/>',
 });

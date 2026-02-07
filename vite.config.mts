@@ -3,6 +3,7 @@ import { defineConfig, normalizePath, loadEnv } from 'vite';
 
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import type { Plugin } from 'vite';
 
 const { getAbsoluteFSPath } = await import('swagger-ui-dist');
 const swaggerUiPath = getAbsoluteFSPath();
@@ -10,6 +11,26 @@ const swaggerUiPath = getAbsoluteFSPath();
 // eslint-disable-next-line prefer-const
 let config = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+
+  const crittersInlineCss = (): Plugin => ({
+    name: 'critters-inline-css',
+    enforce: 'post',
+    apply: 'build',
+    async transformIndexHtml(html) {
+      if (mode === 'development') return html;
+      const { default: Critters } = await import('critters');
+      const critters = new Critters({
+        path: fileURLToPath(new URL('./target/classes/static/', import.meta.url)),
+        publicPath: '/',
+        preload: 'swap',
+        noscriptFallback: true,
+        inlineFonts: true,
+        pruneSource: true,
+        compress: true,
+      });
+      return await critters.process(html);
+    },
+  });
 
   return {
     plugins: [
@@ -35,6 +56,7 @@ let config = defineConfig(({ mode }) => {
                 },
               ],
             }),
+            crittersInlineCss(),
           ]
         : []),
     ],
