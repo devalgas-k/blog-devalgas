@@ -46,7 +46,14 @@
                 },
                 items: { style: { backgroundColor: 'var(--dark)' } },
                 itemGroup: { style: { backgroundColor: 'var(--dark)', color: 'var(--white)' } },
-                item: { style: { backgroundColor: 'var(--dark)', color: 'var(--white)' } },
+                item: {
+                  style: {
+                    backgroundColor: 'var(--dark)',
+                    color: 'var(--white)',
+                    margin: '0',
+                    padding: '0.5rem 1rem',
+                  },
+                },
               }"
               @blur="onAutoBlur"
               @focus="onAutoFocus"
@@ -179,6 +186,8 @@
       & .p-autocomplete-item {
         background-color: var(--dark);
         color: var(--white);
+        margin: 0;
+        padding: 0.5rem 1rem;
         &:hover,
         &.p-highlight {
           background-color: var(--dark);
