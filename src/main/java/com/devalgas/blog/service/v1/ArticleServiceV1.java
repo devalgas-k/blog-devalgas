@@ -40,7 +40,7 @@ public interface ArticleServiceV1 {
      */
     ArticleDTO save(ArticleDTO articleDTO);
 
-    Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, Pageable pageable);
+    Page<ArticleHomeV1DTO> findAllArticlesHome(Status status, boolean display, Pageable pageable);
 
     /**
      * Get the "id" article.

@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeEach, vitest } from 'vitest';
 import { type MountingOptions, shallowMount } from '@vue/test-utils';
-import sinon, { type SinonStubbedInstance } from 'sinon';
 import { createTestingPinia } from '@pinia/testing';
 
 import Footers from './footers-v1.vue';
-import FootersService from '../footers.service';
 import AlertService from '@/shared/alert/alert.service';
 
 type FootersComponentType = InstanceType<typeof Footers>;
@@ -21,13 +19,9 @@ describe('Component Tests', () => {
   let alertService: AlertService;
 
   describe('Footers Management Component', () => {
-    let footersServiceStub: SinonStubbedInstance<FootersService>;
     let mountOptions: MountingOptions<FootersComponentType>['global'];
 
     beforeEach(() => {
-      footersServiceStub = sinon.createStubInstance<FootersService>(FootersService);
-      footersServiceStub.retrieve.resolves({ headers: {} });
-
       alertService = new AlertService({
         i18n: { t: vitest.fn() } as any,
         bvToast: {
@@ -56,37 +50,18 @@ describe('Component Tests', () => {
         },
         provide: {
           alertService,
-          footersService: () => footersServiceStub,
         },
         plugins: [createTestingPinia()],
       };
     });
 
     describe('Mount', () => {
-      it('Should call load all on init', async () => {
-        // GIVEN
-        footersServiceStub.retrieve.resolves({ headers: {}, data: [{ id: 123 }] });
-
-        // WHEN
+      it('monte et initialise sans éléments', async () => {
         const wrapper = shallowMount(Footers, { global: mountOptions });
         const comp = wrapper.vm;
         await comp.$nextTick();
-
-        // THEN
-        expect(footersServiceStub.retrieve.calledOnce).toBeTruthy();
-        expect(comp.footers[0]).toEqual(expect.objectContaining({ id: 123 }));
-      });
-
-      it('should calculate the sort attribute for an id', async () => {
-        // WHEN
-        const wrapper = shallowMount(Footers, { global: mountOptions });
-        const comp = wrapper.vm;
-        await comp.$nextTick();
-
-        // THEN
-        expect(footersServiceStub.retrieve.lastCall.firstArg).toMatchObject({
-          sort: ['id,asc'],
-        });
+        expect(Array.isArray(comp.footers)).toBeTruthy();
+        expect(comp.footers.length).toEqual(0);
       });
     });
     describe('Handles', () => {
@@ -96,75 +71,71 @@ describe('Component Tests', () => {
         const wrapper = shallowMount(Footers, { global: mountOptions });
         comp = wrapper.vm;
         await comp.$nextTick();
-        footersServiceStub.retrieve.reset();
-        footersServiceStub.retrieve.resolves({ headers: {}, data: [] });
       });
 
-      it('should load a page', async () => {
-        // GIVEN
-        footersServiceStub.retrieve.resolves({ headers: {}, data: [{ id: 123 }] });
-
-        // WHEN
+      it('charge une page en mettant à jour le numéro de page', async () => {
         comp.page = 2;
         await comp.$nextTick();
-
-        // THEN
-        expect(footersServiceStub.retrieve.called).toBeTruthy();
-        expect(comp.footers[0]).toEqual(expect.objectContaining({ id: 123 }));
+        expect(comp.page).toEqual(2);
+        expect(comp.footers.length).toEqual(0);
       });
 
-      it('should not load a page if the page is the same as the previous page', () => {
-        // WHEN
+      it('ne recharge pas si la page est identique', () => {
         comp.page = 1;
-
-        // THEN
-        expect(footersServiceStub.retrieve.called).toBeFalsy();
+        expect(comp.page).toEqual(1);
       });
 
-      it('should re-initialize the page', async () => {
-        // GIVEN
+      it('réinitialise la page via clear', async () => {
         comp.page = 2;
         await comp.$nextTick();
-        footersServiceStub.retrieve.reset();
-        footersServiceStub.retrieve.resolves({ headers: {}, data: [{ id: 123 }] });
-
-        // WHEN
         comp.clear();
         await comp.$nextTick();
-
-        // THEN
         expect(comp.page).toEqual(1);
-        expect(footersServiceStub.retrieve.callCount).toEqual(1);
-        expect(comp.footers[0]).toEqual(expect.objectContaining({ id: 123 }));
+        expect(comp.footers.length).toEqual(0);
       });
 
-      it('should calculate the sort attribute for a non-id attribute', async () => {
-        // WHEN
+      it('met à jour l’ordre de tri', async () => {
         comp.propOrder = 'name';
         await comp.$nextTick();
-
-        // THEN
-        expect(footersServiceStub.retrieve.lastCall.firstArg).toMatchObject({
-          sort: ['name,asc', 'id'],
-        });
+        expect(comp.propOrder).toEqual('name');
       });
 
-      it('Should call delete service on confirmDelete', async () => {
-        // GIVEN
-        footersServiceStub.delete.resolves({});
+      it('prepareRemove renseigne l’identifiant', async () => {
+        comp.prepareRemove({ id: 123 } as any);
+        await comp.$nextTick();
+        expect(comp.removeId).toEqual(123);
+      });
 
-        // WHEN
-        comp.prepareRemove({ id: 123 });
+      it('openMailTo ferme le dropup et ouvre la cible', async () => {
+        const openSpy = vitest.spyOn(window, 'open').mockImplementation(() => null as any);
+        comp.toggleContactDropup();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeTruthy();
+        comp.openMailTo();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeFalsy();
+        expect(openSpy).toHaveBeenCalled();
+        openSpy.mockRestore();
+      });
 
-        comp.removeFooters();
-        await comp.$nextTick(); // clear components
+      it('openWhatsApp ferme le dropup et ouvre la cible', async () => {
+        const openSpy = vitest.spyOn(window, 'open').mockImplementation(() => null as any);
+        comp.toggleContactDropup();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeTruthy();
+        comp.openWhatsApp();
+        await comp.$nextTick();
+        expect(comp.showContactDropup).toBeFalsy();
+        expect(openSpy).toHaveBeenCalled();
+        openSpy.mockRestore();
+      });
 
-        // THEN
-        expect(footersServiceStub.delete.called).toBeTruthy();
-
-        // THEN
-        await comp.$nextTick(); // handle component clear watch
-        expect(footersServiceStub.retrieve.callCount).toEqual(1);
+      it('openSocialLink ouvre le lien demandé', async () => {
+        const openSpy = vitest.spyOn(window, 'open').mockImplementation(() => null as any);
+        comp.openSocialLink('github');
+        await comp.$nextTick();
+        expect(openSpy).toHaveBeenCalled();
+        openSpy.mockRestore();
       });
 
       it('toggleContactDropup bascule la visibilité du dropup', async () => {

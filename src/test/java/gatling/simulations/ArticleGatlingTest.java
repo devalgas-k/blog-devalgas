@@ -80,6 +80,7 @@ public class ArticleGatlingTest extends Simulation {
                                 ", \"banner\": null" +
                                 ", \"views\": 0" +
                                 ", \"stars\": 0" +
+                                ", \"display\": null" +
                                 "}"
                             )
                         )

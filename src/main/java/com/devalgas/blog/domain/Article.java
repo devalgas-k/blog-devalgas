@@ -90,6 +90,9 @@ public class Article implements Serializable {
     @Column(name = "stars")
     private Integer stars;
 
+    @Column(name = "display")
+    private Boolean display;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_article__category_article",
@@ -323,6 +326,19 @@ public class Article implements Serializable {
         this.stars = stars;
     }
 
+    public Boolean getDisplay() {
+        return this.display;
+    }
+
+    public Article display(Boolean display) {
+        this.setDisplay(display);
+        return this;
+    }
+
+    public void setDisplay(Boolean display) {
+        this.display = display;
+    }
+
     public Set<CategoryArticle> getCategoryArticles() {
         return this.categoryArticles;
     }
@@ -386,6 +402,7 @@ public class Article implements Serializable {
             ", bannerContentType='" + getBannerContentType() + "'" +
             ", views=" + getViews() +
             ", stars=" + getStars() +
+            ", display='" + getDisplay() + "'" +
             "}";
     }
 }

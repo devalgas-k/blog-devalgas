@@ -101,7 +101,8 @@ class ArticleResourceV1IT {
             .banner(DEFAULT_BANNER)
             .bannerContentType(DEFAULT_BANNER_CONTENT_TYPE)
             .views(DEFAULT_VIEWS)
-            .stars(DEFAULT_STARS);
+            .stars(DEFAULT_STARS)
+            .display(true);
     }
 
     @BeforeEach

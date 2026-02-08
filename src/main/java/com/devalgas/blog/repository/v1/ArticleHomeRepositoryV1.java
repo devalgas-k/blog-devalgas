@@ -5,6 +5,8 @@ import com.devalgas.blog.domain.v1.ArticleHomeV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -25,5 +27,16 @@ public interface ArticleHomeRepositoryV1 extends ArticleHomeRepositoryWithBagRel
 
     default Page<ArticleHomeV1> findByStatusWithEagerRelationships(Status status, Pageable pageable) {
         return this.fetchBagRelationships(this.findByStatus(status, pageable));
+    }
+
+    @Query(
+        value = "SELECT * FROM article WHERE status = :status AND display = :display",
+        countQuery = "SELECT count(*) FROM article WHERE status = :status AND display = :display",
+        nativeQuery = true
+    )
+    Page<ArticleHomeV1> findByStatusAndDisplay(@Param("status") String status, @Param("display") Boolean display, Pageable pageable);
+
+    default Page<ArticleHomeV1> findByStatusAndDisplayWithEagerRelationships(String status, Boolean display, Pageable pageable) {
+        return this.fetchBagRelationships(this.findByStatusAndDisplay(status, display, pageable));
     }
 }

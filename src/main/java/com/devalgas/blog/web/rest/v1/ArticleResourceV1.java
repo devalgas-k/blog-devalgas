@@ -43,10 +43,11 @@ public class ArticleResourceV1 {
     @GetMapping("/summary")
     public ResponseEntity<List<ArticleHomeV1DTO>> getAllArticlesV1(
         @ParameterObject Pageable pageable,
-        @RequestParam(name = "status", required = false, defaultValue = "COMPLETED") Status status
+        @RequestParam(name = "status", required = false, defaultValue = "COMPLETED") Status status,
+        @RequestParam(name = "display", required = false, defaultValue = "true") boolean display
     ) {
         log.debug("REST request to get a page of optimized Articles V1");
-        Page<ArticleHomeV1DTO> page = articleServiceV1.findAllArticlesHome(status, pageable);
+        Page<ArticleHomeV1DTO> page = articleServiceV1.findAllArticlesHome(status, display, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
