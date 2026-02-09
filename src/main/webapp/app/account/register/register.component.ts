@@ -5,6 +5,7 @@ import { email, helpers, maxLength, minLength, required, sameAs } from '@vuelida
 import { useLoginModal } from '@/account/login-modal';
 import RegisterService from '@/account/register/register.service';
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from '@/constants';
+import { useHead } from '@unhead/vue';
 
 const loginPattern = helpers.regex(/^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$/);
 
@@ -44,17 +45,26 @@ export default defineComponent({
     const { showLogin } = useLoginModal();
     const registerService = inject('registerService', () => new RegisterService(), true);
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+    const { t: t$ } = useI18n();
 
-    const error: Ref<string> = ref('');
-    const errorEmailExists: Ref<string> = ref('');
-    const errorUserExists: Ref<string> = ref('');
-    const success: Ref<boolean> = ref(false);
+    const error: Ref<string | null> = ref('');
+    const errorEmailExists: Ref<string | null> = ref('');
+    const errorUserExists: Ref<string | null> = ref('');
+    const success: Ref<boolean | null> = ref(false);
 
     const confirmPassword: Ref<any> = ref(null);
     const registerAccount: Ref<any> = ref({
       login: undefined,
       email: undefined,
       password: undefined,
+    });
+
+    useHead({
+      title: computed(() => t$('register.title').toString()),
+      meta: [
+        { name: 'robots', content: 'noindex,nofollow' },
+        { name: 'googlebot', content: 'noindex,nofollow' },
+      ],
     });
 
     return {
@@ -68,7 +78,7 @@ export default defineComponent({
       confirmPassword,
       registerAccount,
       v$: useVuelidate(),
-      t$: useI18n().t,
+      t$,
     };
   },
   methods: {

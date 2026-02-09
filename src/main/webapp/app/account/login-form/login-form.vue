@@ -56,7 +56,7 @@
         <div>
           <b-alert show variant="warning">
             <span v-text="t$('global.messages.info.register.noaccount')"></span>
-            <b-link :to="'/register'" class="alert-link" v-text="t$('global.messages.info.register.link')"></b-link>
+            <b-link :to="'/register'" rel="nofollow" class="alert-link" v-text="t$('global.messages.info.register.link')"></b-link>
           </b-alert>
         </div>
       </div>

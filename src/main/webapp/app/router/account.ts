@@ -12,6 +12,7 @@ export default [
     path: '/register',
     name: 'Register',
     component: Register,
+    meta: { authorities: [Authority.USER] },
   },
   {
     path: '/account/activate',
