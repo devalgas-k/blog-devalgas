@@ -54,6 +54,9 @@ public class ArticleHomeV1 implements Serializable {
     @Column(name = "status", nullable = false)
     private Status status;
 
+    @Column(name = "display")
+    private Boolean display;
+
     @NotNull
     @Column(name = "date", nullable = false)
     private ZonedDateTime date;
@@ -158,6 +161,19 @@ public class ArticleHomeV1 implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Boolean getDisplay() {
+        return this.display;
+    }
+
+    public ArticleHomeV1 display(Boolean display) {
+        this.setDisplay(display);
+        return this;
+    }
+
+    public void setDisplay(Boolean display) {
+        this.display = display;
     }
 
     public Integer getViews() {

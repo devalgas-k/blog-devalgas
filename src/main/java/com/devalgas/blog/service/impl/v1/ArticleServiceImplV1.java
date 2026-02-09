@@ -100,7 +100,7 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
         LOG.debug("Request to get all Articles by status {} and display {}", status, display);
         return articleHomeRepositoryV1
             .findByStatusAndDisplayWithEagerRelationships(
-                status.name(),
+                status,
                 display,
                 PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "date"))
             )

@@ -84,7 +84,6 @@
     font-size: clamp(1rem, 2.5vw, 2rem);
     line-height: 1.25rem;
     color: var(--white);
-    text-transform: capitalize !important;
     font-weight: bolder !important;
     white-space: normal;
     word-break: break-word;
