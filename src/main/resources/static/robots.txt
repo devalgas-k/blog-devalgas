@@ -8,5 +8,5 @@ Disallow: /admin/
 Disallow: /error
 Disallow: /h2-console/
 Disallow: /swagger-ui.html
-
-Sitemap: /sitemap.xml
+Disallow: /register
+Sitemap: https://devalgas.net/sitemap.xml

@@ -29,14 +29,20 @@ public interface ArticleHomeRepositoryV1 extends ArticleHomeRepositoryWithBagRel
         return this.fetchBagRelationships(this.findByStatus(status, pageable));
     }
 
+    Page<ArticleHomeV1> findByStatusAndDisplay(Status status, Boolean display, Pageable pageable);
+
+    default Page<ArticleHomeV1> findByStatusAndDisplayWithEagerRelationships(Status status, Boolean display, Pageable pageable) {
+        return this.fetchBagRelationships(this.findByStatusAndDisplay(status, display, pageable));
+    }
+
     @Query(
         value = "SELECT * FROM article WHERE status = :status AND display = :display",
         countQuery = "SELECT count(*) FROM article WHERE status = :status AND display = :display",
         nativeQuery = true
     )
-    Page<ArticleHomeV1> findByStatusAndDisplay(@Param("status") String status, @Param("display") Boolean display, Pageable pageable);
+    Page<ArticleHomeV1> findByStatusAndDisplayNative(@Param("status") String status, @Param("display") Boolean display, Pageable pageable);
 
-    default Page<ArticleHomeV1> findByStatusAndDisplayWithEagerRelationships(String status, Boolean display, Pageable pageable) {
-        return this.fetchBagRelationships(this.findByStatusAndDisplay(status, display, pageable));
+    default Page<ArticleHomeV1> findByStatusAndDisplayNativeWithEagerRelationships(String status, Boolean display, Pageable pageable) {
+        return this.fetchBagRelationships(this.findByStatusAndDisplayNative(status, display, pageable));
     }
 }

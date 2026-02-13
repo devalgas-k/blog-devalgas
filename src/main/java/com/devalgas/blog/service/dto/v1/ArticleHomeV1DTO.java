@@ -39,6 +39,8 @@ public class ArticleHomeV1DTO implements Serializable {
     @NotNull
     private Status status;
 
+    private Boolean display;
+
     @NotNull
     private ZonedDateTime date;
 
@@ -94,6 +96,14 @@ public class ArticleHomeV1DTO implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Boolean getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(Boolean display) {
+        this.display = display;
     }
 
     public ZonedDateTime getDate() {

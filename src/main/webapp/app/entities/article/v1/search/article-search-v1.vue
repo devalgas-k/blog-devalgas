@@ -31,8 +31,30 @@
               option-group-label="label"
               option-group-children="items"
               :placeholder="t$('globalV1.about.placeholder')"
-              :append-to="'self'"
-              :pt="{ panel: { style: { width: 40 + 'vw', maxHeight: panelMaxHeight, overflowY: 'auto' } } }"
+              :append-to="'body'"
+              :pt="{
+                panel: {
+                  style: {
+                    width: 40 + 'vw',
+                    maxHeight: panelMaxHeight,
+                    overflowY: 'auto',
+                    zIndex: 9999,
+                    backgroundColor: 'var(--dark)',
+                    border: '1px solid var(--dark)',
+                    color: 'var(--white)',
+                  },
+                },
+                items: { style: { backgroundColor: 'var(--dark)' } },
+                itemGroup: { style: { backgroundColor: 'var(--dark)', color: 'var(--white)' } },
+                item: {
+                  style: {
+                    backgroundColor: 'var(--dark)',
+                    color: 'var(--white)',
+                    margin: '0',
+                    padding: '0.5rem 1rem',
+                  },
+                },
+              }"
               @blur="onAutoBlur"
               @focus="onAutoFocus"
               @hide="onPanelHide"
@@ -164,6 +186,8 @@
       & .p-autocomplete-item {
         background-color: var(--dark);
         color: var(--white);
+        margin: 0;
+        padding: 0.5rem 1rem;
         &:hover,
         &.p-highlight {
           background-color: var(--dark);

@@ -122,6 +122,7 @@ class AccountResourceIT {
     }
 
     @Test
+    @WithMockUser
     @Transactional
     void testRegisterValid() throws Exception {
         ManagedUserVM validUser = new ManagedUserVM();
@@ -145,6 +146,7 @@ class AccountResourceIT {
     }
 
     @Test
+    @WithMockUser
     @Transactional
     void testRegisterInvalidLogin() throws Exception {
         ManagedUserVM invalidUser = new ManagedUserVM();
@@ -175,6 +177,7 @@ class AccountResourceIT {
     }
 
     @ParameterizedTest
+    @WithMockUser
     @MethodSource("invalidUsers")
     @Transactional
     void testRegisterInvalidUsers(ManagedUserVM invalidUser) throws Exception {
@@ -208,6 +211,7 @@ class AccountResourceIT {
     }
 
     @Test
+    @WithMockUser
     @Transactional
     void testRegisterDuplicateLogin() throws Exception {
         // First registration
@@ -260,6 +264,7 @@ class AccountResourceIT {
     }
 
     @Test
+    @WithMockUser
     @Transactional
     void testRegisterDuplicateEmail() throws Exception {
         // First user
@@ -336,6 +341,7 @@ class AccountResourceIT {
     }
 
     @Test
+    @WithMockUser
     @Transactional
     void testRegisterAdminIsIgnored() throws Exception {
         ManagedUserVM validUser = new ManagedUserVM();

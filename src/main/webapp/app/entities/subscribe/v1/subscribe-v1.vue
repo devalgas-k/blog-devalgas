@@ -71,7 +71,9 @@
 
 <style lang="scss" scoped>
 .newsletter {
+  /*
   background: rgba(0, 0, 0, 0.3) !important;
+  */
   padding: 40px 40px;
   z-index: 5;
 
