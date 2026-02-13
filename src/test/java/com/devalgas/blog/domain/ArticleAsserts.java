@@ -70,7 +70,8 @@ public class ArticleAsserts {
             )
             .satisfies(a -> assertThat(a.getViews()).as("check views").isEqualTo(expected.getViews()))
             .satisfies(a -> assertThat(a.getStars()).as("check stars").isEqualTo(expected.getStars()))
-            .satisfies(a -> assertThat(a.getDisplay()).as("check display").isEqualTo(expected.getDisplay()));
+            .satisfies(a -> assertThat(a.getDisplay()).as("check display").isEqualTo(expected.getDisplay()))
+            .satisfies(a -> assertThat(a.getNewsletter()).as("check newsletter").isEqualTo(expected.getNewsletter()));
     }
 
     /**
