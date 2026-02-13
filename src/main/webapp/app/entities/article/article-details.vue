@@ -101,6 +101,12 @@
             <span>{{ article.display }}</span>
           </dd>
           <dt>
+            <span v-text="t$('devalgasApp.article.newsletter')"></span>
+          </dt>
+          <dd>
+            <span>{{ article.newsletter }}</span>
+          </dd>
+          <dt>
             <span v-text="t$('devalgasApp.article.categoryArticle')"></span>
           </dt>
           <dd>

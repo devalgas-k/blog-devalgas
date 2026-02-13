@@ -20,6 +20,7 @@ export interface IArticle {
   views?: number | null;
   stars?: number | null;
   display?: boolean | null;
+  newsletter?: boolean | null;
   categoryArticles?: ICategoryArticle[] | null;
 }
 
@@ -43,8 +44,10 @@ export class Article implements IArticle {
     public views?: number | null,
     public stars?: number | null,
     public display?: boolean | null,
+    public newsletter?: boolean | null,
     public categoryArticles?: ICategoryArticle[] | null,
   ) {
     this.display = this.display ?? false;
+    this.newsletter = this.newsletter ?? false;
   }
 }

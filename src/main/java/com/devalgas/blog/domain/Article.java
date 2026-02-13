@@ -93,6 +93,9 @@ public class Article implements Serializable {
     @Column(name = "display")
     private Boolean display;
 
+    @Column(name = "newsletter")
+    private Boolean newsletter;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_article__category_article",
@@ -339,6 +342,19 @@ public class Article implements Serializable {
         this.display = display;
     }
 
+    public Boolean getNewsletter() {
+        return this.newsletter;
+    }
+
+    public Article newsletter(Boolean newsletter) {
+        this.setNewsletter(newsletter);
+        return this;
+    }
+
+    public void setNewsletter(Boolean newsletter) {
+        this.newsletter = newsletter;
+    }
+
     public Set<CategoryArticle> getCategoryArticles() {
         return this.categoryArticles;
     }
@@ -403,6 +419,7 @@ public class Article implements Serializable {
             ", views=" + getViews() +
             ", stars=" + getStars() +
             ", display='" + getDisplay() + "'" +
+            ", newsletter='" + getNewsletter() + "'" +
             "}";
     }
 }

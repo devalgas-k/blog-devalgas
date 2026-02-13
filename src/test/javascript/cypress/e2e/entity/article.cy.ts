@@ -15,7 +15,7 @@ describe('Article e2e test', () => {
   const articlePageUrlPattern = new RegExp('/article(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const articleSample = { labelEn: 'F', labelFr: 'W#8rS3', status: 'PENDING', date: '2025-12-10T04:01:31.454Z' };
+  const articleSample = { labelEn: 'Q}hq1d', labelFr: 'Du4/q', status: 'INPROGRESS', date: '2025-12-09T17:20:13.116Z' };
 
   let article;
 
@@ -160,41 +160,45 @@ describe('Article e2e test', () => {
     });
 
     it('should create an instance of Article', () => {
-      cy.get(`[data-cy="labelEn"]`).type('K}0');
-      cy.get(`[data-cy="labelEn"]`).should('have.value', 'K}0');
+      cy.get(`[data-cy="labelEn"]`).type('ZE');
+      cy.get(`[data-cy="labelEn"]`).should('have.value', 'ZE');
 
-      cy.get(`[data-cy="labelFr"]`).type('KnT');
-      cy.get(`[data-cy="labelFr"]`).should('have.value', 'KnT');
+      cy.get(`[data-cy="labelFr"]`).type('JTv,P');
+      cy.get(`[data-cy="labelFr"]`).should('have.value', 'JTv,P');
 
-      cy.get(`[data-cy="descriptionFr"]`).type('diablement chef de cuisine prétendre');
-      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'diablement chef de cuisine prétendre');
+      cy.get(`[data-cy="descriptionFr"]`).type('pis');
+      cy.get(`[data-cy="descriptionFr"]`).should('have.value', 'pis');
 
-      cy.get(`[data-cy="descriptionEn"]`).type("à l'exception de super");
-      cy.get(`[data-cy="descriptionEn"]`).should('have.value', "à l'exception de super");
+      cy.get(`[data-cy="descriptionEn"]`).type('écraser membre de l’équipe');
+      cy.get(`[data-cy="descriptionEn"]`).should('have.value', 'écraser membre de l’équipe');
 
       cy.setFieldImageAsBytesOfEntity('markdownFr', 'integration-test.png', 'image/png');
 
       cy.setFieldImageAsBytesOfEntity('markdownEn', 'integration-test.png', 'image/png');
 
-      cy.get(`[data-cy="status"]`).select('COMPLETED');
+      cy.get(`[data-cy="status"]`).select('INPROGRESS');
 
-      cy.get(`[data-cy="date"]`).type('2025-12-10T09:32');
+      cy.get(`[data-cy="date"]`).type('2025-12-10T02:50');
       cy.get(`[data-cy="date"]`).blur();
-      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T09:32');
+      cy.get(`[data-cy="date"]`).should('have.value', '2025-12-10T02:50');
 
       cy.setFieldImageAsBytesOfEntity('badge', 'integration-test.png', 'image/png');
 
       cy.setFieldImageAsBytesOfEntity('banner', 'integration-test.png', 'image/png');
 
-      cy.get(`[data-cy="views"]`).type('4830');
-      cy.get(`[data-cy="views"]`).should('have.value', '4830');
+      cy.get(`[data-cy="views"]`).type('19837');
+      cy.get(`[data-cy="views"]`).should('have.value', '19837');
 
-      cy.get(`[data-cy="stars"]`).type('22816');
-      cy.get(`[data-cy="stars"]`).should('have.value', '22816');
+      cy.get(`[data-cy="stars"]`).type('15510');
+      cy.get(`[data-cy="stars"]`).should('have.value', '15510');
 
       cy.get(`[data-cy="display"]`).should('not.be.checked');
       cy.get(`[data-cy="display"]`).click();
       cy.get(`[data-cy="display"]`).should('be.checked');
+
+      cy.get(`[data-cy="newsletter"]`).should('not.be.checked');
+      cy.get(`[data-cy="newsletter"]`).click();
+      cy.get(`[data-cy="newsletter"]`).should('be.checked');
 
       // since cypress clicks submit too fast before the blob fields are validated
       cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting

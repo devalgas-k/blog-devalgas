@@ -51,6 +51,7 @@ describe('Service Tests', () => {
         0,
         0,
         false,
+        false,
       );
     });
 
@@ -110,6 +111,7 @@ describe('Service Tests', () => {
           views: 1,
           stars: 1,
           display: true,
+          newsletter: true,
           ...elemDefault,
         };
 
@@ -134,16 +136,17 @@ describe('Service Tests', () => {
 
       it('should partial update a Article', async () => {
         const patchObject = {
-          labelEn: 'BBBBBB',
+          labelFr: 'BBBBBB',
           descriptionFr: 'BBBBBB',
           descriptionEn: 'BBBBBB',
           markdownFr: 'BBBBBB',
           markdownEn: 'BBBBBB',
           status: 'BBBBBB',
-          date: dayjs(currentDate).format(DATE_TIME_FORMAT),
-          banner: 'BBBBBB',
+          badge: 'BBBBBB',
+          views: 1,
           stars: 1,
           display: true,
+          newsletter: true,
           ...new Article(),
         };
         const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -182,6 +185,7 @@ describe('Service Tests', () => {
           views: 1,
           stars: 1,
           display: true,
+          newsletter: true,
           ...elemDefault,
         };
         const expected = { date: currentDate, ...returnedFromService };

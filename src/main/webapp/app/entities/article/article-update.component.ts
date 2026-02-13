@@ -86,6 +86,7 @@ export default defineComponent({
       views: {},
       stars: {},
       display: {},
+      newsletter: {},
       categoryArticles: {},
     };
     const v$ = useVuelidate(validationRules, article as any);
