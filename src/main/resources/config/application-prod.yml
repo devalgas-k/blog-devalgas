@@ -147,3 +147,8 @@ fallback:
     port: ${FALLBACK_MAIL_PORT:587}
     username: ${FALLBACK_MAIL_USERNAME:}
     password: ${FALLBACK_MAIL_PASSWORD:}
+
+app:
+  article-digest:
+    cron: '0 0 18 * * MON'
+    zone: 'Europe/Paris'

@@ -130,3 +130,8 @@ application:
     contact-from: ${MAIL_FROM_CONTACT:contact@devalgas.net}
   contact:
     email: ${CONTACT_EMAIL:info@devalgas.net}
+
+app:
+  article-digest:
+    cron: '0 */5 * * * *'
+    zone: 'Europe/Paris'

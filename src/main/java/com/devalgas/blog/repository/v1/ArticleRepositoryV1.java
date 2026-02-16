@@ -1,8 +1,10 @@
 package com.devalgas.blog.repository.v1;
 
 import com.devalgas.blog.domain.Article;
+import com.devalgas.blog.domain.enumeration.Status;
 import com.devalgas.blog.repository.ArticleRepositoryWithBagRelationships;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,15 @@ public interface ArticleRepositoryV1 extends ArticleRepositoryWithBagRelationshi
 
     default Page<Article> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
+    }
+
+    Optional<Article> findFirstByStatusAndDisplayAndNewsletterOrderByDateDesc(Status status, Boolean display, Boolean newsletter);
+
+    default Optional<Article> findFirstByStatusAndDisplayAndNewsletterWithEagerRelationships(
+        Status status,
+        Boolean display,
+        Boolean newsletter
+    ) {
+        return this.fetchBagRelationships(this.findFirstByStatusAndDisplayAndNewsletterOrderByDateDesc(status, display, newsletter));
     }
 }

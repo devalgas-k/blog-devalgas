@@ -1,17 +1,17 @@
-Titre: Conception Technique Détaillée (CTD) — Batch e‑mail d’articles COMPLETED non affichés (V1)
+Titre: Conception Technique Détaillée (CTD) — Batch e‑mail d’articles COMPLETED publiés non diffusés (V1)
 
-Rôle: Tu es un architecte logiciel senior. Produis en français une CTD exhaustive pour concevoir un batch qui récupère les articles V1 avec status=COMPLETED et display=false, puis envoie un e‑mail aux abonnés (Subscribe) avec un nouveau template dérivé de subscribeEmail.html. Ne pas implémenter; livrer uniquement la CTD et les blocs/configs prêts à l’emploi.
+Rôle: Tu es un architecte logiciel senior. Produis en français une CTD exhaustive pour concevoir un batch qui récupère les articles V1 avec status=COMPLETED, display=true et newsletter=false, puis envoie un e‑mail aux abonnés (Subscribe) avec un nouveau template dérivé de subscribeEmail.html. Ne pas implémenter; livrer uniquement la CTD et les blocs/configs prêts à l’emploi.
 
-Objectif: Définir l’architecture, les choix techniques, les spécifications détaillées et les impacts d’un batch qui:
+Objectif: Définir l’architecture, les choix techniques, les spécifications détaillées, les impacts d’un batch et implémentation qui:
 
-- Récupère les ArticleHomeV1 via articleHomeRepositoryV1.findByStatusAndDisplayWithEagerRelationships(Status.COMPLETED, false, pageable)
+- Récupère UNIQUEMENT l’article le plus récent (date max) avec status=COMPLETED, display=true et newsletter=false
 - Construit un lien absolu vers la page article (slug FR/EN) en fonction du profil (prod: devalgas.net; autres: localhost/127.0.0.1)
-- Envoie un e‑mail aux abonnés (Subscribe) en s’inspirant de MailServiceImplV1.sendEmailNewSubscribe, avec un nouveau template comprenant label, description, date et lien vers l’article
-- Assure l’idempotence (pas d’envoi répété) et BASCULE OBLIGATOIREMENT display à true à la fin du batch
+- Envoie un e‑mail aux abonnés (Subscribe) en s’inspirant de MailServiceImplV1.sendEmailNewSubscribe, avec un template comprenant label, description, date et lien vers l’article
+- Assure l’idempotence et BASCULE OBLIGATOIREMENT newsletter à true à la fin du batch
 
 Entrées (à fournir et à intégrer dans la CTD):
 
-- Contexte et objectifs métier: informer les abonnés des nouveaux articles publiés (status COMPLETED) non encore diffusés (display=false)
+- Contexte et objectifs métier: informer les abonnés des nouveaux articles publiés (status COMPLETED, display=true) non encore diffusés (newsletter=false)
 - Hypothèses et périmètre: batch interne, pas d’UI; un e‑mail par abonné; slug calculé à la volée
 - Contraintes et dépendances: Spring Boot 3.5.x, Java 17, Thymeleaf, JHipsterProperties.mail.base-url, Brevo SMTP + fallback
 - Volumétrie et SLA attendus: faible à modéré; envois séquentiels/asynchrones avec limite de débit si nécessaire
@@ -19,11 +19,12 @@ Entrées (à fournir et à intégrer dans la CTD):
 
 Livrables attendus:
 
-- CTD complète au format Markdown suivant la structure ci‑dessous
+- CTD complète au format Markdown dans docs/ctd suivant la structure ci‑dessous
 - Spécifications détaillées (API interne, modèle de données, configuration, scheduling)
-- Liste des fichiers à créer/modifier avec chemins absolus
+- Liste des fichiers à créer/modifier avec chemins relatifs
 - Blocs de configuration exacts et testables par profil (prod/dev/local/azure)
 - Plan de tests et validation locale (sans implémentation)
+- Implémentation de la CTD dans le projet
 
 Contraintes et contexte (adapter depuis le projet):
 
@@ -39,7 +40,7 @@ Structure et contenu requis de la CTD (squelette à respecter):
 2. Architecture & choix techniques
    - Composants, patterns (Service + Scheduler), justification des décisions
 3. Modèle de domaine et données
-   - Entités utilisées: ArticleHomeV1, Subscribe; invariants (status, display); stratégie d’idempotence (bascule display à true)
+   - Entités utilisées: Article, Subscribe; invariants (status, display); stratégie d’idempotence (bascule newsletter à true)
 4. Interfaces & contrats
    - Service batch, dépendances repository, contrat de template (variables: articles, baseUrl, lang)
 5. Spécification de configuration
@@ -64,7 +65,8 @@ Structure et contenu requis de la CTD (squelette à respecter):
 Spécifications à intégrer (exacts et contextualisés):
 
 - Sélection des articles:
-  - Méthode: ArticleRepositoryV1.findByStatusAndDisplayWithEagerRelationships(Status.COMPLETED, false, pageable)
+  - Méthode: ArticleRepositoryV1.findFirstByStatusAndDisplayAndNewsletterOrderByDateDesc(Status.COMPLETED, true, false)
+  - Variante eager: default Optional<Article> findFirstByStatusAndDisplayAndNewsletterWithEagerRelationships(...) utilisant fetchBagRelationships(Optional<Article>)
   - Fichier: [ArticleRepositoryV1.java](src/main/java/com/devalgas/blog/repository/v1/ArticleRepositoryV1.java)
   - Domaine: [Article.java](src/main/java/com/devalgas/blog/domain/Article.java)
 - Abonnés:
@@ -74,9 +76,9 @@ Spécifications à intégrer (exacts et contextualisés):
   - Méthode existante: sendEmailNewSubscribe(SubscribeDTO) dans [MailServiceImplV1.java](src/main/java/com/devalgas/blog/service/impl/v1/MailServiceImplV1.java#L154-L163)
   - Base URL injectée: jHipsterProperties.getMail().getBaseUrl() via le contexte Thymeleaf
 - Nouveau template à créer (dérivé de subscribeEmail.html):
-  - Emplacement: src/main/resources/templates/mail/articlesDigestEmail.html
-  - Variables: articles (List<Article>), baseUrl, langKey
-  - Contenu: pour chaque article, afficher label (FR/EN selon abonné), description, date (ISO‑8601 formaté), lien absolu vers /v1/articles/{id}-{slug}/view
+  - Emplacement: src/main/resources/templates/mail/articleDigestEmail.html
+  - Variables: article (Article), baseUrl, langKey, slug
+  - Contenu: afficher label (FR/EN selon abonné), description, date (ISO‑8601 formaté), lien absolu vers /v1/articles/{id}-{slug}/view
   - Référence visuelle: [subscribeEmail.html](src/main/resources/templates/mail/subscribeEmail.html)
 - Calcul du slug (à décrire dans la CTD, sans code):
   - Règles: lowercase, normalisation NFD, suppression diacritiques, remplacement non‑alphanum par ‘-’, trim des tirets, longueur max 80
@@ -86,13 +88,14 @@ Spécifications à intégrer (exacts et contextualisés):
   - Autres profils: baseUrl=http://127.0.0.1:8080
   - Format: ${baseUrl}/v1/articles/${id}-${slug}/view
 - Scheduling (à définir):
-  - Prod: @Scheduled(cron = "0 0 18 \* \* \*", zone="Europe/Paris") — quotidien 18:00
+  - Prod: @Scheduled(cron = "0 0 18 \* \* MON", zone="Europe/Paris") — chaque lundi à 18:00
   - Dev/Local/Azure: @Scheduled(cron = "0 _/5 _ \* \* \*", zone="Europe/Paris") — toutes les 5 minutes
   - Pagination: taille raisonnable (ex.: 50) pour éviter de longs envois
+  - Note compatibilité Spring: format à 6 champs (secondes minutes heures jour-du-mois mois jour-de-semaine); MON/TUE/WED/THU/FRI/SAT/SUN pour hebdo; "0 0 18 \* \* MON" est valide avec zone="Europe/Paris"
 - Post‑traitement:
-  - À la fin du batch et après succès global d’envoi, basculer article.display à true et persister la mise à jour
+  - À la fin du batch et après succès global d’envoi, basculer article.newsletter à true et persister la mise à jour
 - Idempotence:
-  - Basculer article.display à true à la fin du batch après succès d’envoi
+  - Basculer article.newsletter à true à la fin du batch après succès d’envoi
 - Fallback SMTP:
   - Si envoi échoue (MailException), retenter via un JavaMailSender “fallback” si activé
   - Propriétés fallback.\* présentes dans application‑prod.yml
@@ -149,7 +152,7 @@ Stratégies de tests pour le scheduler
       ArticleDigestService service;
 
       @Autowired
-      ArticleHomeRepositoryV1 articleRepo;
+      ArticleRepositoryV1 articleRepo;
 
       @Autowired
       SubscribeRepositoryV1 subscribeRepo;
@@ -158,9 +161,9 @@ Stratégies de tests pour le scheduler
       JavaMailSender mailSender;
 
       @Test
-      void processDigest_setsDisplayTrue_andSendsEmails() {
+      void processDigest_setsNewsletterTrue_andSendsEmails() {
         service.processDigest();
-        // assertions sur display=true et vérification d'appels mailSender.send(...)
+        // assertions sur newsletter=true et vérification d'appels mailSender.send(...)
       }
     }
 
@@ -316,6 +319,7 @@ public class ArticleDigestScheduler {
     this.service = service;
   }
 
+  @Transactional
   @Scheduled(cron = "${app.article-digest.cron}", zone = "${app.article-digest.zone:Europe/Paris}")
   public void run() {
     service.processDigest();
@@ -331,7 +335,7 @@ application-prod.yml
 ```
 app:
   article-digest:
-    cron: "0 0 18 * * *"
+    cron: "0 0 18 * * MON"
     zone: "Europe/Paris"
 ```
 
@@ -344,7 +348,7 @@ app:
     zone: "Europe/Paris"
 ```
 
-- Service batch (sélection, envoi, bascule display=true):
+- Service batch (sélection, envoi, bascule newsletter=true):
 
 ```java
 @Service
@@ -374,22 +378,27 @@ public class ArticleDigestService {
   }
 
   public void processDigest() {
-    Pageable page = PageRequest.of(0, 50);
-    Page<Article> articles = articleRepo.findByStatusAndDisplayWithEagerRelationships(Status.COMPLETED, false, page);
+    Optional<Article> opt = articleRepo.findFirstByStatusAndDisplayAndNewsletterWithEagerRelationships(Status.COMPLETED, true, false);
+    if (opt.isEmpty()) return;
+    Article article = opt.get();
     List<Subscribe> subscribers = subscribeRepo.findAll();
     String baseUrl = jhipster.getMail().getBaseUrl();
     for (Subscribe s : subscribers) {
       Locale locale = Locale.forLanguageTag(Optional.ofNullable(s.getLangKey()).orElse("fr"));
+      boolean useFr = "fr".equalsIgnoreCase(locale.getLanguage());
+      String title = useFr ? article.getLabelFr() : article.getLabelEn();
+      String slugStr = slug(title);
       Context ctx = new Context(locale);
-      ctx.setVariable("articles", articles.getContent());
+      ctx.setVariable("article", article);
       ctx.setVariable("baseUrl", baseUrl);
       ctx.setVariable("subscribe", s);
-      String content = templateEngine.process("mail/articlesDigestEmail", ctx);
+      ctx.setVariable("slug", slugStr);
+      String content = templateEngine.process("mail/articleDigestEmail", ctx);
       String subject = messageSource.getMessage("email.digest.title", null, locale);
       send(content, subject, s.getEmail());
     }
-    List<Long> ids = articles.getContent().stream().map(Article::getId).toList();
-    articleRepo.bulkSetDisplayTrue(ids);
+    article.setNewsletter(true);
+    articleRepo.save(article);
   }
 
   private void send(String content, String subject, String to) {
@@ -405,20 +414,20 @@ public class ArticleDigestService {
 
 ```
 
-- Méthodes repository à prévoir (sélection + update bulk):
+- Méthodes repository à prévoir (sélection):
 
 ```java
 @Repository
 public interface ArticleRepositoryV1 extends ArticleRepositoryWithBagRelationships, JpaRepository<Article, Long> {
-  Page<Article> findByStatusAndDisplay(Status status, Boolean display, Pageable pageable);
+  Optional<Article> findFirstByStatusAndDisplayAndNewsletterOrderByDateDesc(Status status, Boolean display, Boolean newsletter);
 
-  default Page<Article> findByStatusAndDisplayWithEagerRelationships(Status status, Boolean display, Pageable pageable) {
-    return this.fetchBagRelationships(this.findByStatusAndDisplay(status, display, pageable));
+  default Optional<Article> findFirstByStatusAndDisplayAndNewsletterWithEagerRelationships(
+    Status status,
+    Boolean display,
+    Boolean newsletter
+  ) {
+    return this.fetchBagRelationships(this.findFirstByStatusAndDisplayAndNewsletterOrderByDateDesc(status, display, newsletter));
   }
-
-  @Modifying
-  @Query("update Article a set a.display = true where a.id in :ids")
-  int bulkSetDisplayTrue(@Param("ids") List<Long> ids);
 }
 
 ```
@@ -440,16 +449,16 @@ private String articleUrl(String baseUrl, Article a, boolean useFr) {
 
 ```
 
-- Snippet Thymeleaf (extrait articlesDigestEmail.html):
+- Snippet Thymeleaf (extrait articleDigestEmail.html):
 
 ```html
 <ul>
-  <li th:each="a : ${articles}">
-    <a th:href="${baseUrl} + '/v1/articles/' + ${a.id} + '/view'">
-      <span th:text="${#locale.language == 'fr' ? a.labelFr : a.labelEn}"></span>
+  <li>
+    <a th:href="${baseUrl} + '/v1/articles/' + ${article.id} + '-' + ${slug} + '/view'">
+      <span th:text="${#locale.language == 'fr' ? article.labelFr : article.labelEn}"></span>
     </a>
-    <p th:text="${#locale.language == 'fr' ? a.descriptionFr : a.descriptionEn}"></p>
-    <time th:text="${#temporals.format(a.date, 'yyyy-MM-dd')}"></time>
+    <p th:text="${#locale.language == 'fr' ? article.descriptionFr : article.descriptionEn}"></p>
+    <time th:text="${#temporals.format(article.date, 'yyyy-MM-dd')}"></time>
   </li>
 </ul>
 ```
@@ -459,7 +468,3 @@ private String articleUrl(String baseUrl, Article a, boolean useFr) {
 - Subscribe: [Subscribe.java](src/main/java/com/devalgas/blog/domain/Subscribe.java), [SubscribeRepositoryV1.java](src/main/java/com/devalgas/blog/repository/v1/SubscribeRepositoryV1.java)
 - Service Mail: [MailServiceImplV1.java](src/main/java/com/devalgas/blog/service/impl/v1/MailServiceImplV1.java), [MailService.java](src/main/java/com/devalgas/blog/service/MailService.java)
 - Template de référence: [subscribeEmail.html](src/main/resources/templates/mail/subscribeEmail.html)
-
-Rappel important:
-
-- Ne produire aucune implémentation dans cette CTD; uniquement design, choix techniques, blocs de config exacts, et plan de tests.
