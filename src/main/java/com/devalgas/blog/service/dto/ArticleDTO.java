@@ -65,6 +65,8 @@ public class ArticleDTO implements Serializable {
 
     private Boolean display;
 
+    private Boolean newsletter;
+
     private Set<CategoryArticleDTO> categoryArticles = new HashSet<>();
 
     public Long getId() {
@@ -211,6 +213,14 @@ public class ArticleDTO implements Serializable {
         this.display = display;
     }
 
+    public Boolean getNewsletter() {
+        return newsletter;
+    }
+
+    public void setNewsletter(Boolean newsletter) {
+        this.newsletter = newsletter;
+    }
+
     public Set<CategoryArticleDTO> getCategoryArticles() {
         return categoryArticles;
     }
@@ -258,6 +268,7 @@ public class ArticleDTO implements Serializable {
             ", views=" + getViews() +
             ", stars=" + getStars() +
             ", display='" + getDisplay() + "'" +
+            ", newsletter='" + getNewsletter() + "'" +
             ", categoryArticles=" + getCategoryArticles() +
             "}";
     }

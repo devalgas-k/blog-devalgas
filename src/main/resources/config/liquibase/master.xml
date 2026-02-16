@@ -26,6 +26,8 @@
     <include file="config/liquibase/changelog/20251223152637_added_entity_constraints_Message.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <include file="config/liquibase/changelog/20260208123000_added_column_display_Article.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260213120000_added_column_newsletter_Article.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260209123500_added_index_article_status_display_date.xml" relativeToChangelogFile="false"/>
-    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20260216123000_update_article_set_newsletter_false.xml" relativeToChangelogFile="false"/>
+  <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

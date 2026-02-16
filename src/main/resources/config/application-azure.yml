@@ -119,4 +119,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+app:
+  article-digest:
+    cron: '0 */5 * * * *'
+    zone: 'Europe/Paris'

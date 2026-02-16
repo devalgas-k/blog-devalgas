@@ -84,6 +84,10 @@
               <span v-text="t$('devalgasApp.article.display')"></span>
               <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'display'"></jhi-sort-indicator>
             </th>
+            <th scope="row" @click="changeOrder('newsletter')">
+              <span v-text="t$('devalgasApp.article.newsletter')"></span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'newsletter'"></jhi-sort-indicator>
+            </th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -129,6 +133,7 @@
             <td>{{ article.views }}</td>
             <td>{{ article.stars }}</td>
             <td>{{ article.display }}</td>
+            <td>{{ article.newsletter }}</td>
             <td class="text-right">
               <div class="btn-group">
                 <router-link :to="{ name: 'ArticleView', params: { articleId: article.id } }" custom v-slot="{ navigate }">

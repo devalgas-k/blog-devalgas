@@ -67,6 +67,10 @@
     {
       "fieldName": "display",
       "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "newsletter",
+      "fieldType": "Boolean"
     }
   ],
   "name": "Article",

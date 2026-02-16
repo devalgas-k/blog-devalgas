@@ -54,6 +54,7 @@ entity Article {
   views Integer
   stars Integer
   display Boolean
+  newsletter Boolean
 }
 
 /**

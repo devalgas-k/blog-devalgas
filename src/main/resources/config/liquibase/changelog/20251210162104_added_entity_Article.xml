@@ -92,6 +92,8 @@
           Spring Boot configuration key.
     -->
     <changeSet id="20251210162104-1-data" author="jhipster" context="faker">
+        <validCheckSum>9:94d4a0aea9e11b6a0a958c5f2bcc7018</validCheckSum>
+        <validCheckSum>9:458d59795bb29c59c3c276600561b2cf</validCheckSum>
         <loadData
                   file="config/liquibase/fake-data/article.csv"
                   separator=";"
