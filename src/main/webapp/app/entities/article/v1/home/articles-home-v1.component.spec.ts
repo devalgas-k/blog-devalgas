@@ -1,5 +1,6 @@
 import { vitest, describe, it, expect } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
 import ArticlesHomeV1 from './articles-home-v1.vue';
 import { computed, nextTick } from 'vue';
 
@@ -18,6 +19,7 @@ describe('ArticlesHomeV1', () => {
           'article-info': true,
           'font-awesome-icon': true,
         },
+        plugins: [createTestingPinia({ createSpy: vitest.fn })],
         provide: {
           alertService: { showHttpError: vitest.fn() },
           articleService: () => ({

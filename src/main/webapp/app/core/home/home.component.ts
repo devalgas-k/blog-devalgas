@@ -1,4 +1,4 @@
-import { type ComputedRef, defineComponent, inject, onMounted, onBeforeUnmount, ref, computed } from 'vue';
+import { type ComputedRef, defineComponent, inject, onMounted, onBeforeUnmount, onActivated, onDeactivated, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useHead } from '@unhead/vue';
 
@@ -10,6 +10,7 @@ declare const WRITING_HASH: string;
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
+  name: 'Home',
   components: {
     'article-search': ArticleSearchV1,
     'articles-home': ArticlesHome,
@@ -37,13 +38,24 @@ export default defineComponent({
     const onHashChange = () => {
       hashRef.value = window?.location?.hash ?? '';
     };
-    onMounted(() => {
-      onHashChange();
-      window.addEventListener('hashchange', onHashChange);
-    });
-    onBeforeUnmount(() => {
-      window.removeEventListener('hashchange', onHashChange);
-    });
+    const listenerAttached = ref(false);
+    const attach = () => {
+      if (!listenerAttached.value) {
+        onHashChange();
+        window.addEventListener('hashchange', onHashChange);
+        listenerAttached.value = true;
+      }
+    };
+    const detach = () => {
+      if (listenerAttached.value) {
+        window.removeEventListener('hashchange', onHashChange);
+        listenerAttached.value = false;
+      }
+    };
+    onMounted(attach);
+    onActivated(attach);
+    onDeactivated(detach);
+    onBeforeUnmount(detach);
 
     return {
       authenticated,

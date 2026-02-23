@@ -12,6 +12,7 @@ import CategoryArticleService from '@/entities/category-article/category-article
 import { type ICategoryArticle } from '@/shared/model/category-article.model';
 import { Article, type IArticle } from '@/shared/model/article.model';
 import { Status } from '@/shared/model/enumerations/status.model';
+import { useContentUpdateStore } from '@/shared/config/store/content-update-store';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -19,6 +20,7 @@ export default defineComponent({
   setup() {
     const articleService = inject('articleService', () => new ArticleService());
     const alertService = inject('alertService', () => useAlertService(), true);
+    const contentUpdateStore = useContentUpdateStore();
 
     const article: Ref<IArticle> = ref(new Article());
 
@@ -105,6 +107,7 @@ export default defineComponent({
       v$,
       ...useDateFormat({ entityRef: article }),
       t$,
+      contentUpdateStore,
     };
   },
   created(): void {
@@ -120,6 +123,7 @@ export default defineComponent({
             this.isSaving = false;
             this.previousState();
             this.alertService.showInfo(this.t$('devalgasApp.article.updated', { param: param.id }));
+            this.contentUpdateStore.markArticlesChanged();
           })
           .catch(error => {
             this.isSaving = false;
@@ -132,6 +136,7 @@ export default defineComponent({
             this.isSaving = false;
             this.previousState();
             this.alertService.showSuccess(this.t$('devalgasApp.article.created', { param: param.id }).toString());
+            this.contentUpdateStore.markArticlesChanged();
           })
           .catch(error => {
             this.isSaving = false;

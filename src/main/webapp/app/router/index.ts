@@ -34,6 +34,7 @@ export const createRouter = () =>
         path: '/',
         name: 'Home',
         component: Home,
+        meta: { keepAlive: true },
       },
       {
         path: '/forbidden',
