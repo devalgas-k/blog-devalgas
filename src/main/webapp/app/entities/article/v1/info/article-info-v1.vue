@@ -192,6 +192,18 @@
     min-height: 140px;
     &__title {
       font-size: 1rem;
+      display: block;
+      overflow: visible;
+      text-overflow: clip;
+      -webkit-line-clamp: unset;
+      -webkit-box-orient: unset;
+    }
+    &__description {
+      display: block;
+      overflow: visible;
+      text-overflow: clip;
+      -webkit-line-clamp: unset;
+      -webkit-box-orient: unset;
     }
 
     &__body {

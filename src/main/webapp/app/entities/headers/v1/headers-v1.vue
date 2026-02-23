@@ -17,20 +17,20 @@
 
     <b-collapse is-nav id="header-tabs">
       <template v-if="i18nReady">
-        <b-navbar-nav class="ml-auto row pl-lg-5">
+        <b-navbar-nav class="headers-v1__nav-center justify-content-center">
           <b-nav-item :to="{ path: '/', hash: '#writing' }" exact v-if="!authenticated">
             <span>
               <font-awesome-icon icon="newspaper" />
               <span v-text="t$('globalV1.headers.blog')"></span>
             </span>
           </b-nav-item>
-          <b-nav-item href="#newsletter" class="ml-1" exact v-if="!authenticated">
+          <b-nav-item href="#newsletter" class="ml-md-1" exact v-if="!authenticated">
             <span>
               <font-awesome-icon icon="envelopes-bulk" />
               <span v-text="t$('globalV1.headers.newsletter')"></span>
             </span>
           </b-nav-item>
-          <b-nav-item-dropdown id="contactUsnavBarDropdown" ref="contactDropdown" class="mx-1">
+          <b-nav-item-dropdown id="contactUsnavBarDropdown" ref="contactDropdown" class="mx-md-1" v-if="!authenticated">
             <template #button-content>
               <span class="navbar-dropdown-menu">
                 <font-awesome-icon icon="paper-plane"></font-awesome-icon>
@@ -141,7 +141,7 @@
               {{ value.name }}
             </b-dropdown-item>
           </b-nav-item-dropdown>
-          <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-1" right v-if="themes && Object.keys(themes).length > 1">
+          <b-nav-item-dropdown id="themesnavBarDropdown" class="mx-md-1" right v-if="themes && Object.keys(themes).length > 1">
             <template #button-content>
               <span class="navbar-dropdown-menu">
                 <font-awesome-icon icon="circle-half-stroke" />
@@ -205,6 +205,7 @@
 
 <style lang="scss" scoped>
 .headers-v1 {
+  position: relative;
   &__brand {
     padding: 0.3rem 0.5rem calc(15px - 0.75rem) !important;
   }
@@ -212,6 +213,11 @@
   @media screen and (min-width: 768px) {
     &__toggler {
       display: none;
+    }
+    &__nav-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
 
