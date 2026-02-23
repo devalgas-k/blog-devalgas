@@ -9,7 +9,12 @@
 
         <div class="container">
           <div class="w-75 mx-auto">
-            <router-view></router-view>
+            <router-view v-slot="{ Component, route }">
+              <keep-alive>
+                <component :is="Component" v-if="route.meta && route.meta.keepAlive" />
+              </keep-alive>
+              <component :is="Component" v-if="!route.meta || !route.meta.keepAlive" />
+            </router-view>
           </div>
           <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
             <template #modal-title>

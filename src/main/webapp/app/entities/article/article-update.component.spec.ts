@@ -1,6 +1,7 @@
 import { vitest } from 'vitest';
 import { type MountingOptions, shallowMount } from '@vue/test-utils';
 import sinon, { type SinonStubbedInstance } from 'sinon';
+import { createTestingPinia } from '@pinia/testing';
 import { type RouteLocation } from 'vue-router';
 
 import dayjs from 'dayjs';
@@ -51,6 +52,7 @@ describe('Component Tests', () => {
           'b-form-datepicker': true,
           'b-form-input': true,
         },
+        plugins: [createTestingPinia({ createSpy: vitest.fn })],
         provide: {
           alertService,
           articleService: () => articleServiceStub,

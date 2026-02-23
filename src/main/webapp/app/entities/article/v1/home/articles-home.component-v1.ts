@@ -1,4 +1,4 @@
-import { type Ref, computed, defineAsyncComponent, defineComponent, inject, onMounted, ref, watch } from 'vue';
+import { type Ref, computed, defineAsyncComponent, defineComponent, inject, onMounted, onActivated, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { type IArticle } from '@/shared/model/article.model';
@@ -6,6 +6,7 @@ import useDataUtils from '@/shared/data/data-utils.service';
 import { useDateFormat } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ArticleServiceV1 from '../article.service-v1';
+import { useContentUpdateStore } from '@/shared/config/store/content-update-store';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 const ArticleInfo = defineAsyncComponent(() => import('@/entities/article/v1/info/article-info-v1.vue'));
@@ -42,6 +43,7 @@ export default defineComponent({
     const articles: Ref<IArticle[]> = ref([]);
 
     const isFetching = ref(false);
+    const contentUpdateStore = useContentUpdateStore();
 
     const clear = () => {
       page.value = 1;
@@ -55,8 +57,16 @@ export default defineComponent({
       return result;
     };
 
-    const retrieveArticles = async () => {
-      isFetching.value = true;
+    const lastFetchAt: Ref<number | null> = ref(null);
+    const refreshInProgress = ref(false);
+    const retrieveArticles = async (silent = false) => {
+      if (refreshInProgress.value) {
+        return;
+      }
+      refreshInProgress.value = true;
+      if (!silent) {
+        isFetching.value = true;
+      }
       try {
         const paginationQuery = {
           page: page.value - 1,
@@ -67,10 +77,14 @@ export default defineComponent({
         totalItems.value = Number(res.headers['x-total-count']);
         queryCount.value = totalItems.value;
         articles.value = res.data;
+        lastFetchAt.value = Date.now();
       } catch (err: any) {
         alertService.showHttpError(err?.response);
       } finally {
-        isFetching.value = false;
+        if (!silent) {
+          isFetching.value = false;
+        }
+        refreshInProgress.value = false;
       }
     };
 
@@ -80,6 +94,20 @@ export default defineComponent({
 
     onMounted(async () => {
       await retrieveArticles();
+    });
+
+    onActivated(async () => {
+      const ttlRaw = (import.meta as any).env?.VITE_HOME_REFRESH_TTL;
+      const ttl = typeof ttlRaw === 'string' ? parseInt(ttlRaw, 10) || 60_000 : 60_000;
+      const now = Date.now();
+      const last = lastFetchAt.value ?? 0;
+      const changed = contentUpdateStore.articlesChanged;
+      if (changed || now - last > ttl) {
+        await retrieveArticles(true);
+        if (changed) {
+          contentUpdateStore.resetArticlesChanged();
+        }
+      }
     });
 
     const removeId: Ref<number | null> = ref(null);
@@ -116,6 +144,8 @@ export default defineComponent({
     watch(page, async () => {
       await retrieveArticles();
     });
+
+    // refresh via store signal pris en compte dans onActivated
 
     const filter = null;
     const slugify = (s: string) =>
@@ -154,6 +184,7 @@ export default defineComponent({
       t$,
       ...dataUtils,
       slugForArticle,
+      contentUpdateStore,
     };
   },
 });
