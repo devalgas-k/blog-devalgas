@@ -206,8 +206,17 @@
 <style lang="scss" scoped>
 .headers-v1 {
   position: relative;
+  z-index: 10002;
   &__brand {
     padding: 0.3rem 0.5rem calc(15px - 0.75rem) !important;
+  }
+
+  & :deep(#contactUsnavBarDropdown .dropdown-menu) {
+    z-index: 10001;
+  }
+  & :deep(#languagesnavBarDropdown .dropdown-menu),
+  & :deep(#themesnavBarDropdown .dropdown-menu) {
+    z-index: 10001;
   }
 
   @media screen and (min-width: 768px) {
@@ -218,6 +227,7 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      z-index: 10002;
     }
   }
 
