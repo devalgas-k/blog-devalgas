@@ -7,8 +7,8 @@
           <headers-v1></headers-v1>
         </div>
         <div class="row">
-          <div class="col-lg-2 mt-15rem">
-            <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotLeftValid" class="d-none d-lg-flex">
+          <div class="col-lg-2 mt-2 mt-lg-5">
+            <div class="d-none d-lg-flex" v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotLeftValid">
               <adsense
                 :ad-slot="ADSENSE_SLOT_SIDEBAR_LEFT"
                 format="auto"
@@ -35,8 +35,8 @@
               </b-modal>
             </div>
           </div>
-          <div class="col-lg-2 mt-15rem">
-            <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotRightValid" class="d-none d-lg-flex">
+          <div class="col-lg-2 mt-2 mt-lg-5">
+            <div class="d-none d-lg-flex" v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotRightValid">
               <adsense
                 :ad-slot="ADSENSE_SLOT_SIDEBAR_RIGHT"
                 format="auto"

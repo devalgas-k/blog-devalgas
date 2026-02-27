@@ -50,6 +50,8 @@ export default defineComponent({
 
     const previousState = () => router.go(-1);
     const article: Ref<IArticle> = ref(props.initialArticle ?? {});
+    const consentGiven = inject('consentGiven', () => computed(() => true), true);
+    const adsenseScriptReady = inject('adsenseScriptReady', () => computed(() => false), true);
 
     const retrieveArticle = async (articleId: number) => {
       try {
@@ -198,6 +200,8 @@ export default defineComponent({
       description,
       adsenseClient: ADSENSE_CLIENT,
       adsenseSlot: ADSENSE_SLOT,
+      consentGiven,
+      adsenseScriptReady,
     };
   },
 });

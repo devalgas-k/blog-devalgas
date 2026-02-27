@@ -1,10 +1,4 @@
 <template>
-  <div class="d-none row ad-top">
-    <div class="col-12">
-      <adsense :client="adsenseClient" :ad-slot="adsenseSlot" format="auto" />
-    </div>
-  </div>
-
   <article-info-v1 :article="article" class="mt-5"></article-info-v1>
   <p-splitter class="mt-5" style="width: 100%">
     <p-splitter-panel :size="100">
