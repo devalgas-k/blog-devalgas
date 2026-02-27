@@ -12,6 +12,7 @@ import com.devalgas.blog.service.mapper.v1.ArticleDetailV1Mapper;
 import com.devalgas.blog.service.mapper.v1.ArticleHomeV1Mapper;
 import com.devalgas.blog.service.v1.ArticleServiceV1;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
         LOG.debug("Request to save Article : {}", articleDTO);
         Article article = articleMapper.toEntity(articleDTO);
         article = articleRepository.save(article);
+        evictV1Caches(article.getId());
         return articleMapper.toDto(article);
     }
 
@@ -70,6 +72,7 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
         LOG.debug("Request to update Article : {}", articleDTO);
         Article article = articleMapper.toEntity(articleDTO);
         article = articleRepository.save(article);
+        evictV1Caches(article.getId());
         return articleMapper.toDto(article);
     }
 
@@ -85,13 +88,17 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
                 return existingArticle;
             })
             .map(articleRepository::save)
-            .map(articleMapper::toDto);
+            .map(saved -> {
+                evictV1Caches(saved.getId());
+                return articleMapper.toDto(saved);
+            });
     }
 
     @Override
     public void delete(Long id) {
         LOG.debug("Request to delete Article : {}", id);
         articleRepository.deleteById(id);
+        evictV1Caches(id);
     }
 
     @Override
@@ -112,5 +119,14 @@ public class ArticleServiceImplV1 implements ArticleServiceV1 {
     public Optional<ArticleDetailV1DTO> findOneArticleDetails(Long id) {
         LOG.debug("Request to get Article : {}", id);
         return articleDetailRepositoryV1.findOneWithEagerRelationships(id).map(articleDetailV1Mapper::toDto);
+    }
+
+    private void evictV1Caches(Long articleId) {
+        if (articleId == null) return;
+        EntityManagerFactory emf = entityManager.getEntityManagerFactory();
+        var cache = emf.getCache();
+        cache.evict(com.devalgas.blog.domain.v1.ArticleHomeV1.class, articleId);
+        cache.evict(com.devalgas.blog.domain.v1.ArticleDetailV1.class, articleId);
+        cache.evict(com.devalgas.blog.domain.v1.CategoryArticleHomeV1.class);
     }
 }
