@@ -1,4 +1,4 @@
-import { defineComponent, provide, inject, computed } from 'vue';
+import { defineComponent, provide, inject, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 
@@ -36,6 +36,8 @@ export default defineComponent({
     const slotRightValid = computed(() => !!ADSENSE_SLOT_SIDEBAR_RIGHT && !ADSENSE_SLOT_SIDEBAR_RIGHT.startsWith('000000'));
     const slotFooterValid = computed(() => !!ADSENSE_SLOT_FOOTER && !ADSENSE_SLOT_FOOTER.startsWith('000000'));
 
+    const topNoFill = ref(false);
+
     return {
       loginModalOpen,
       i18nReady,
@@ -51,6 +53,12 @@ export default defineComponent({
       slotLeftValid,
       slotRightValid,
       slotFooterValid,
+      topNoFill,
     };
+  },
+  methods: {
+    onTopNoFill() {
+      (this as any).topNoFill = true;
+    },
   },
 });

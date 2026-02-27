@@ -6,9 +6,8 @@
         <div id="app-header">
           <headers-v1></headers-v1>
         </div>
-
         <div class="row">
-          <div class="col-lg-2">
+          <div class="col-lg-2 mt-15rem">
             <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotLeftValid" class="d-none d-lg-flex">
               <adsense
                 :ad-slot="ADSENSE_SLOT_SIDEBAR_LEFT"
@@ -19,18 +18,6 @@
             </div>
           </div>
           <div class="col-12 col-lg-8">
-            <div class="row">
-              <div class="col-12">
-                <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid" class="d-none d-lg-flex">
-                  <adsense
-                    :ad-slot="ADSENSE_SLOT_TOP"
-                    format="auto"
-                    :responsive="true"
-                    style="display: block; width: 100%; min-height: 90px"
-                  />
-                </div>
-              </div>
-            </div>
             <div class="container-fluid">
               <div class="w-auto px-4 px-lg-0 mx-auto">
                 <router-view v-slot="{ Component, route }">
@@ -47,20 +34,8 @@
                 <login-form></login-form>
               </b-modal>
             </div>
-            <div class="row">
-              <div class="col-12">
-                <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotFooterValid" class="d-none d-lg-flex">
-                  <adsense
-                    :ad-slot="ADSENSE_SLOT_FOOTER"
-                    format="auto"
-                    :responsive="true"
-                    style="display: block; width: 100%; min-height: 280px"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
-          <div class="col-lg-2">
+          <div class="col-lg-2 mt-15rem">
             <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotRightValid" class="d-none d-lg-flex">
               <adsense
                 :ad-slot="ADSENSE_SLOT_SIDEBAR_RIGHT"
@@ -98,6 +73,10 @@
   bottom: 0;
   width: 100%;
   height: 2.5rem;
+}
+
+.mt-15rem {
+  margin-top: 15rem !important;
 }
 
 @media (max-width: 576px) {

@@ -2,6 +2,7 @@
   <!--  https://github.com/mazipan/vue-google-adsense-->
   <div class="adsense adsense__wrapper" :key="adKey">
     <ins
+      ref="insEl"
       class="adsbygoogle"
       :style="insStyle"
       :data-ad-client="dataAdClient"

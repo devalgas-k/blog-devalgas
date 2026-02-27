@@ -216,7 +216,6 @@ const app = createApp({
           crossorigin: 'anonymous',
         },
       ],
-      meta: [{ name: 'google-adsense-account', content: ADSENSE_CLIENT }],
     });
     const consentRef = ref(true);
     const adsenseReady = ref(false);

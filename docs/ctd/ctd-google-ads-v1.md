@@ -11,10 +11,11 @@
 
 - Composants: composant interne [Adsense](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/core/adsense/adsense.vue) + [adsense.component.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/core/adsense/adsense.component.ts) pour rendre `<ins.adsbygoogle>` et déclencher `adsbygoogle.push`.
 - Head management: injection unique du script AdSense via Unhead (`useHead`) dans [main.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/main.ts) avec `crossorigin: 'anonymous'`.
+- Meta `google-adsense-account`: statique dans [index.html](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/index.html); ne pas l’injecter via Unhead pour éviter les doublons et garantir la visibilité sans exécution JavaScript.
 - Configurabilité: constants Vite `define` exposées globalement (client, flag d’activation et slots par emplacement) déclarées dans [declarations.d.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/declarations.d.ts).
 - Layout & rendu: mapping des formats par emplacement; utilisation de `format="auto"` et `:responsive="true"` pour adapter aux conteneurs Bootstrap; réservation de hauteur pour minimiser le CLS.
 - Décisions: manuel par emplacement (pas Auto Ads) pour contrôler densité, formats et UX; un seul chargement du script; préserver la stabilité en navigation SPA (clé stable sur le composant).
-- Garde‑fous de rendu: ne pas rendre d’annonce si `ADSENSE_ENABLED` est faux, si le consentement est absent, si le script est indisponible (`adsenseScriptReady`), ou si le slot de l’emplacement n’est pas valide (`slotTopValid/slotLeftValid/slotRightValid/slotFooterValid`, exclus les placeholders commençant par `000000`); replier le conteneur en cas de no‑fill.
+- Garde‑fous de rendu: ne pas rendre d’annonce si `ADSENSE_ENABLED` est faux, si le consentement est absent, si le script est indisponible (`adsenseScriptReady`), ou si le slot de l’emplacement n’est pas valide (`slotTopValid/slotLeftValid/slotRightValid/slotFooterValid`, exclus les placeholders commençant par `000000`). En cas de no‑fill: émission d’un événement `no-fill` et repli/fallback selon l’emplacement.
 
 ## 3. Modèle de domaine et données
 
@@ -23,27 +24,28 @@
 ## 4. Interfaces & contrats
 
 - Contrat du composant Adsense:
-  - Props: `client: string`, `adSlot: string`, `format: string`, `responsive: boolean`, `style: string`, `npa: boolean`, `test: boolean`, `layout: string`, `adLayoutKey: string`.
-  - Comportement: réserve la hauteur via `style`, rend `<ins class="adsbygoogle">`, déclenche `adsbygoogle.push({})` en `mounted`, option NPA si consentement absent, `data-adtest="on"` en dev.
+  - Props: `client: string`, `adSlot: string`, `format: string`, `responsive: boolean`, `style: string`, `npa: boolean`, `test: boolean`, `layout: string`, `adLayoutKey: string`, `collapseIfNoFill: boolean`.
+  - Événements: `no-fill` (émis quand la hauteur du `<ins>` reste à 0 après le push).
+  - Comportement: réserve la hauteur via `style`, rend `<ins class="adsbygoogle">` avec `ref` interne, déclenche `adsbygoogle.push({})` en `mounted`, option NPA si consentement absent, `data-adtest="on"` en dev; délai court (~1,5 s) pour mesurer `offsetHeight` et replier le wrapper si `collapseIfNoFill=true`.
 
 ## 5. Spécification de configuration
 
 - Variables d’environnement (exemples à définir côté CI/CD ou `.env`):
-  - `ADSENSE_CLIENT`: ID éditeur (ex. `ca-pub-6181972205565553`).
+  - `ADSENSE_CLIENT`: ID éditeur (ex. `ca-pub-8340083616743463`).
   - `ADSENSE_SLOT_TOP`, `ADSENSE_SLOT_SIDEBAR_LEFT`, `ADSENSE_SLOT_SIDEBAR_RIGHT`, `ADSENSE_SLOT_FOOTER`: ad unit IDs réels par emplacement.
   - `ADSENSE_ENABLED`: activer/désactiver globalement l’affichage des annonces (`true` par défaut).
 - Vite `define` dans [vite.config.mts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/vite.config.mts):
 
 ```ts
 define: {
-  ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-6181972205565553'}"`,
+  ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-8340083616743463'}"`,
   // Normalisation booléenne avec défaut true
   // const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? env.ADSENSE_ENABLED === 'true' : true;
   ADSENSE_ENABLED: ADSENSE_ENABLED_VAL,
-  ADSENSE_SLOT_TOP: `"${env.ADSENSE_SLOT_TOP ? env.ADSENSE_SLOT_TOP : '0000000001'}"`,
-  ADSENSE_SLOT_SIDEBAR_LEFT: `"${env.ADSENSE_SLOT_SIDEBAR_LEFT ? env.ADSENSE_SLOT_SIDEBAR_LEFT : '0000000002'}"`,
-  ADSENSE_SLOT_SIDEBAR_RIGHT: `"${env.ADSENSE_SLOT_SIDEBAR_RIGHT ? env.ADSENSE_SLOT_SIDEBAR_RIGHT : '0000000003'}"`,
-  ADSENSE_SLOT_FOOTER: `"${env.ADSENSE_SLOT_FOOTER ? env.ADSENSE_SLOT_FOOTER : '0000000004'}"`,
+  ADSENSE_SLOT_TOP: `"${env.ADSENSE_SLOT_TOP ? env.ADSENSE_SLOT_TOP : '1159284671'}"`,
+  ADSENSE_SLOT_SIDEBAR_LEFT: `"${env.ADSENSE_SLOT_SIDEBAR_LEFT ? env.ADSENSE_SLOT_SIDEBAR_LEFT : '6647773869'}"`,
+  ADSENSE_SLOT_SIDEBAR_RIGHT: `"${env.ADSENSE_SLOT_SIDEBAR_RIGHT ? env.ADSENSE_SLOT_SIDEBAR_RIGHT : '2280794651'}"`,
+  ADSENSE_SLOT_FOOTER: `"${env.ADSENSE_SLOT_FOOTER ? env.ADSENSE_SLOT_FOOTER : '6028467975'}"`,
 }
 ```
 
@@ -156,14 +158,14 @@ provide(
 
 ```ts
 define: {
-  ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-6181972205565553'}"`,
+  ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-8340083616743463'}"`,
   // ADSENSE_ENABLED normalisé (string env -> boolean)
   // const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? env.ADSENSE_ENABLED === 'true' : true;
   ADSENSE_ENABLED: ADSENSE_ENABLED_VAL,
-  ADSENSE_SLOT_TOP: `"${env.ADSENSE_SLOT_TOP ? env.ADSENSE_SLOT_TOP : '0000000001'}"`,
-  ADSENSE_SLOT_SIDEBAR_LEFT: `"${env.ADSENSE_SLOT_SIDEBAR_LEFT ? env.ADSENSE_SLOT_SIDEBAR_LEFT : '0000000002'}"`,
-  ADSENSE_SLOT_SIDEBAR_RIGHT: `"${env.ADSENSE_SLOT_SIDEBAR_RIGHT ? env.ADSENSE_SLOT_SIDEBAR_RIGHT : '0000000003'}"`,
-  ADSENSE_SLOT_FOOTER: `"${env.ADSENSE_SLOT_FOOTER ? env.ADSENSE_SLOT_FOOTER : '0000000004'}"`,
+  ADSENSE_SLOT_TOP: `"${env.ADSENSE_SLOT_TOP ? env.ADSENSE_SLOT_TOP : '1159284671'}"`,
+  ADSENSE_SLOT_SIDEBAR_LEFT: `"${env.ADSENSE_SLOT_SIDEBAR_LEFT ? env.ADSENSE_SLOT_SIDEBAR_LEFT : '6647773869'}"`,
+  ADSENSE_SLOT_SIDEBAR_RIGHT: `"${env.ADSENSE_SLOT_SIDEBAR_RIGHT ? env.ADSENSE_SLOT_SIDEBAR_RIGHT : '2280794651'}"`,
+  ADSENSE_SLOT_FOOTER: `"${env.ADSENSE_SLOT_FOOTER ? env.ADSENSE_SLOT_FOOTER : '6028467975'}"`,
 }
 ```
 
@@ -186,11 +188,14 @@ declare const ADSENSE_SLOT_FOOTER: string;
 - Contexte: layout desktop `col-lg-2 | col-12 col-lg-8 | col-lg-2`.
 - Emplacements et blocs:
 
-1. Après la navbar (desktop, dans `col-lg-8`, réserver 90px)
+1. Après la navbar (desktop, dans `col-lg-8`, réserver 90px, fallback neutre)
 
 ```vue
-<div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid" class="d-none d-lg-flex">
-  <adsense :ad-slot="ADSENSE_SLOT_TOP" format="auto" :responsive="true" style="display:block;width:100%;min-height:90px" />
+<div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid && !topNoFill" class="d-none d-lg-flex">
+  <adsense :ad-slot="ADSENSE_SLOT_TOP" format="auto" :responsive="true" style="display:block;width:100%;min-height:90px" @no-fill="onTopNoFill" />
+</div>
+<div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid && topNoFill" class="d-none d-lg-flex" style="width:100%">
+  <div style="display:block;width:100%;min-height:90px"><hr style="opacity:0.35;border-color:var(--dark)" /></div>
 </div>
 ```
 
@@ -210,11 +215,11 @@ declare const ADSENSE_SLOT_FOOTER: string;
 </div>
 ```
 
-4. Bandeau avant footer (desktop, réserver 280px)
+4. Bandeau avant footer (desktop, réserver 280px, collapse si no‑fill)
 
 ```vue
 <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotFooterValid" class="d-none d-lg-flex">
-  <adsense :ad-slot="ADSENSE_SLOT_FOOTER" format="auto" :responsive="true" style="display:block;width:100%;min-height:280px" />
+  <adsense :ad-slot="ADSENSE_SLOT_FOOTER" format="auto" :responsive="true" style="display:block;width:100%;min-height:280px" :collapse-if-no-fill="true" />
 </div>
 ```
 
@@ -230,7 +235,7 @@ Variant avec gating visibilité + consentement (desktop uniquement) et NPA
 
 - Mobile: ajouter une bannière dédiée 320×100 (fallback 320×50) en haut/bas d’écran; réserver `min-height:100px`; afficher uniquement avec consentement.
 - In‑article/multiplex: en fin d’article si disponible côté compte.
-- `ads.txt`: vérifier les fichiers `src/main/webapp/ads.txt` et `src/main/resources/static/ads.txt` avec `google.com, pub-6181972205565553, DIRECT, f08c47fec0942fa0`.
+- `ads.txt`: utiliser une seule source en production: `src/main/resources/static/ads.txt` avec `google.com, pub-8340083616743463, DIRECT, f08c47fec0942fa0`; supprimer toute duplication côté webapp.
 
 ### CI/CD & provisioning
 
@@ -323,3 +328,5 @@ const consentGranted = computed(() => ConsentStore().granted);
 #### CSP
 
 - La politique CSP existante autorise les domaines nécessaires (script/img/frame/connect) pour AdSense [application.yml](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/resources/config/application.yml#L192-L200).
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8340083616743463" crossorigin="anonymous"></script>
