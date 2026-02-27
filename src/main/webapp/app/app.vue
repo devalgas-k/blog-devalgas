@@ -7,23 +7,70 @@
           <headers-v1></headers-v1>
         </div>
 
-        <div class="container">
-          <div class="w-75 mx-auto">
-            <router-view v-slot="{ Component, route }">
-              <keep-alive>
-                <component :is="Component" v-if="route.meta && route.meta.keepAlive" />
-              </keep-alive>
-              <component :is="Component" v-if="!route.meta || !route.meta.keepAlive" />
-            </router-view>
+        <div class="row">
+          <div class="col-lg-2">
+            <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotLeftValid" class="d-none d-lg-flex">
+              <adsense
+                :ad-slot="ADSENSE_SLOT_SIDEBAR_LEFT"
+                format="auto"
+                :responsive="true"
+                style="display: block; width: 100%; min-height: 600px"
+              />
+            </div>
           </div>
-          <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
-            <template #modal-title>
-              <span v-if="i18nReady" data-cy="loginTitle" id="login-title" v-text="t$('login.title')"></span>
-            </template>
-            <login-form></login-form>
-          </b-modal>
+          <div class="col-12 col-lg-8">
+            <div class="row">
+              <div class="col-12">
+                <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid" class="d-none d-lg-flex">
+                  <adsense
+                    :ad-slot="ADSENSE_SLOT_TOP"
+                    format="auto"
+                    :responsive="true"
+                    style="display: block; width: 100%; min-height: 90px"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="container-fluid">
+              <div class="w-auto px-4 px-lg-0 mx-auto">
+                <router-view v-slot="{ Component, route }">
+                  <keep-alive>
+                    <component :is="Component" v-if="route.meta && route.meta.keepAlive" />
+                  </keep-alive>
+                  <component :is="Component" v-if="!route.meta || !route.meta.keepAlive" />
+                </router-view>
+              </div>
+              <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
+                <template #modal-title>
+                  <span v-if="i18nReady" data-cy="loginTitle" id="login-title" v-text="t$('login.title')"></span>
+                </template>
+                <login-form></login-form>
+              </b-modal>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotFooterValid" class="d-none d-lg-flex">
+                  <adsense
+                    :ad-slot="ADSENSE_SLOT_FOOTER"
+                    format="auto"
+                    :responsive="true"
+                    style="display: block; width: 100%; min-height: 280px"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2">
+            <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotRightValid" class="d-none d-lg-flex">
+              <adsense
+                :ad-slot="ADSENSE_SLOT_SIDEBAR_RIGHT"
+                format="auto"
+                :responsive="true"
+                style="display: block; width: 100%; min-height: 250px"
+              />
+            </div>
+          </div>
         </div>
-
         <div id="footer">
           <footers-v1></footers-v1>
           <ScrollTop />

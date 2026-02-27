@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 }
 
@@ -15,6 +19,11 @@ provider "azurerm" {
   }
   use_oidc                   = var.use_oidc
   skip_provider_registration = true
+}
+
+provider "github" {
+  token = var.github_token
+  owner = var.github_owner
 }
 
 resource "azurerm_resource_group" "rg" {

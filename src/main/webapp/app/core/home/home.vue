@@ -1,7 +1,7 @@
 <template>
   <div class="row">
-    <article-search class="col-12 mt-4"></article-search>
-    <articles-home class="col-12 mt-1"></articles-home>
+    <article-search class="col-12 my-4"></article-search>
+    <articles-home class="col-12"></articles-home>
   </div>
   <div class="home row d-none">
     <div class="col-md-3">

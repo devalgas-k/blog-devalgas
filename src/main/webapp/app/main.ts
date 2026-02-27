@@ -208,6 +208,35 @@ const app = createApp({
       },
       link: [{ rel: 'preload', as: 'font', href: primeiconsWoff2Url, crossorigin: 'anonymous' }],
     });
+    useHead({
+      script: [
+        {
+          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`,
+          async: true,
+          crossorigin: 'anonymous',
+        },
+      ],
+      meta: [{ name: 'google-adsense-account', content: ADSENSE_CLIENT }],
+    });
+    const consentRef = ref(true);
+    const adsenseReady = ref(false);
+    const ensureAdsenseReady = () => {
+      const w = window as any;
+      if (w.adsbygoogle && typeof w.adsbygoogle.push === 'function') {
+        adsenseReady.value = true;
+      } else {
+        setTimeout(ensureAdsenseReady, 300);
+      }
+    };
+    ensureAdsenseReady();
+    provide(
+      'consentGiven',
+      computed(() => consentRef.value),
+    );
+    provide(
+      'adsenseScriptReady',
+      computed(() => adsenseReady.value),
+    );
 
     const s = document.createElement('style');
     s.textContent =

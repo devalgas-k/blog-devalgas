@@ -13,6 +13,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  actions: write
 jobs:
   manage-infrastructure:
     runs-on: ubuntu-22.04
@@ -20,6 +21,8 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_github_token: ${{ github.token }}
+      TF_VAR_github_owner: ${{ github.repository_owner }}
       TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
       TF_VAR_mail_password: ${{ secrets.MAIL_PASSWORD }}
@@ -44,6 +47,11 @@ jobs:
       KEY_VAULT_NAME: kv-devalgas-blog
       ADMIN_OBJECT_ID: ${{ vars.ADMIN_OBJECT_ID }}
       ADMIN_UPN: kamgadevalgas@gmail.com
+      # Defender pricing tiers (prod policy: Standard on App Services)
+      TF_VAR_enable_defender_pricing: true
+      TF_VAR_defender_tier_app_services: Standard
+      TF_VAR_defender_tier_open_source_db: Free
+      TF_VAR_defender_tier_key_vaults: Free
     outputs:
       application_name: ${{ steps.set-outputs.outputs.application_name }}
       application_url: ${{ steps.set-outputs.outputs.application_url }}
@@ -118,6 +126,19 @@ jobs:
           echo "HAS_SP=${HAS_SP}"
           echo "ACTOR=${{ github.actor }}"
           echo "REPO_OWNER=${{ github.repository_owner }}"
+      - name: Detect GH admin token and set Terraform gating
+        shell: bash
+        env:
+          GH_ADMIN_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+        run: |
+          if [ -n "${GH_ADMIN_TOKEN}" ]; then
+            echo "Detected GH admin token; enabling Terraform management of GitHub variables"
+            echo "TF_VAR_github_token=${GH_ADMIN_TOKEN}" >> "$GITHUB_ENV"
+            echo "TF_VAR_manage_github_vars=true" >> "$GITHUB_ENV"
+          else
+            echo "No GH admin token; disabling Terraform management of GitHub variables"
+            echo "TF_VAR_manage_github_vars=false" >> "$GITHUB_ENV"
+          fi
       - name: Normalize TF_VAR_fallback_mail_enabled
         shell: bash
         env:
@@ -172,6 +193,9 @@ jobs:
           print(f"ARM_SUBSCRIPTION_ID={creds['subscriptionId']}")
           print(f"ARM_TENANT_ID={creds['tenantId']}")
           PY
+      - name: Terraform fmt (auto)
+        working-directory: ./terraform
+        run: terraform fmt -recursive
       - name: Terraform fmt
         working-directory: ./terraform
         run: terraform fmt -check
@@ -447,6 +471,19 @@ jobs:
         shell: bash
         run: |
           set +e
+          # Defender pricing plans (import into state if already configured)
+          if ! terraform state list | grep -q '^azurerm_security_center_subscription_pricing.app_services\\[0\\]$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/providers/Microsoft.Security/pricings/AppServices"
+            terraform import "azurerm_security_center_subscription_pricing.app_services[0]" "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_security_center_subscription_pricing.open_source_db\\[0\\]$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases"
+            terraform import "azurerm_security_center_subscription_pricing.open_source_db[0]" "$ID" || true
+          fi
+          if ! terraform state list | grep -q '^azurerm_security_center_subscription_pricing.key_vaults\\[0\\]$'; then
+            ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/providers/Microsoft.Security/pricings/KeyVaults"
+            terraform import "azurerm_security_center_subscription_pricing.key_vaults[0]" "$ID" || true
+          fi
           if ! terraform state list | grep -q '^azurerm_service_plan.asp$'; then
             ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/serverFarms/${PLAN_NAME}"
             terraform import azurerm_service_plan.asp "$ID" || true
@@ -514,6 +551,41 @@ jobs:
             fi
           else
             echo "Key Vault disabled; skipping import"
+          fi
+          set -e
+      - name: Terraform import GitHub Actions variables
+        if: ${{ env.TF_VAR_manage_github_vars == 'true' }}
+        working-directory: ./terraform
+        shell: bash
+        run: |
+          set +e
+          OWNER="$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1)"
+          REPO="$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2)"
+          # Variables
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_enabled\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_enabled[0]" "${OWNER}/${REPO}:ADSENSE_ENABLED" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_client\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_client[0]" "${OWNER}/${REPO}:ADSENSE_CLIENT" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_slot_top\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_slot_top[0]" "${OWNER}/${REPO}:ADSENSE_SLOT_TOP" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_slot_sidebar_left\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_slot_sidebar_left[0]" "${OWNER}/${REPO}:ADSENSE_SLOT_SIDEBAR_LEFT" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_slot_sidebar_right\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_slot_sidebar_right[0]" "${OWNER}/${REPO}:ADSENSE_SLOT_SIDEBAR_RIGHT" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.adsense_slot_footer\\[0\\]$'; then
+            terraform import "github_actions_variable.adsense_slot_footer[0]" "${OWNER}/${REPO}:ADSENSE_SLOT_FOOTER" || true
+          fi
+          if ! terraform state list | grep -q '^github_actions_variable.recaptcha_site_key\\[0\\]$'; then
+            terraform import "github_actions_variable.recaptcha_site_key[0]" "${OWNER}/${REPO}:RECAPTCHA_SITE_KEY" || true
+          fi
+          # Secret (if present)
+          if ! terraform state list | grep -q '^github_actions_secret.recaptcha_secret\\[0\\]$'; then
+            terraform import "github_actions_secret.recaptcha_secret[0]" "${OWNER}/${REPO}:RECAPTCHA_SECRET" || true
           fi
           set -e
       - name: Terraform validate
@@ -590,6 +662,12 @@ jobs:
         env:
           NODE_ENV: development
           RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
+          ADSENSE_ENABLED: ${{ vars.ADSENSE_ENABLED }}
+          ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
+          ADSENSE_SLOT_TOP: ${{ vars.ADSENSE_SLOT_TOP }}
+          ADSENSE_SLOT_SIDEBAR_LEFT: ${{ vars.ADSENSE_SLOT_SIDEBAR_LEFT }}
+          ADSENSE_SLOT_SIDEBAR_RIGHT: ${{ vars.ADSENSE_SLOT_SIDEBAR_RIGHT }}
+          ADSENSE_SLOT_FOOTER: ${{ vars.ADSENSE_SLOT_FOOTER }}
         run: |
           rm -rf target/classes/static
           NODE_ENV=development npm run webapp:build:prod --

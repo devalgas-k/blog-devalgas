@@ -55,7 +55,9 @@ code {
 
 .editor-content {
   width: 100%;
+  /*
   max-width: 880px;
+  */
   margin: 0 auto;
   padding: 1.25rem;
   border-radius: 16px;

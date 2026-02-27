@@ -32,6 +32,8 @@ let config = defineConfig(({ mode }) => {
     },
   });
 
+  const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? env.ADSENSE_ENABLED === 'true' : true;
+
   return {
     plugins: [
       vue(),
@@ -86,6 +88,11 @@ let config = defineConfig(({ mode }) => {
       RECAPTCHA_SITE_KEY: `"${env.RECAPTCHA_SITE_KEY ? env.RECAPTCHA_SITE_KEY : '6LewAUwsAAAAAOVXC6a37SgGw4TOQa4T9JUo6wcK'}"`,
       ADSENSE_CLIENT: `"${env.ADSENSE_CLIENT ? env.ADSENSE_CLIENT : 'ca-pub-6181972205565553'}"`,
       ADSENSE_SLOT: `"${env.ADSENSE_SLOT ? env.ADSENSE_SLOT : '4433984685'}"`,
+      ADSENSE_ENABLED: ADSENSE_ENABLED_VAL,
+      ADSENSE_SLOT_TOP: `"${env.ADSENSE_SLOT_TOP ? env.ADSENSE_SLOT_TOP : '0000000001'}"`,
+      ADSENSE_SLOT_SIDEBAR_LEFT: `"${env.ADSENSE_SLOT_SIDEBAR_LEFT ? env.ADSENSE_SLOT_SIDEBAR_LEFT : '0000000002'}"`,
+      ADSENSE_SLOT_SIDEBAR_RIGHT: `"${env.ADSENSE_SLOT_SIDEBAR_RIGHT ? env.ADSENSE_SLOT_SIDEBAR_RIGHT : '0000000003'}"`,
+      ADSENSE_SLOT_FOOTER: `"${env.ADSENSE_SLOT_FOOTER ? env.ADSENSE_SLOT_FOOTER : '0000000004'}"`,
       IMAGE_BASE_PATH: `"${env.IMAGE_BASE_PATH ? env.IMAGE_BASE_PATH : '/content/images'}"`,
       WRITING_HASH: `"${env.WRITING_HASH ? env.WRITING_HASH : '#writing'}"`,
       LINKEDIN_URL: `"${env.LINKEDIN_URL ? env.LINKEDIN_URL : 'https://www.linkedin.com/in/devalgas-kamga/'}"`,

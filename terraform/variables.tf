@@ -187,3 +187,87 @@ variable "admin_user_object_id" {
   type    = string
   default = ""
 }
+
+variable "enable_defender_pricing" {
+  type    = bool
+  default = true
+}
+
+variable "defender_tier_app_services" {
+  type    = string
+  default = "Free"
+  validation {
+    condition     = contains(["Free", "Standard"], var.defender_tier_app_services)
+    error_message = "defender_tier_app_services must be either 'Free' or 'Standard'."
+  }
+}
+
+variable "defender_tier_open_source_db" {
+  type    = string
+  default = "Free"
+  validation {
+    condition     = contains(["Free", "Standard"], var.defender_tier_open_source_db)
+    error_message = "defender_tier_open_source_db must be either 'Free' or 'Standard'."
+  }
+}
+
+variable "defender_tier_key_vaults" {
+  type    = string
+  default = "Free"
+  validation {
+    condition     = contains(["Free", "Standard"], var.defender_tier_key_vaults)
+    error_message = "defender_tier_key_vaults must be either 'Free' or 'Standard'."
+  }
+}
+
+# --- GitHub Actions variables management ---
+variable "github_token" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "github_owner" {
+  type    = string
+  default = "devalgas"
+}
+
+variable "repository" {
+  type    = string
+  default = "blog-devalgas"
+}
+
+variable "manage_github_vars" {
+  type    = bool
+  default = false
+}
+
+variable "adsense_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "adsense_client" {
+  type    = string
+  default = "ca-pub-6181972205565553"
+}
+
+variable "adsense_slot_top" {
+  type    = string
+  default = "0000000001"
+}
+
+variable "adsense_slot_sidebar_left" {
+  type    = string
+  default = "0000000002"
+}
+
+variable "adsense_slot_sidebar_right" {
+  type    = string
+  default = "0000000003"
+}
+
+variable "adsense_slot_footer" {
+  type    = string
+  default = "0000000004"
+}
