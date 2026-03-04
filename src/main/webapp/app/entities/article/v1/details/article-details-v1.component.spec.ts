@@ -66,4 +66,20 @@ describe('ArticleDetails V1', () => {
     const comp = wrapper.vm as any;
     expect(comp.decodedMarkdownContent.html).toContain('Title EN');
   });
+
+  it('génère une description fallback depuis le markdown quand absente', async () => {
+    const wrapper = shallowMount(ArticleDetails, {
+      global: {
+        stubs: commonStubs,
+        provide: {
+          alertService: { showHttpError: vitest.fn() },
+          articleService: () => ({ find: vitest.fn().mockResolvedValue({ ...article, descriptionFr: '', descriptionEn: '' }) }) as any,
+          currentLanguage: computed(() => 'fr'),
+        },
+      },
+    });
+    await flushPromises();
+    const comp = wrapper.vm as any;
+    expect(String(comp.description)).toContain('Titre FR');
+  });
 });

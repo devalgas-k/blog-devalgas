@@ -1,4 +1,5 @@
 import { type ComputedRef, computed, defineComponent, inject, onMounted, onUnmounted, type Ref, ref, watch, nextTick } from 'vue';
+import { useHead } from '@unhead/vue';
 import { useI18n } from 'vue-i18n';
 
 import InputGroup from 'primevue/inputgroup';
@@ -10,6 +11,7 @@ import CategoryArticleService from '@/entities/category-article/v1/category-arti
 import useDataUtils from '@/shared/data/data-utils.service';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ArticleInfoV1 from '../info/article-info-v1.vue';
+import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
 
 /**
  * Composant V1 de recherche d’articles.
@@ -179,9 +181,18 @@ export default defineComponent({
       filteredArticles.value = newFilteredGroups;
     };
 
+    let gate: any;
+    try {
+      gate = useRenderGateStore();
+    } catch (e) {
+      void e;
+    }
     onMounted(async () => {
       await retrieveCategoryArticles();
       search({ query: '' });
+      if (gate && typeof gate.markDataReady === 'function') {
+        gate.markDataReady();
+      }
     });
 
     watch(currentLanguage, () => {
@@ -220,6 +231,17 @@ export default defineComponent({
     const backgroundImageSrc = computed(() =>
       currentTheme.value === 'dark' ? '/content/images/abort-d.jpg' : '/content/images/about.jpg',
     );
+
+    useHead({
+      link: [
+        {
+          rel: 'preload',
+          as: 'image',
+          href: computed(() => backgroundImageSrc.value),
+          media: '(min-width: 576px)',
+        },
+      ],
+    });
 
     const showBackgroundImage = (() => {
       try {

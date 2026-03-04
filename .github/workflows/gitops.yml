@@ -539,6 +539,30 @@ jobs:
         shell: bash
         run: |
           set +e
+          if [ "${TF_VAR_enable_cdn}" = "true" ]; then
+            PROFILE="${TF_VAR_cdn_profile_name:-cdn-devalgas}"
+            ENDPOINT="${TF_VAR_cdn_endpoint_name:-cdn-devalgas-endpoint}"
+            if ! terraform state list | grep -q '^azurerm_cdn_frontdoor_profile.cdn\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Cdn/profiles/${PROFILE}"
+              terraform import "azurerm_cdn_frontdoor_profile.cdn[0]" "$ID" || true
+            fi
+            if ! terraform state list | grep -q '^azurerm_cdn_frontdoor_endpoint.cdn\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Cdn/profiles/${PROFILE}/afdEndpoints/${ENDPOINT}"
+              terraform import "azurerm_cdn_frontdoor_endpoint.cdn[0]" "$ID" || true
+            fi
+            if ! terraform state list | grep -q '^azurerm_cdn_frontdoor_origin_group.app\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Cdn/profiles/${PROFILE}/originGroups/origin-group-app"
+              terraform import "azurerm_cdn_frontdoor_origin_group.app[0]" "$ID" || true
+            fi
+            if ! terraform state list | grep -q '^azurerm_cdn_frontdoor_origin.app\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Cdn/profiles/${PROFILE}/origins/origin-app"
+              terraform import "azurerm_cdn_frontdoor_origin.app[0]" "$ID" || true
+            fi
+            if ! terraform state list | grep -q '^azurerm_cdn_frontdoor_route.route_all\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Cdn/profiles/${PROFILE}/routes/route-all"
+              terraform import "azurerm_cdn_frontdoor_route.route_all[0]" "$ID" || true
+            fi
+          fi
           # Import CDN budget if it exists already
           if [ "${TF_VAR_enable_cdn}" = "true" ]; then
             if ! terraform state list | grep -q '^azurerm_consumption_budget_subscription.cdn_monthly\\[0\\]$'; then

@@ -8,9 +8,8 @@
         alt="background"
         width="960"
         height="960"
-        loading="lazy"
         decoding="async"
-        fetchpriority="low"
+        fetchpriority="high"
       />
     </picture>
     <figure class="about__figure">

@@ -7,6 +7,7 @@ import useDataUtils from '@/shared/data/data-utils.service';
 import { useDateFormat } from '@/shared/composables';
 import { type IArticle } from '@/shared/model/article.model';
 import { useAlertService } from '@/shared/alert/alert.service';
+import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
@@ -23,11 +24,18 @@ export default defineComponent({
 
     const previousState = () => router.go(-1);
     const article: Ref<IArticle> = ref({});
+    let gate: any;
+    try {
+      gate = useRenderGateStore();
+    } catch {}
 
     const retrieveArticle = async articleId => {
       try {
         const res = await articleService().find(articleId);
         article.value = res;
+        if (gate && typeof gate.markDataReady === 'function') {
+          gate.markDataReady();
+        }
       } catch (error) {
         alertService.showHttpError(error.response);
       }

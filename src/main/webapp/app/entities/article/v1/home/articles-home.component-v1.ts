@@ -7,6 +7,7 @@ import { useDateFormat } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
 import ArticleServiceV1 from '../article.service-v1';
 import { useContentUpdateStore } from '@/shared/config/store/content-update-store';
+import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 const ArticleInfo = defineAsyncComponent(() => import('@/entities/article/v1/info/article-info-v1.vue'));
@@ -92,8 +93,15 @@ export default defineComponent({
       retrieveArticles();
     };
 
+    let gate: any;
+    try {
+      gate = useRenderGateStore();
+    } catch {}
     onMounted(async () => {
       await retrieveArticles();
+      if (gate && typeof gate.markDataReady === 'function') {
+        gate.markDataReady();
+      }
     });
 
     onActivated(async () => {

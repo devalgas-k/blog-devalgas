@@ -15,6 +15,7 @@ import Skeleton from 'primevue/skeleton';
 import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
 const ArticleInfoV1 = defineAsyncComponent(() => import('../info/article-info-v1.vue'));
 const Adsense = defineAsyncComponent(() => import('@/core/adsense/adsense.vue'));
+import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
 
 /**
  * Composant V1 d’affichage des détails d’un article.
@@ -52,11 +53,18 @@ export default defineComponent({
     const article: Ref<IArticle> = ref(props.initialArticle ?? {});
     const consentGiven = inject('consentGiven', () => computed(() => true), true);
     const adsenseScriptReady = inject('adsenseScriptReady', () => computed(() => false), true);
+    let gate: any;
+    try {
+      gate = useRenderGateStore();
+    } catch {}
 
     const retrieveArticle = async (articleId: number) => {
       try {
         const res = await articleService().find(articleId);
         article.value = res;
+        if (gate && typeof gate.markDataReady === 'function') {
+          gate.markDataReady();
+        }
       } catch (error: any) {
         alertService.showHttpError(error?.response);
       }

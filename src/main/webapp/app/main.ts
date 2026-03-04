@@ -78,6 +78,14 @@ const app = createApp({
     const translationStore = useTranslationStore();
     const translationService = new TranslationService(i18n);
     const i18nReady = ref(false);
+    let gate: any = null;
+    const loadGate = async () => {
+      try {
+        const m = await import('@/shared/config/store/render-gate-store');
+        gate = m.useRenderGateStore();
+      } catch {}
+    };
+    loadGate();
     const applyTheme = (theme: string) => {
       const root = document.documentElement;
       root.classList.remove('theme-light', 'theme-dark');
@@ -100,6 +108,9 @@ const app = createApp({
         await translationService.refreshTranslation(newLanguage);
         translationStore.setCurrentLanguage(newLanguage);
         i18nReady.value = true;
+        if (gate && typeof gate.markI18nReady === 'function') {
+          gate.markI18nReady();
+        }
       }
     };
 
@@ -152,7 +163,9 @@ const app = createApp({
     });*/
 
     router.beforeResolve(async (to, from, next) => {
-      // Make sure login modal is closed
+      if (gate && typeof gate.reset === 'function') {
+        gate.reset();
+      }
       hideLogin();
 
       if (!store.authenticated) {
@@ -169,6 +182,14 @@ const app = createApp({
       }
       next();
     });
+    if (typeof (router as any).afterEach === 'function') {
+      (router as any).afterEach(async () => {
+        await loadGate();
+        if (gate && typeof gate.markRouteReady === 'function') {
+          gate.markRouteReady();
+        }
+      });
+    }
 
     setupAxiosInterceptors(
       error => {
