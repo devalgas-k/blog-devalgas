@@ -271,3 +271,43 @@ variable "adsense_slot_footer" {
   type    = string
   default = "0000000004"
 }
+
+variable "enable_cdn" {
+  type    = bool
+  default = false
+}
+
+variable "cdn_profile_name" {
+  type    = string
+  default = "cdn-devalgas"
+}
+
+variable "cdn_endpoint_name" {
+  type    = string
+  default = "cdn-devalgas-endpoint"
+}
+
+variable "cdn_origin_hostname" {
+  type    = string
+  default = "app-springboot-blog-devalgas.azurewebsites.net"
+}
+
+variable "cdn_querystring_behavior" {
+  type    = string
+  default = "UseQueryString"
+}
+
+variable "cdn_monthly_budget_eur" {
+  type    = number
+  default = 5
+}
+
+variable "cdn_budget_contact_email" {
+  type    = string
+  default = ""
+}
+
+variable "cdn_budget_start_date" {
+  type    = string
+  default = "2026-01-01T00:00:00Z"
+}

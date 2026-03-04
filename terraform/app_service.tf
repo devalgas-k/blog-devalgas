@@ -67,6 +67,9 @@ resource "azurerm_linux_web_app" "app" {
       "FALLBACK_MAIL_PORT"     = var.fallback_mail_port
       "FALLBACK_MAIL_USERNAME" = var.fallback_mail_username
       "FALLBACK_MAIL_PASSWORD" = local.fb_smtp_secret_uri != "" ? "@Microsoft.KeyVault(SecretUri=${local.fb_smtp_secret_uri})" : var.fallback_mail_password
+    } : {},
+    var.enable_cdn ? {
+      "CDN_BASE_URL" = "https://${azurerm_cdn_frontdoor_endpoint.cdn[0].host_name}"
     } : {}
   )
 

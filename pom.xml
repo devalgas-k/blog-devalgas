@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Devalgas</name>
-    <description>Description for Devalgas</description>
+    <description>Devalgas — blog d’ingénierie logicielle: Java, Spring Boot, cloud, sécurité, performance, CI/CD, bonnes pratiques et tutoriels.</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>

@@ -2,7 +2,7 @@
   "name": "devalgas",
   "version": "0.0.0",
   "private": true,
-  "description": "Description for Devalgas",
+  "description": "Devalgas — blog d’ingénierie logicielle: Java, Spring Boot, cloud, sécurité, performance, CI/CD, bonnes pratiques et tutoriels.",
   "license": "UNLICENSED",
   "scripts": {
     "app:start": "./mvnw -ntp --batch-mode",

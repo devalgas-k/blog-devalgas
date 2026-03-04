@@ -52,6 +52,14 @@ jobs:
       TF_VAR_defender_tier_app_services: Standard
       TF_VAR_defender_tier_open_source_db: Free
       TF_VAR_defender_tier_key_vaults: Free
+      TF_VAR_enable_cdn: ${{ vars.ENABLE_CDN }}
+      TF_VAR_cdn_profile_name: ${{ vars.CDN_PROFILE_NAME }}
+      TF_VAR_cdn_endpoint_name: ${{ vars.CDN_ENDPOINT_NAME }}
+      TF_VAR_cdn_origin_hostname: ${{ vars.CDN_ORIGIN_HOSTNAME }}
+      TF_VAR_cdn_querystring_behavior: ${{ vars.CDN_QUERYSTRING_BEHAVIOR }}
+      TF_VAR_cdn_monthly_budget_eur: ${{ vars.CDN_MONTHLY_BUDGET_EUR }}
+      TF_VAR_cdn_budget_contact_email: ${{ vars.CDN_BUDGET_CONTACT_EMAIL }}
+      TF_VAR_cdn_budget_start_date: ${{ vars.CDN_BUDGET_START_DATE }}
     outputs:
       application_name: ${{ steps.set-outputs.outputs.application_name }}
       application_url: ${{ steps.set-outputs.outputs.application_url }}
@@ -149,6 +157,29 @@ jobs:
             1|true|yes|on) echo "TF_VAR_fallback_mail_enabled=true" >> "$GITHUB_ENV" ;;
             *) echo "TF_VAR_fallback_mail_enabled=false" >> "$GITHUB_ENV" ;;
           esac
+      - name: Normalize TF_VAR_enable_cdn
+        shell: bash
+        env:
+          ENABLE_CDN: ${{ vars.ENABLE_CDN }}
+        run: |
+          v="$(echo "${ENABLE_CDN}" | tr '[:upper:]' '[:lower:]')"
+          case "$v" in
+            1|true|yes|on) echo "TF_VAR_enable_cdn=true" >> "$GITHUB_ENV" ;;
+            *) echo "TF_VAR_enable_cdn=false" >> "$GITHUB_ENV" ;;
+          esac
+      - name: Normalize TF_VAR_cdn_budget_start_date (RFC3339)
+        shell: bash
+        env:
+          BUDGET_START_DATE: ${{ vars.CDN_BUDGET_START_DATE }}
+        run: |
+          d="${BUDGET_START_DATE}"
+          if [ -n "$d" ]; then
+            if echo "$d" | grep -Eq 'T[0-9]{2}:[0-9]{2}'; then
+              echo "TF_VAR_cdn_budget_start_date=$d" >> "$GITHUB_ENV"
+            else
+              echo "TF_VAR_cdn_budget_start_date=${d}T00:00:00Z" >> "$GITHUB_ENV"
+            fi
+          fi
       - name: Azure login (Service Principal)
         if: ${{ env.HAS_SP == 'true' }}
         uses: azure/login@v2
@@ -208,7 +239,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             set -e
-            for ns in Microsoft.KeyVault Microsoft.Web Microsoft.DBforPostgreSQL; do
+            for ns in Microsoft.KeyVault Microsoft.Web Microsoft.DBforPostgreSQL Microsoft.CDN; do
               echo "Registering provider: $ns"
               az provider register --namespace "$ns" || true
               for i in $(seq 1 12); do
@@ -218,6 +249,43 @@ jobs:
                 sleep 5
               done
             done
+      - name: Audit CDN/Front Door resources in resource group
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ env.RESOURCE_GROUP }}"
+            echo "Listing classic CDN profiles/endpoints (if any):"
+            az cdn profile list -g "$RG" -o table || true
+            az cdn endpoint list -g "$RG" -o table || true
+            echo "Listing Azure Front Door profiles/endpoints:"
+            az afd profile list -g "$RG" -o table || true
+            az afd endpoint list -g "$RG" -o table || true
+      - name: Remove legacy CDN profiles/endpoints (classic)
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ env.RESOURCE_GROUP }}"
+            profiles=$(az cdn profile list -g "$RG" --query "[].name" -o tsv 2>/dev/null || true)
+            if [ -n "$profiles" ]; then
+              for p in $profiles; do
+                echo "Processing legacy CDN profile: $p"
+                endpoints=$(az cdn endpoint list -g "$RG" --profile-name "$p" --query "[].name" -o tsv 2>/dev/null || true)
+                if [ -n "$endpoints" ]; then
+                  for e in $endpoints; do
+                    echo "Deleting CDN endpoint: $e (profile: $p)"
+                    az cdn endpoint delete -g "$RG" --profile-name "$p" -n "$e" --yes || true
+                  done
+                fi
+                echo "Deleting CDN profile: $p"
+                az cdn profile delete -g "$RG" -n "$p" --yes || true
+              done
+            else
+              echo "No legacy CDN profiles found in resource group $RG"
+            fi
       - name: Compute Key Vault name
         shell: bash
         run: |
@@ -471,6 +539,13 @@ jobs:
         shell: bash
         run: |
           set +e
+          # Import CDN budget if it exists already
+          if [ "${TF_VAR_enable_cdn}" = "true" ]; then
+            if ! terraform state list | grep -q '^azurerm_consumption_budget_subscription.cdn_monthly\\[0\\]$'; then
+              ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/providers/Microsoft.Consumption/budgets/budget-cdn"
+              terraform import "azurerm_consumption_budget_subscription.cdn_monthly[0]" "$ID" || true
+            fi
+          fi
           # Defender pricing plans (import into state if already configured)
           if ! terraform state list | grep -q '^azurerm_security_center_subscription_pricing.app_services\\[0\\]$'; then
             ID="/subscriptions/${ARM_SUBSCRIPTION_ID}/providers/Microsoft.Security/pricings/AppServices"
@@ -937,6 +1012,20 @@ jobs:
             RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
             APP="${{ needs.manage-infrastructure.outputs.application_name }}"
             az webapp restart -g "$RG" -n "$APP"
+      - name: Purge CDN (HTML & manifest)
+        if: ${{ vars.ENABLE_CDN == 'true' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            PROFILE="${CDN_PROFILE_NAME:-cdn-devalgas}"
+            ENDPOINT="${CDN_ENDPOINT_NAME:-cdn-devalgas-endpoint}"
+            az afd endpoint purge -g "$RG" --profile-name "$PROFILE" --endpoint-name "$ENDPOINT" --content-paths "/index.html" "/manifest.json" "/service-worker.js"
+        env:
+          CDN_PROFILE_NAME: ${{ vars.CDN_PROFILE_NAME }}
+          CDN_ENDPOINT_NAME: ${{ vars.CDN_ENDPOINT_NAME }}
       - name: Health check application
         shell: bash
         run: |
