@@ -52,7 +52,7 @@ jobs:
       TF_VAR_defender_tier_app_services: Standard
       TF_VAR_defender_tier_open_source_db: Free
       TF_VAR_defender_tier_key_vaults: Free
-      TF_VAR_enable_cdn: ${{ vars.ENABLE_CDN }}
+      TF_VAR_enable_cdn: false
       TF_VAR_cdn_profile_name: ${{ vars.CDN_PROFILE_NAME }}
       TF_VAR_cdn_endpoint_name: ${{ vars.CDN_ENDPOINT_NAME }}
       TF_VAR_cdn_origin_hostname: ${{ vars.CDN_ORIGIN_HOSTNAME }}
@@ -162,11 +162,7 @@ jobs:
         env:
           ENABLE_CDN: ${{ vars.ENABLE_CDN }}
         run: |
-          v="$(echo "${ENABLE_CDN}" | tr '[:upper:]' '[:lower:]')"
-          case "$v" in
-            1|true|yes|on) echo "TF_VAR_enable_cdn=true" >> "$GITHUB_ENV" ;;
-            *) echo "TF_VAR_enable_cdn=false" >> "$GITHUB_ENV" ;;
-          esac
+          echo "TF_VAR_enable_cdn=false" >> "$GITHUB_ENV"
       - name: Normalize TF_VAR_cdn_budget_start_date (RFC3339)
         shell: bash
         env:
@@ -239,7 +235,11 @@ jobs:
           azcliversion: latest
           inlineScript: |
             set -e
-            for ns in Microsoft.KeyVault Microsoft.Web Microsoft.DBforPostgreSQL Microsoft.CDN; do
+            providers="Microsoft.KeyVault Microsoft.Web Microsoft.DBforPostgreSQL"
+            if [ "${TF_VAR_enable_cdn}" = "true" ]; then
+              providers="$providers Microsoft.CDN"
+            fi
+            for ns in $providers; do
               echo "Registering provider: $ns"
               az provider register --namespace "$ns" || true
               for i in $(seq 1 12); do
@@ -1037,7 +1037,7 @@ jobs:
             APP="${{ needs.manage-infrastructure.outputs.application_name }}"
             az webapp restart -g "$RG" -n "$APP"
       - name: Purge CDN (HTML & manifest)
-        if: ${{ vars.ENABLE_CDN == 'true' }}
+        if: ${{ env.TF_VAR_enable_cdn == 'true' }}
         uses: azure/cli@v1
         with:
           azcliversion: latest
