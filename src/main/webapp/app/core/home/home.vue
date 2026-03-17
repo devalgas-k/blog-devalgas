@@ -1,7 +1,22 @@
 <template>
   <div class="row">
-    <article-search class="col-12 my-4"></article-search>
-    <articles-home class="col-12"></articles-home>
+    <Suspense>
+      <template #default>
+        <article-search class="col-12 my-4"></article-search>
+      </template>
+      <template #fallback>
+        <div class="col-12 my-4" aria-busy="true" style="height: 55px"></div>
+      </template>
+    </Suspense>
+    <div ref="homeListAnchor" class="col-12"></div>
+    <Suspense>
+      <template #default>
+        <articles-home v-if="listVisible" class="col-12"></articles-home>
+      </template>
+      <template #fallback>
+        <div class="col-12" aria-busy="true" style="min-height: 200px"></div>
+      </template>
+    </Suspense>
   </div>
   <div class="home row d-none">
     <div class="col-md-3">

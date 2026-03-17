@@ -1,10 +1,21 @@
-import { type ComputedRef, defineComponent, inject, onMounted, onBeforeUnmount, onActivated, onDeactivated, ref, computed } from 'vue';
+import {
+  type ComputedRef,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  onMounted,
+  onBeforeUnmount,
+  onActivated,
+  onDeactivated,
+  ref,
+  computed,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useHead } from '@unhead/vue';
 
 import { useLoginModal } from '@/account/login-modal';
-import ArticleSearchV1 from '@/entities/article/v1/search/article-search-v1.vue';
-import ArticlesHome from '@/entities/article/v1/home/articles-home-v1.vue';
+const ArticleSearchAsync = defineAsyncComponent(() => import('@/entities/article/v1/search/article-search-v1.vue'));
+const ArticlesHomeAsync = defineAsyncComponent(() => import('@/entities/article/v1/home/articles-home-v1.vue'));
 
 declare const WRITING_HASH: string;
 
@@ -12,8 +23,8 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'Home',
   components: {
-    'article-search': ArticleSearchV1,
-    'articles-home': ArticlesHome,
+    'article-search': ArticleSearchAsync,
+    'articles-home': ArticlesHomeAsync,
   },
   setup() {
     const { showLogin } = useLoginModal();
@@ -57,12 +68,40 @@ export default defineComponent({
     onDeactivated(detach);
     onBeforeUnmount(detach);
 
+    const listVisible = ref(false);
+    const homeListAnchor = ref<HTMLElement | null>(null);
+    const prefetchArticlesHome = () => import('@/entities/article/v1/home/articles-home-v1.vue');
+    onMounted(() => {
+      const el = homeListAnchor.value;
+      if (el) {
+        try {
+          const io = new IntersectionObserver(
+            entries => {
+              if (entries.some(e => e.isIntersecting)) {
+                listVisible.value = true;
+                io.disconnect();
+              }
+            },
+            { rootMargin: '300px' },
+          );
+          io.observe(el);
+        } catch {}
+      }
+      try {
+        (window as any).requestIdleCallback(() => prefetchArticlesHome(), { timeout: 2000 });
+      } catch {
+        setTimeout(() => prefetchArticlesHome(), 1500);
+      }
+    });
+
     return {
       authenticated,
       username,
       showLogin,
       t$,
       baseLang,
+      listVisible,
+      homeListAnchor,
     };
   },
 });

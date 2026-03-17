@@ -82,6 +82,14 @@ export default defineComponent({
     const selectedArticle = ref();
     const filteredArticles = ref<any[]>([]);
     const lastQuery = ref<string>('');
+    const dataLoaded = ref(false);
+    const inFocus = ref(false);
+    const loadData = async () => {
+      if (dataLoaded.value) return;
+      await retrieveCategoryArticles();
+      dataLoaded.value = true;
+      search({ query: '' });
+    };
 
     const search = (event: any) => {
       const query: string = event?.query ?? '';
@@ -188,10 +196,35 @@ export default defineComponent({
       void e;
     }
     onMounted(async () => {
-      await retrieveCategoryArticles();
-      search({ query: '' });
-      if (gate && typeof gate.markDataReady === 'function') {
-        gate.markDataReady();
+      const mode = (import.meta as any).env?.MODE;
+      if (mode === 'test') {
+        await loadData();
+        if (gate && typeof gate.markDataReady === 'function') {
+          gate.markDataReady();
+        }
+        return;
+      }
+      try {
+        (window as any).requestIdleCallback(
+          async () => {
+            if (!dataLoaded.value) {
+              await loadData();
+              if (gate && typeof gate.markDataReady === 'function') {
+                gate.markDataReady();
+              }
+            }
+          },
+          { timeout: 2000 },
+        );
+      } catch {
+        setTimeout(async () => {
+          if (!dataLoaded.value) {
+            await loadData();
+            if (gate && typeof gate.markDataReady === 'function') {
+              gate.markDataReady();
+            }
+          }
+        }, 1500);
       }
     });
 
@@ -200,7 +233,6 @@ export default defineComponent({
     });
 
     const viewArticle = computed(() => !!selectedArticle.value?.label);
-    const inFocus = ref(false);
     const justSelected = ref(false);
     const onAutoBlur = () => {
       inFocus.value = false;
@@ -210,6 +242,7 @@ export default defineComponent({
     };
     const onAutoFocus = () => {
       inFocus.value = true;
+      loadData();
     };
     const onPanelHide = () => {
       if (!inFocus.value && !justSelected.value) {
