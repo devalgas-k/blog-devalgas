@@ -90,67 +90,29 @@
                 <ScrollTop />
               </div>
             </div>
-            <div v-else class="skeleton-container">
-              <div class="container-fluid">
-                <div class="w-auto px-4 px-lg-0 mx-auto">
-                  <div class="skeleton-header loading-header">
-                    <div class="ball">
-                      <div class="inner">
-                        <div class="line"></div>
-                        <div class="li ne line--two"></div>
-                        <div class="oval"></div>
-                        <div class="oval oval--two"></div>
-                      </div>
-                    </div>
-                    <div class="shadow"></div>
-                  </div>
+            <div v-else class="loading-center">
+              <div class="ball">
+                <div class="inner">
+                  <div class="line"></div>
+                  <div class="line line--two"></div>
+                  <div class="oval"></div>
+                  <div class="oval oval--two"></div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-lg-2 mt-2 mt-lg-5"></div>
-                <div class="col-12 col-lg-8">
-                  <div class="container-fluid">
-                    <div class="w-auto px-4 px-lg-0 mx-auto">
-                      <div class="skeleton-content"></div>
-                      <div class="skeleton-content"></div>
-                      <div class="skeleton-content"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-2 mt-2 mt-lg-5"></div>
-              </div>
+              <div class="shadow"></div>
             </div>
           </template>
           <template #fallback>
-            <div class="skeleton-container">
-              <div class="container-fluid">
-                <div class="w-auto px-4 px-lg-0 mx-auto">
-                  <div class="skeleton-header loading-header">
-                    <div class="ball">
-                      <div class="inner">
-                        <div class="line"></div>
-                        <div class="li ne line--two"></div>
-                        <div class="oval"></div>
-                        <div class="oval oval--two"></div>
-                      </div>
-                    </div>
-                    <div class="shadow"></div>
-                  </div>
+            <div class="loading-center">
+              <div class="ball">
+                <div class="inner">
+                  <div class="line"></div>
+                  <div class="line line--two"></div>
+                  <div class="oval"></div>
+                  <div class="oval oval--two"></div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-lg-2 mt-2 mt-lg-5"></div>
-                <div class="col-12 col-lg-8">
-                  <div class="container-fluid">
-                    <div class="w-auto px-4 px-lg-0 mx-auto">
-                      <div class="skeleton-content"></div>
-                      <div class="skeleton-content"></div>
-                      <div class="skeleton-content"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-2 mt-2 mt-lg-5"></div>
-              </div>
+              <div class="shadow"></div>
             </div>
           </template>
         </Suspense>
@@ -197,61 +159,6 @@
   .container-sm {
     padding-right: 0 !important;
     padding-left: 0 !important;
-  }
-}
-
-.skeleton-header {
-  height: 56px;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08) 25%, rgba(0, 0, 0, 0.15) 37%, rgba(0, 0, 0, 0.08) 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.2s infinite;
-}
-.skeleton-content {
-  height: 24px;
-  margin: 8px 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08) 25%, rgba(0, 0, 0, 0.15) 37%, rgba(0, 0, 0, 0.08) 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.2s infinite;
-}
-.loading-header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 56px;
-  overflow: visible;
-}
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
-}
-
-.skeleton-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 2.5rem;
-}
-.skeleton-container .row {
-  width: 100%;
-  justify-content: center;
-}
-.loading-header {
-  width: clamp(280px, 85vw, 720px);
-}
-.skeleton-content {
-  width: clamp(280px, 85vw, 720px);
-}
-@media screen and (min-width: 992px) {
-  .loading-header,
-  .skeleton-content {
-    width: clamp(360px, 50vw, 880px);
   }
 }
 </style>
