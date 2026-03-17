@@ -125,6 +125,11 @@ const app = createApp({
       computed(() => themeRef.value),
     );
     provide('changeTheme', changeTheme);
+    const routeReadyRef = ref(false);
+    provide(
+      'routeReady',
+      computed(() => routeReadyRef.value),
+    );
 
     watch(
       () => store.account,
@@ -166,6 +171,7 @@ const app = createApp({
       if (gate && typeof gate.reset === 'function') {
         gate.reset();
       }
+      routeReadyRef.value = false;
       hideLogin();
 
       if (!store.authenticated) {
@@ -188,6 +194,7 @@ const app = createApp({
         if (gate && typeof gate.markRouteReady === 'function') {
           gate.markRouteReady();
         }
+        routeReadyRef.value = true;
       });
     }
 

@@ -170,3 +170,86 @@
 - 2 réduit la latence réseau dev.
 - 3 supprime le coût Ads en dev et protège la prod via consent gating.
 - 4 évite layout/paint hors-viewport et limite le travail initial du navigateur.
+
+**Solution 1+ — AppShell instantané pour App.vue (navbar + shell visibles immédiatement)**
+
+- Constat
+  - Le header attend i18nReady pour afficher le contenu [headers-v1.vue](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/entities/headers/v1/headers-v1.vue#L19-L33), alors que le chargement des messages de langue est déclenché au montage [main.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/main.ts#L138-L152). Résultat: navbar masquée pendant l’import des traductions.
+  - Des sous-composants du header (EntitiesMenu, MessageContactV1) sont importés statiquement [headers-v1.component.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/entities/headers/v1/headers-v1.component.ts#L25-L31), ils augmentent la pression sur le bundle initial même si le dropdown n’est pas ouvert.
+- Objectif
+  - Afficher simultanément et rapidement la navbar et les autres blocs d’App.vue, en supprimant la dépendance au “i18nReady” global pour le rendu structurel, tout en repoussant les contenus lourds et les textes détaillés.
+- Approche
+  1. Pré-initialiser i18n avant le montage et marquer i18nReady tôt
+     ```ts
+     // src/main/webapp/app/main.ts (setup)
+     const initialLang =
+       translationService.getLocalStoreLanguage() ??
+       (translationService.isLanguageSupported(navigator.language) ? navigator.language : 'fr');
+     await translationService.refreshTranslation(initialLang); // précharge le bundle dès setup
+     translationStore.setCurrentLanguage(initialLang);
+     i18nReady.value = true; // permet au header d’apparaître immédiatement
+     // Les mises à jour liées au compte peuvent recaler la langue ensuite (watch store.account)
+     ```
+     - Impact: la navbar peut s’afficher sans attendre onMounted; les textes se raffinent si la langue change plus tard.
+  2. Rendu partiel sans gating total
+     ```vue
+     <!-- src/main/webapp/app/entities/headers/v1/headers-v1.vue -->
+     <b-collapse is-nav id="header-tabs">
+       <!-- Rendre la structure (brand, icônes, toggler) sans dépendre de i18nReady -->
+       <b-navbar-nav class="headers-v1__nav-center justify-content-center">
+         <!-- Icônes et liens peuvent s’afficher, les libellés utilisent t$ (clé si non prête) -->
+       </b-navbar-nav>
+       <b-navbar-nav class="ml-auto">
+         <!-- Dropdowns visibles, mais leur contenu détaillé reste conditionnel -->
+       </b-navbar-nav>
+     </b-collapse>
+     <!-- Supprimer le v-else loader global; utiliser des skeletons ciblés pour les libellés -->
+     ```
+     - Impact: la structure du header est visible immédiatement; les libellés se mettent à jour dès disponibilité des traductions, sans bloquer l’apparition.
+  3. Menus lourds en lazy et au “open” du dropdown
+     ```ts
+     // src/main/webapp/app/entities/headers/v1/headers-v1.component.ts
+     import { defineAsyncComponent } from 'vue';
+     const EntitiesMenuAsync = defineAsyncComponent(() => import('@/entities/entities-menu.vue'));
+     const MessageContactAsync = defineAsyncComponent(() => import('@/entities/message/v1/message-contact/message-contact-v1.vue'));
+     export default defineComponent({
+       components: {
+         'entities-menu': EntitiesMenuAsync,
+         'message-contact-v1': MessageContactAsync,
+       },
+     });
+     ```
+     ```vue
+     <!-- src/main/webapp/app/entities/headers/v1/headers-v1.vue -->
+     <b-nav-item-dropdown id="entity-menu" v-if="authenticated" @shown="showEntities = true">
+       <template #button-content>...</template>
+       <entities-menu v-if="showEntities"></entities-menu>
+     </b-nav-item-dropdown>
+     <b-nav-item-dropdown id="contactUsnavBarDropdown" ref="contactDropdown" @shown="showContact = true">
+       <template #button-content>...</template>
+       <message-contact-v1 v-if="showContact" @saved="onContactSaved"></message-contact-v1>
+     </b-nav-item-dropdown>
+     ```
+     - Impact: les composants complexes ne sont pas importés tant que le dropdown n’est pas ouvert; le header lui-même rend vite.
+  4. App.vue: paralléliser le shell
+     - Garder le header non-suspensible; placer Suspense uniquement autour de router-view et des sections de page lourdes, pour que header + footer apparaissent en même temps que le container.
+     - Ajouter content-visibility: auto sur le container principal pour réduire le coût de paint initial, tout en montrant le cadre.
+  5. Préchauffage ciblé des dépendances UI
+     ```ts
+     // src/main/webapp/app/main.ts
+     useHead({
+       link: [
+         { rel: 'preconnect', href: 'https://use.fontawesome.com', crossorigin: '' },
+         { rel: 'dns-prefetch', href: 'https://use.fontawesome.com' },
+       ],
+     });
+     ```
+     - Impact: les icônes s’affichent plus vite, évitant un header visuellement vide.
+- Impact attendu
+  - AppShell visible quasi instantanément (brand, toggler, icônes, structure) pendant que les traductions se chargent et que le contenu lourd reste en lazy.
+  - Navbar et autres blocs de App.vue apparaissent ensemble, réduisant la perception de latence et améliorant le Speed Index/INP.
+  - Réduction du bundle initial effectif grâce aux menus en lazy et aux préchauffages ciblés.
+- Références
+  - i18n init et i18nReady → [main.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/main.ts#L97-L121)
+  - Header/vue structure → [headers-v1.vue](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/entities/headers/v1/headers-v1.vue)
+  - Imports actuels du header → [headers-v1.component.ts](file:///Users/devalgas/Documents/projets/perso/blog-devalgas/src/main/webapp/app/entities/headers/v1/headers-v1.component.ts#L25-L31)

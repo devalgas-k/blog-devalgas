@@ -5,7 +5,7 @@
         <ribbon></ribbon>
         <Suspense timeout="0">
           <template #default>
-            <div class="suspense-content">
+            <div v-if="shellReady" class="suspense-content">
               <div id="app-header">
                 <headers-async></headers-async>
               </div>
@@ -88,6 +88,32 @@
               <div id="footer">
                 <footers-v1></footers-v1>
                 <ScrollTop />
+              </div>
+            </div>
+            <div v-else class="skeleton-container">
+              <div class="skeleton-header loading-header">
+                <div class="ball">
+                  <div class="inner">
+                    <div class="line"></div>
+                    <div class="li ne line--two"></div>
+                    <div class="oval"></div>
+                    <div class="oval oval--two"></div>
+                  </div>
+                </div>
+                <div class="shadow"></div>
+              </div>
+              <div class="row">
+                <div class="col-lg-2 mt-2 mt-lg-5"></div>
+                <div class="col-12 col-lg-8">
+                  <div class="container-fluid">
+                    <div class="w-auto px-4 px-lg-0 mx-auto">
+                      <div class="skeleton-content"></div>
+                      <div class="skeleton-content"></div>
+                      <div class="skeleton-content"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-2 mt-2 mt-lg-5"></div>
               </div>
             </div>
           </template>

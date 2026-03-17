@@ -31,15 +31,17 @@ export default defineComponent({
   setup() {
     provide('alertService', useAlertService());
     const { loginModalOpen } = storeToRefs(useLoginModal());
-    const i18nReady = inject('i18nReady', () => computed(() => false), true);
+    const i18nReady = inject('i18nReady', () => computed(() => true), true);
     const consentGiven = inject('consentGiven', () => computed(() => true), true);
     const adsenseScriptReady = inject('adsenseScriptReady', () => computed(() => false), true);
+    const routeReady = inject('routeReady', () => computed(() => true), true);
     const slotTopValid = computed(() => !!ADSENSE_SLOT_TOP && !ADSENSE_SLOT_TOP.startsWith('000000'));
     const slotLeftValid = computed(() => !!ADSENSE_SLOT_SIDEBAR_LEFT && !ADSENSE_SLOT_SIDEBAR_LEFT.startsWith('000000'));
     const slotRightValid = computed(() => !!ADSENSE_SLOT_SIDEBAR_RIGHT && !ADSENSE_SLOT_SIDEBAR_RIGHT.startsWith('000000'));
     const slotFooterValid = computed(() => !!ADSENSE_SLOT_FOOTER && !ADSENSE_SLOT_FOOTER.startsWith('000000'));
 
     const topNoFill = ref(false);
+    const shellReady = computed(() => i18nReady.value && routeReady.value);
 
     return {
       loginModalOpen,
@@ -57,6 +59,7 @@ export default defineComponent({
       slotRightValid,
       slotFooterValid,
       topNoFill,
+      shellReady,
     };
   },
   methods: {
