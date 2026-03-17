@@ -5,7 +5,9 @@
         <article-search class="col-12 my-4"></article-search>
       </template>
       <template #fallback>
-        <div class="col-12 my-4" aria-busy="true" style="height: 55px"></div>
+        <div class="col-12 my-4 home-skeleton-wrap">
+          <div class="home-skeleton-bar" aria-busy="true"></div>
+        </div>
       </template>
     </Suspense>
     <div ref="homeListAnchor" class="col-12"></div>
@@ -14,7 +16,9 @@
         <articles-home v-if="listVisible" class="col-12"></articles-home>
       </template>
       <template #fallback>
-        <div class="col-12" aria-busy="true" style="min-height: 200px"></div>
+        <div class="col-12 home-skeleton-wrap">
+          <div class="home-skeleton-block" aria-busy="true"></div>
+        </div>
       </template>
     </Suspense>
   </div>
@@ -93,6 +97,28 @@
 
 <script lang="ts" src="./home.component.ts"></script>
 <style lang="scss" scoped>
+.home-skeleton-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+.home-skeleton-bar {
+  height: 55px;
+  width: clamp(280px, 85vw, 720px);
+}
+.home-skeleton-block {
+  min-height: 200px;
+  width: clamp(360px, 85vw, 980px);
+}
+@media screen and (min-width: 992px) {
+  .home-skeleton-bar {
+    width: clamp(360px, 50vw, 880px);
+  }
+  .home-skeleton-block {
+    width: clamp(480px, 50vw, 1080px);
+  }
+}
 .home {
   &__title {
     margin-bottom: 0.5rem;

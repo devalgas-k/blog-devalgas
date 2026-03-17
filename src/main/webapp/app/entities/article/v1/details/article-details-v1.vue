@@ -1,32 +1,58 @@
 <template>
-  <article-info-v1 :article="article" class="mt-5"></article-info-v1>
-  <p-splitter class="mt-5" style="width: 100%">
-    <p-splitter-panel :size="100">
-      <div class="editor-content" :aria-busy="!decodedMarkdownContent.html">
-        <Transition name="fade">
-          <div v-if="decodedMarkdownContent.html" class="github-markdown-body" v-html="decodedMarkdownContent.html"></div>
-        </Transition>
-        <template v-if="!decodedMarkdownContent.html">
-          <p-skeleton width="70%" height="28px" class="mb-2" />
-          <p-skeleton width="100%" height="16px" class="mb-2" />
-          <p-skeleton width="100%" height="16px" class="mb-2" />
-          <p-skeleton width="60%" height="16px" />
-        </template>
+  <div class="container-fluid">
+    <div class="w-auto px-4 px-lg-0 mx-auto">
+      <template v-if="decodedMarkdownContent.html">
+        <article-info-v1 :article="article" class="mt-5"></article-info-v1>
+      </template>
+      <template v-else>
+        <div class="details-skeleton-wrap mt-5">
+          <div class="details-skeleton-bar"></div>
+        </div>
+      </template>
+      <p-splitter class="mt-5" style="width: 100%">
+        <p-splitter-panel :size="100">
+          <div class="editor-content" :aria-busy="!decodedMarkdownContent.html">
+            <Transition name="fade">
+              <div v-if="decodedMarkdownContent.html" class="github-markdown-body" v-html="decodedMarkdownContent.html"></div>
+            </Transition>
+            <template v-if="!decodedMarkdownContent.html">
+              <p-skeleton width="70%" height="28px" class="mb-2" style="display: block; margin: 0 auto" />
+              <p-skeleton width="100%" height="16px" class="mb-2" style="display: block; margin: 0 auto" />
+              <p-skeleton width="100%" height="16px" class="mb-2" style="display: block; margin: 0 auto" />
+              <p-skeleton width="60%" height="16px" style="display: block; margin: 0 auto" />
+            </template>
+          </div>
+        </p-splitter-panel>
+      </p-splitter>
+      <div class="d-none justify-content-end mt-5">
+        <router-link :to="{ name: 'Home' }" custom v-slot="{ navigate }">
+          <button @click="navigate" id="articles-border-all" class="btn btn-ark">
+            <font-awesome-icon icon="border-all"></font-awesome-icon>
+            <span v-text="t$('devalgasApp.articleV1.content.explore')"></span>
+          </button>
+        </router-link>
       </div>
-    </p-splitter-panel>
-  </p-splitter>
-  <div class="d-none justify-content-end mt-5">
-    <router-link :to="{ name: 'Home' }" custom v-slot="{ navigate }">
-      <button @click="navigate" id="articles-border-all" class="btn btn-ark">
-        <font-awesome-icon icon="border-all"></font-awesome-icon>
-        <span v-text="t$('devalgasApp.articleV1.content.explore')"></span>
-      </button>
-    </router-link>
+    </div>
   </div>
 </template>
 <script lang="ts" src="./article-details-v1.component.ts"></script>
 
 <style lang="scss" scoped>
+.details-skeleton-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+.details-skeleton-bar {
+  height: 55px;
+  width: clamp(280px, 85vw, 720px);
+}
+@media screen and (min-width: 992px) {
+  .details-skeleton-bar {
+    width: clamp(360px, 50vw, 880px);
+  }
+}
 .p-splitter {
   background: var(--dark) !important;
   border: none !important;

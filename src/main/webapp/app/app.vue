@@ -91,16 +91,20 @@
               </div>
             </div>
             <div v-else class="skeleton-container">
-              <div class="skeleton-header loading-header">
-                <div class="ball">
-                  <div class="inner">
-                    <div class="line"></div>
-                    <div class="li ne line--two"></div>
-                    <div class="oval"></div>
-                    <div class="oval oval--two"></div>
+              <div class="container-fluid">
+                <div class="w-auto px-4 px-lg-0 mx-auto">
+                  <div class="skeleton-header loading-header">
+                    <div class="ball">
+                      <div class="inner">
+                        <div class="line"></div>
+                        <div class="li ne line--two"></div>
+                        <div class="oval"></div>
+                        <div class="oval oval--two"></div>
+                      </div>
+                    </div>
+                    <div class="shadow"></div>
                   </div>
                 </div>
-                <div class="shadow"></div>
               </div>
               <div class="row">
                 <div class="col-lg-2 mt-2 mt-lg-5"></div>
@@ -119,16 +123,20 @@
           </template>
           <template #fallback>
             <div class="skeleton-container">
-              <div class="skeleton-header loading-header">
-                <div class="ball">
-                  <div class="inner">
-                    <div class="line"></div>
-                    <div class="li ne line--two"></div>
-                    <div class="oval"></div>
-                    <div class="oval oval--two"></div>
+              <div class="container-fluid">
+                <div class="w-auto px-4 px-lg-0 mx-auto">
+                  <div class="skeleton-header loading-header">
+                    <div class="ball">
+                      <div class="inner">
+                        <div class="line"></div>
+                        <div class="li ne line--two"></div>
+                        <div class="oval"></div>
+                        <div class="oval oval--two"></div>
+                      </div>
+                    </div>
+                    <div class="shadow"></div>
                   </div>
                 </div>
-                <div class="shadow"></div>
               </div>
               <div class="row">
                 <div class="col-lg-2 mt-2 mt-lg-5"></div>
@@ -219,6 +227,31 @@
   }
   100% {
     background-position: 0 0;
+  }
+}
+
+.skeleton-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 2.5rem;
+}
+.skeleton-container .row {
+  width: 100%;
+  justify-content: center;
+}
+.loading-header {
+  width: clamp(280px, 85vw, 720px);
+}
+.skeleton-content {
+  width: clamp(280px, 85vw, 720px);
+}
+@media screen and (min-width: 992px) {
+  .loading-header,
+  .skeleton-content {
+    width: clamp(360px, 50vw, 880px);
   }
 }
 </style>

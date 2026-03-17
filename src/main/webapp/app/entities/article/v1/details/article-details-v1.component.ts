@@ -13,8 +13,21 @@ import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Skeleton from 'primevue/skeleton';
 import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
-const ArticleInfoV1 = defineAsyncComponent(() => import('../info/article-info-v1.vue'));
-const Adsense = defineAsyncComponent(() => import('@/core/adsense/adsense.vue'));
+const mode = (import.meta as any).env?.MODE;
+const debugSkeleton =
+  mode === 'development' &&
+  (((window as any).location?.search ?? '').includes('debugSkeleton=1') ||
+    (import.meta as any).env?.VITE_DEBUG_SHELL === 'true' ||
+    localStorage.getItem('debugSkeleton') === 'true');
+const makeLoader = (cb: () => Promise<any>) => {
+  if (!debugSkeleton) return cb;
+  return () =>
+    new Promise<any>(resolve => {
+      setTimeout(async () => resolve(await cb()), 800);
+    });
+};
+const ArticleInfoV1 = defineAsyncComponent(makeLoader(() => import('../info/article-info-v1.vue')));
+const Adsense = defineAsyncComponent(makeLoader(() => import('@/core/adsense/adsense.vue')));
 import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
 
 /**
