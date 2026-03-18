@@ -1,4 +1,4 @@
-import { computed, defineAsyncComponent, defineComponent, inject, ref, type Ref, type PropType } from 'vue';
+import { computed, defineAsyncComponent, defineComponent, inject, ref, watch, type Ref, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useHead } from '@unhead/vue';
@@ -86,6 +86,15 @@ export default defineComponent({
     if (route.params?.articleId) {
       retrieveArticle(Number(route.params.articleId));
     }
+    watch(
+      () => route.params?.articleId,
+      newId => {
+        const idNum = typeof newId === 'string' ? parseInt(newId, 10) : Number(newId);
+        if (!Number.isNaN(idNum) && idNum > 0) {
+          retrieveArticle(idNum);
+        }
+      },
+    );
     const decodedMarkdownContent = computed(() => {
       const isFr = langBase.value === 'fr';
       const base64 = isFr ? (article.value.markdownFr ?? '') : (article.value.markdownEn ?? '');
