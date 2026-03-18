@@ -5,8 +5,16 @@
         <article-info-v1 :article="article" class="mt-5"></article-info-v1>
       </template>
       <template v-else>
-        <div class="details-skeleton-wrap mt-5">
-          <div class="details-skeleton-bar"></div>
+        <div class="loading-center">
+          <div class="ball">
+            <div class="inner">
+              <div class="line"></div>
+              <div class="line line--two"></div>
+              <div class="oval"></div>
+              <div class="oval oval--two"></div>
+            </div>
+          </div>
+          <div class="shadow"></div>
         </div>
       </template>
       <p-splitter class="mt-5" style="width: 100%">
@@ -15,12 +23,6 @@
             <Transition name="fade">
               <div v-if="decodedMarkdownContent.html" class="github-markdown-body" v-html="decodedMarkdownContent.html"></div>
             </Transition>
-            <template v-if="!decodedMarkdownContent.html">
-              <p-skeleton width="70%" height="28px" class="mb-2" style="display: block; margin: 0 auto" />
-              <p-skeleton width="100%" height="16px" class="mb-2" style="display: block; margin: 0 auto" />
-              <p-skeleton width="100%" height="16px" class="mb-2" style="display: block; margin: 0 auto" />
-              <p-skeleton width="60%" height="16px" style="display: block; margin: 0 auto" />
-            </template>
           </div>
         </p-splitter-panel>
       </p-splitter>
@@ -38,21 +40,6 @@
 <script lang="ts" src="./article-details-v1.component.ts"></script>
 
 <style lang="scss" scoped>
-.details-skeleton-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-}
-.details-skeleton-bar {
-  height: 55px;
-  width: clamp(280px, 85vw, 720px);
-}
-@media screen and (min-width: 992px) {
-  .details-skeleton-bar {
-    width: clamp(360px, 50vw, 880px);
-  }
-}
 .p-splitter {
   background: var(--dark) !important;
   border: none !important;

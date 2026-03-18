@@ -71,6 +71,7 @@
 
 <style lang="scss" scoped>
 .newsletter {
+  scroll-margin-top: 80px;
   /*
   background: rgba(0, 0, 0, 0.3) !important;
   */

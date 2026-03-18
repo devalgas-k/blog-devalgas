@@ -24,7 +24,7 @@
               <span v-text="t$('globalV1.headers.blog')"></span>
             </span>
           </b-nav-item>
-          <b-nav-item :to="{ path: '/', hash: '#newsletter' }" class="ml-md-1" exact v-if="!authenticated">
+          <b-nav-item href="javascript:void(0);" class="ml-md-1" exact v-if="!authenticated" @click="goNewsletter">
             <span>
               <font-awesome-icon icon="envelopes-bulk" />
               <span v-text="t$('globalV1.headers.newsletter')"></span>

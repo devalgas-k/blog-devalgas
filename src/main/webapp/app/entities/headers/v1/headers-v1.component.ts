@@ -142,5 +142,15 @@ export default defineComponent({
       this.hideDropdown('contactDropdown');
       window.open(MAIL_TO, '_blank');
     },
+    goNewsletter() {
+      const el = document.querySelector('#newsletter') as HTMLElement | null;
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if ((this as any).$router && typeof (this as any).$router.push === 'function') {
+        (this as any).$router.push({ path: '/', hash: '#newsletter' });
+      }
+    },
   },
 });
