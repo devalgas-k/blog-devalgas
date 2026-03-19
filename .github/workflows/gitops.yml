@@ -47,9 +47,8 @@ jobs:
       KEY_VAULT_NAME: kv-devalgas-blog
       ADMIN_OBJECT_ID: ${{ vars.ADMIN_OBJECT_ID }}
       ADMIN_UPN: kamgadevalgas@gmail.com
-      # Defender pricing tiers (prod policy: Standard on App Services)
       TF_VAR_enable_defender_pricing: true
-      TF_VAR_defender_tier_app_services: Standard
+      TF_VAR_defender_tier_app_services: Free
       TF_VAR_defender_tier_open_source_db: Free
       TF_VAR_defender_tier_key_vaults: Free
       TF_VAR_enable_cdn: false
@@ -162,7 +161,11 @@ jobs:
         env:
           ENABLE_CDN: ${{ vars.ENABLE_CDN }}
         run: |
-          echo "TF_VAR_enable_cdn=false" >> "$GITHUB_ENV"
+          v="$(echo "${ENABLE_CDN}" | tr '[:upper:]' '[:lower:]')"
+          case "$v" in
+            1|true|yes|on) echo "TF_VAR_enable_cdn=true" >> "$GITHUB_ENV" ;;
+            *) echo "TF_VAR_enable_cdn=false" >> "$GITHUB_ENV" ;;
+          esac
       - name: Normalize TF_VAR_cdn_budget_start_date (RFC3339)
         shell: bash
         env:
@@ -286,6 +289,66 @@ jobs:
             else
               echo "No legacy CDN profiles found in resource group $RG"
             fi
+      - name: Remove Azure Front Door when disabled
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            if [ "${TF_VAR_enable_cdn}" != "true" ]; then
+              RG="${{ env.RESOURCE_GROUP }}"
+              PROFILE="${TF_VAR_cdn_profile_name:-cdn-devalgas}"
+              if az afd profile show -g "$RG" -n "$PROFILE" &>/dev/null; then
+                eps=$(az afd endpoint list -g "$RG" --profile-name "$PROFILE" --query "[].name" -o tsv 2>/dev/null || true)
+                if [ -n "$eps" ]; then
+                  for ep in $eps; do
+                    routes=$(az afd route list -g "$RG" --profile-name "$PROFILE" --endpoint-name "$ep" --query "[].name" -o tsv 2>/dev/null || true)
+                    if [ -n "$routes" ]; then
+                      for r in $routes; do
+                        az afd route delete -g "$RG" --profile-name "$PROFILE" --endpoint-name "$ep" -n "$r" --yes || true
+                      done
+                    fi
+                    az afd endpoint delete -g "$RG" --profile-name "$PROFILE" -n "$ep" --yes || true
+                  done
+                fi
+                rs=$(az afd rule-set list -g "$RG" --profile-name "$PROFILE" --query "[].name" -o tsv 2>/dev/null || true)
+                if [ -n "$rs" ]; then
+                  for x in $rs; do
+                    az afd rule-set delete -g "$RG" --profile-name "$PROFILE" -n "$x" --yes || true
+                  done
+                fi
+                sps=$(az afd security-policy list -g "$RG" --profile-name "$PROFILE" --query "[].name" -o tsv 2>/dev/null || true)
+                if [ -n "$sps" ]; then
+                  for sp in $sps; do
+                    az afd security-policy delete -g "$RG" --profile-name "$PROFILE" -n "$sp" --yes || true
+                  done
+                fi
+                ogs=$(az afd origin-group list -g "$RG" --profile-name "$PROFILE" --query "[].name" -o tsv 2>/dev/null || true)
+                if [ -n "$ogs" ]; then
+                  for og in $ogs; do
+                    origins=$(az afd origin list -g "$RG" --profile-name "$PROFILE" --origin-group-name "$og" --query "[].name" -o tsv 2>/dev/null || true)
+                    if [ -n "$origins" ]; then
+                      for o in $origins; do
+                        az afd origin delete -g "$RG" --profile-name "$PROFILE" --origin-group-name "$og" -n "$o" --yes || true
+                      done
+                    fi
+                    az afd origin-group delete -g "$RG" --profile-name "$PROFILE" -n "$og" --yes || true
+                  done
+                fi
+                az afd profile delete -g "$RG" -n "$PROFILE" --yes || true
+              else
+                echo "No Front Door profile found; skipping delete"
+              fi
+            fi
+      - name: Force Defender pricing to Free
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            for t in AppServices OpenSourceRelationalDatabases KeyVaults StorageAccounts Containers Arm VirtualMachines KubernetesService ContainerRegistry Dns ApiManagement; do
+              az security pricing create -n "$t" --tier Free >/dev/null 2>&1 || true
+            done
       - name: Compute Key Vault name
         shell: bash
         run: |
@@ -999,6 +1062,25 @@ jobs:
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           CONTACT_PHONE: ${{ vars.CONTACT_PHONE }}
           APPLICATION_URL: ${{ needs.manage-infrastructure.outputs.application_url }}
+      - name: Normalize ENABLE_CDN for deploy
+        shell: bash
+        run: |
+          v="$(echo "${{ vars.ENABLE_CDN }}" | tr '[:upper:]' '[:lower:]')"
+          case "$v" in
+            1|true|yes|on) echo "ENABLE_CDN_NORM=true" >> "$GITHUB_ENV" ;;
+            *) echo "ENABLE_CDN_NORM=false" >> "$GITHUB_ENV" ;;
+          esac
+      - name: Remove CDN_BASE_URL when CDN disabled
+        if: ${{ env.ENABLE_CDN_NORM != 'true' }}
+        uses: azure/cli@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            set -e
+            RG="${{ needs.manage-infrastructure.outputs.resource_group }}"
+            APP="${{ needs.manage-infrastructure.outputs.application_name }}"
+            echo "Removing CDN_BASE_URL from app settings (if present)"
+            az webapp config appsettings delete -g "$RG" -n "$APP" --setting-names CDN_BASE_URL || true
       - name: Deploy to Azure App Service (publish profile)
         if: ${{ env.HAS_PUBLISH_PROFILE == 'true' }}
         id: deploy_pp
