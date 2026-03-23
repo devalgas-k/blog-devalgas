@@ -10,7 +10,8 @@ const swaggerUiPath = getAbsoluteFSPath();
 
 // eslint-disable-next-line prefer-const
 let config = defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+  const envFile = loadEnv(mode, process.cwd(), '');
+  const env: Record<string, string | undefined> = { ...(process.env as Record<string, string | undefined>), ...envFile };
 
   const crittersInlineCss = (): Plugin => ({
     name: 'critters-inline-css',
@@ -32,7 +33,7 @@ let config = defineConfig(({ mode }) => {
     },
   });
 
-  const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? env.ADSENSE_ENABLED === 'true' : true;
+  const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? ['1', 'true', 'yes', 'on'].includes(String(env.ADSENSE_ENABLED).toLowerCase()) : true;
 
   return {
     plugins: [
