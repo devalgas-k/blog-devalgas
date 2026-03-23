@@ -34,6 +34,10 @@ let config = defineConfig(({ mode }) => {
   });
 
   const ADSENSE_ENABLED_VAL = env.ADSENSE_ENABLED ? ['1', 'true', 'yes', 'on'].includes(String(env.ADSENSE_ENABLED).toLowerCase()) : true;
+  try {
+    // eslint-disable-next-line no-console
+    console.log(`[vite] ADSENSE_ENABLED="${env.ADSENSE_ENABLED}" -> ${ADSENSE_ENABLED_VAL}`);
+  } catch {}
 
   return {
     plugins: [

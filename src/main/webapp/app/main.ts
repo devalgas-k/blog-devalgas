@@ -236,16 +236,19 @@ const app = createApp({
       },
       link: [{ rel: 'preload', as: 'font', href: primeiconsWoff2Url, crossorigin: 'anonymous' }],
     });
-    useHead({
-      script: [
-        {
-          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`,
-          async: true,
-          crossorigin: 'anonymous',
-        },
-      ],
-    });
     const consentRef = ref(true);
+    const ADSENSE_ENABLED_LOCAL = typeof (globalThis as any).ADSENSE_ENABLED !== 'undefined' ? (ADSENSE_ENABLED as boolean) : true;
+    if (ADSENSE_ENABLED_LOCAL && consentRef.value) {
+      useHead({
+        script: [
+          {
+            src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT as string}`,
+            async: true,
+            crossorigin: 'anonymous',
+          },
+        ],
+      });
+    }
     const adsenseReady = ref(false);
     const ensureAdsenseReady = () => {
       const w = window as any;
@@ -255,7 +258,9 @@ const app = createApp({
         setTimeout(ensureAdsenseReady, 300);
       }
     };
-    ensureAdsenseReady();
+    if (ADSENSE_ENABLED_LOCAL) {
+      ensureAdsenseReady();
+    }
     provide(
       'consentGiven',
       computed(() => consentRef.value),

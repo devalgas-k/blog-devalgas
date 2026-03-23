@@ -832,6 +832,12 @@ jobs:
           ADSENSE_SLOT_FOOTER: ${{ vars.ADSENSE_SLOT_FOOTER }}
         run: |
           rm -rf target/classes/static
+          echo "ADSENSE_ENABLED=${ADSENSE_ENABLED}"
+          echo "ADSENSE_CLIENT=${ADSENSE_CLIENT}"
+          echo "ADSENSE_SLOT_TOP=${ADSENSE_SLOT_TOP}"
+          echo "ADSENSE_SLOT_SIDEBAR_LEFT=${ADSENSE_SLOT_SIDEBAR_LEFT}"
+          echo "ADSENSE_SLOT_SIDEBAR_RIGHT=${ADSENSE_SLOT_SIDEBAR_RIGHT}"
+          echo "ADSENSE_SLOT_FOOTER=${ADSENSE_SLOT_FOOTER}"
           NODE_ENV=development npm run webapp:build:prod --
       - name: Build Maven prod
         run: ./mvnw -ntp --batch-mode -Pprod -DskipTests package
