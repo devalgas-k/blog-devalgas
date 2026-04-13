@@ -33,8 +33,8 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-lg-2 mt-2 mt-lg-5">
-                  <div class="d-none d-lg-flex" v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotLeftValid">
+                <div class="col-lg-2 mt-2 mt-lg-5" v-if="showLeftAd">
+                  <div class="d-none d-lg-flex">
                     <adsense
                       :ad-slot="ADSENSE_SLOT_SIDEBAR_LEFT"
                       format="auto"
@@ -43,7 +43,7 @@
                     />
                   </div>
                 </div>
-                <div class="col-12 col-lg-8">
+                <div :class="mainColClass">
                   <div class="container-fluid">
                     <div class="w-auto px-4 px-lg-0 mx-auto">
                       <router-view v-slot="{ Component, route }">
@@ -74,8 +74,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-2 mt-2 mt-lg-5">
-                  <div class="d-none d-lg-flex" v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotRightValid">
+                <div class="col-lg-2 mt-2 mt-lg-5" v-if="showRightAd">
+                  <div class="d-none d-lg-flex">
                     <adsense
                       :ad-slot="ADSENSE_SLOT_SIDEBAR_RIGHT"
                       format="auto"

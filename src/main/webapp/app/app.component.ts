@@ -43,6 +43,15 @@ export default defineComponent({
     const topNoFill = ref(false);
     const shellReady = computed(() => i18nReady.value && routeReady.value);
 
+    const showLeftAd = computed(() => ADSENSE_ENABLED && consentGiven.value && adsenseScriptReady.value && slotLeftValid.value);
+    const showRightAd = computed(() => ADSENSE_ENABLED && consentGiven.value && adsenseScriptReady.value && slotRightValid.value);
+    const mainColClass = computed(() => {
+      let cols = 12;
+      if (showLeftAd.value) cols -= 2;
+      if (showRightAd.value) cols -= 2;
+      return `col-12 col-lg-${cols}`;
+    });
+
     return {
       loginModalOpen,
       i18nReady,
@@ -60,6 +69,9 @@ export default defineComponent({
       slotFooterValid,
       topNoFill,
       shellReady,
+      showLeftAd,
+      showRightAd,
+      mainColClass,
     };
   },
   methods: {
