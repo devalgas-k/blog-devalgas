@@ -9,42 +9,9 @@
               <div id="app-header">
                 <headers-async></headers-async>
               </div>
-              <div class="row d-none">
-                <div class="col-12">
-                  <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid && !topNoFill" class="d-none d-lg-flex">
-                    <adsense
-                      ref="adsenseTop"
-                      :ad-slot="ADSENSE_SLOT_TOP"
-                      format="auto"
-                      :responsive="true"
-                      style="display: block; width: 100%; min-height: 90px"
-                      @no-fill="onTopNoFill"
-                    />
-                  </div>
-                  <div
-                    v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotTopValid && topNoFill"
-                    class="d-none d-lg-flex"
-                    style="width: 100%"
-                  >
-                    <div style="display: block; width: 100%; min-height: 90px">
-                      <hr style="opacity: 0.35; border-color: var(--dark)" />
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div class="row">
-                <div class="col-lg-2 mt-2 mt-lg-5" v-if="showLeftAd">
-                  <div class="d-none d-lg-flex">
-                    <adsense
-                      :ad-slot="ADSENSE_SLOT_SIDEBAR_LEFT"
-                      format="auto"
-                      :responsive="true"
-                      style="display: block; width: 100%; min-height: 600px"
-                    />
-                  </div>
-                </div>
-                <div :class="mainColClass">
-                  <div class="container-fluid">
+                <div class="col-12 col-lg-12">
+                  <div class="container">
                     <div class="w-auto px-4 px-lg-0 mx-auto">
                       <router-view v-slot="{ Component, route }">
                         <keep-alive>
@@ -59,29 +26,6 @@
                       </template>
                       <login-form></login-form>
                     </b-modal>
-                  </div>
-                  <div class="row d-none">
-                    <div class="col-12">
-                      <div v-if="ADSENSE_ENABLED && consentGiven && adsenseScriptReady && slotFooterValid" class="d-none d-lg-flex">
-                        <adsense
-                          :ad-slot="ADSENSE_SLOT_FOOTER"
-                          format="auto"
-                          :responsive="true"
-                          style="display: block; width: 100%; min-height: 280px"
-                          :collapse-if-no-fill="true"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-2 mt-2 mt-lg-5" v-if="showRightAd">
-                  <div class="d-none d-lg-flex">
-                    <adsense
-                      :ad-slot="ADSENSE_SLOT_SIDEBAR_RIGHT"
-                      format="auto"
-                      :responsive="true"
-                      style="display: block; width: 100%; min-height: 250px"
-                    />
                   </div>
                 </div>
               </div>
