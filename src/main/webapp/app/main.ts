@@ -19,6 +19,7 @@ import AccountService from '@/account/account.service';
 
 import '../content/scss/vendor.scss';
 import '../content/scss/global.scss';
+import '../content/scss/markdown-content.scss';
 import TranslationService from '@/locale/translation.service';
 
 import PrimeVue from 'primevue/config';

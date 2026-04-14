@@ -232,11 +232,20 @@ const useDataUtils = () => ({
     const mk = base64 ?? '';
     if (!mk) return { html: '', isHtmlContent: false };
     const ct = (contentType ?? '').toLowerCase();
+    const cacheKey = getMarkdownCacheKey(mk, ct);
+    const cached = markdownRenderCache.get(cacheKey);
+    if (cached) return cached;
     const text = this.decodeBase64(mk);
     const isMarkdown = ct.includes('markdown') || ct.includes('md');
     const rawHtml = isMarkdown ? md.render(text) : text;
     const html = this.sanitizeHtml(rawHtml);
-    return { html, isHtmlContent: !isMarkdown };
+    const result = { html, isHtmlContent: !isMarkdown };
+    markdownRenderCache.set(cacheKey, result);
+    if (markdownRenderCache.size > MARKDOWN_CACHE_MAX_ENTRIES) {
+      const oldestKey = markdownRenderCache.keys().next().value;
+      if (oldestKey) markdownRenderCache.delete(oldestKey);
+    }
+    return result;
   },
 });
 
@@ -247,3 +256,8 @@ import markdownItKatex from 'markdown-it-katex';
 import DOMPurify from 'dompurify';
 const md = new MarkdownIt({ linkify: true, typographer: true });
 md.use(markdownItKatex);
+
+const MARKDOWN_CACHE_MAX_ENTRIES = 8;
+const markdownRenderCache = new Map<string, { html: string; isHtmlContent: boolean }>();
+
+const getMarkdownCacheKey = (base64: string, contentType: string) => `${contentType}::${base64}`;

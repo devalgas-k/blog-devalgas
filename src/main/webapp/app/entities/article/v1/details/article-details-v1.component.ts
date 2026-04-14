@@ -1,4 +1,15 @@
-import { computed, defineAsyncComponent, defineComponent, inject, ref, watch, type Ref, type PropType } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type Ref,
+  type PropType,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useHead } from '@unhead/vue';
@@ -8,10 +19,8 @@ import { type IArticle } from '@/shared/model/article.model.ts';
 import { useAlertService } from '@/shared/alert/alert.service.ts';
 import { useDateFormat } from '@/shared/composables';
 
-import Panel from 'primevue/panel';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
-import Skeleton from 'primevue/skeleton';
 import AppLoader from '@/core/loader/app-loader.vue';
 import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
 const mode = (import.meta as any).env?.MODE;
@@ -40,10 +49,8 @@ export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ArticleDetailsV1',
   components: {
-    'p-panel': Panel,
     'p-splitter': Splitter,
     'p-splitter-panel': SplitterPanel,
-    'p-skeleton': Skeleton,
     'article-info-v1': ArticleInfoV1,
     adsense: Adsense,
     'app-loader': AppLoader,
@@ -63,6 +70,31 @@ export default defineComponent({
 
     const route = useRoute();
     const router = useRouter();
+    const isDesktop = ref(true);
+    let mediaQuery: MediaQueryList | null = null;
+    const onViewportChange = (event: MediaQueryListEvent) => {
+      isDesktop.value = event.matches;
+    };
+
+    onMounted(() => {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+      mediaQuery = window.matchMedia('(min-width: 768px)');
+      isDesktop.value = mediaQuery.matches;
+      if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', onViewportChange);
+      } else {
+        (mediaQuery as any).addListener(onViewportChange);
+      }
+    });
+
+    onBeforeUnmount(() => {
+      if (!mediaQuery) return;
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', onViewportChange);
+      } else {
+        (mediaQuery as any).removeListener(onViewportChange);
+      }
+    });
 
     const previousState = () => router.go(-1);
     const article: Ref<IArticle> = ref(props.initialArticle ?? {});
@@ -230,6 +262,7 @@ export default defineComponent({
       decodedMarkdownContent,
       articleTitle,
       description,
+      isDesktop,
       adsenseClient: ADSENSE_CLIENT,
       adsenseSlot: ADSENSE_SLOT,
       consentGiven,

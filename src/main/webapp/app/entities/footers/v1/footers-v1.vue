@@ -1,7 +1,7 @@
 <template>
   <!-- TODO https://bootstrapbrain.com/component/bootstrap-signup-form-design/ -->
 
-  <div class="footer-v1 mt-5">
+  <div class="footer-v1 mt-2">
     <div class="container">
       <div class="footer-v1__content py-4">
         <div class="row">
