@@ -34,30 +34,10 @@
                 <ScrollTop />
               </div>
             </div>
-            <div v-else class="loading-center">
-              <div class="ball">
-                <div class="inner">
-                  <div class="line"></div>
-                  <div class="line line--two"></div>
-                  <div class="oval"></div>
-                  <div class="oval oval--two"></div>
-                </div>
-              </div>
-              <div class="shadow"></div>
-            </div>
+            <app-loader v-else />
           </template>
           <template #fallback>
-            <div class="loading-center">
-              <div class="ball">
-                <div class="inner">
-                  <div class="line"></div>
-                  <div class="line line--two"></div>
-                  <div class="oval"></div>
-                  <div class="oval oval--two"></div>
-                </div>
-              </div>
-              <div class="shadow"></div>
-            </div>
+            <app-loader />
           </template>
         </Suspense>
       </div>

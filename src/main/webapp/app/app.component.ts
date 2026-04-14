@@ -1,4 +1,4 @@
-import { defineComponent, provide, inject, computed, ref, defineAsyncComponent } from 'vue';
+import { defineComponent, provide, inject, computed, defineAsyncComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 
@@ -7,6 +7,7 @@ import LoginForm from '@/account/login-form/v1/login-form-v1.vue';
 import Ribbon from '@/core/ribbon/ribbon.vue';
 import JhiFooter from '@/core/jhi-footer/jhi-footer.vue';
 import JhiNavbar from '@/core/jhi-navbar/jhi-navbar.vue';
+import AppLoader from '@/core/loader/app-loader.vue';
 const HeadersAsync = defineAsyncComponent({
   loader: () => import('@/entities/headers/v1/headers-v1.vue'),
   suspensible: false,
@@ -25,6 +26,7 @@ export default defineComponent({
     'jhi-footer': JhiFooter,
     'headers-async': HeadersAsync,
     'footers-v1': FootersV1T,
+    'app-loader': AppLoader,
   },
   setup() {
     provide('alertService', useAlertService());

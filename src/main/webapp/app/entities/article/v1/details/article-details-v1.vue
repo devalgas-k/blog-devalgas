@@ -3,37 +3,27 @@
     <div class="w-auto px-4 px-lg-0 mx-auto">
       <template v-if="decodedMarkdownContent.html">
         <article-info-v1 :article="article" class="mt-5"></article-info-v1>
-      </template>
-      <template v-else>
-        <div class="loading-center">
-          <div class="ball">
-            <div class="inner">
-              <div class="line"></div>
-              <div class="line line--two"></div>
-              <div class="oval"></div>
-              <div class="oval oval--two"></div>
+        <p-splitter class="mt-5" style="width: 100%">
+          <p-splitter-panel :size="100">
+            <div class="editor-content" aria-busy="false">
+              <Transition name="fade">
+                <div class="github-markdown-body" v-html="decodedMarkdownContent.html"></div>
+              </Transition>
             </div>
-          </div>
-          <div class="shadow"></div>
+          </p-splitter-panel>
+        </p-splitter>
+        <div class="d-none justify-content-end mt-5">
+          <router-link :to="{ name: 'Home' }" custom v-slot="{ navigate }">
+            <button @click="navigate" id="articles-border-all" class="btn btn-ark">
+              <font-awesome-icon icon="border-all"></font-awesome-icon>
+              <span v-text="t$('devalgasApp.articleV1.content.explore')"></span>
+            </button>
+          </router-link>
         </div>
       </template>
-      <p-splitter class="mt-5" style="width: 100%">
-        <p-splitter-panel :size="100">
-          <div class="editor-content" :aria-busy="!decodedMarkdownContent.html">
-            <Transition name="fade">
-              <div v-if="decodedMarkdownContent.html" class="github-markdown-body" v-html="decodedMarkdownContent.html"></div>
-            </Transition>
-          </div>
-        </p-splitter-panel>
-      </p-splitter>
-      <div class="d-none justify-content-end mt-5">
-        <router-link :to="{ name: 'Home' }" custom v-slot="{ navigate }">
-          <button @click="navigate" id="articles-border-all" class="btn btn-ark">
-            <font-awesome-icon icon="border-all"></font-awesome-icon>
-            <span v-text="t$('devalgasApp.articleV1.content.explore')"></span>
-          </button>
-        </router-link>
-      </div>
+      <template v-else>
+        <app-loader />
+      </template>
     </div>
   </div>
 </template>

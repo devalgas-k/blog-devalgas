@@ -12,6 +12,7 @@ import Panel from 'primevue/panel';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Skeleton from 'primevue/skeleton';
+import AppLoader from '@/core/loader/app-loader.vue';
 import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
 const mode = (import.meta as any).env?.MODE;
 const debugSkeleton =
@@ -45,6 +46,7 @@ export default defineComponent({
     'p-skeleton': Skeleton,
     'article-info-v1': ArticleInfoV1,
     adsense: Adsense,
+    'app-loader': AppLoader,
   },
   props: {
     articleId: { type: Number, required: false, default: undefined },

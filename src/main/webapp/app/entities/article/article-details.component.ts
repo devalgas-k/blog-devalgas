@@ -8,10 +8,14 @@ import { useDateFormat } from '@/shared/composables';
 import { type IArticle } from '@/shared/model/article.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 import { useRenderGateStore } from '@/shared/config/store/render-gate-store';
+import AppLoader from '@/core/loader/app-loader.vue';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ArticleDetails',
+  components: {
+    'app-loader': AppLoader,
+  },
   setup() {
     const dateFormat = useDateFormat();
     const articleService = inject('articleService', () => new ArticleService());
@@ -29,20 +33,24 @@ export default defineComponent({
       gate = useRenderGateStore();
     } catch {}
 
-    const retrieveArticle = async articleId => {
+    const retrieveArticle = async (articleId: number) => {
       try {
         const res = await articleService().find(articleId);
         article.value = res;
         if (gate && typeof gate.markDataReady === 'function') {
           gate.markDataReady();
         }
-      } catch (error) {
-        alertService.showHttpError(error.response);
+      } catch (error: any) {
+        alertService.showHttpError(error?.response);
       }
     };
 
     if (route.params?.articleId) {
-      retrieveArticle(route.params.articleId);
+      const routeId = Array.isArray(route.params.articleId) ? route.params.articleId[0] : route.params.articleId;
+      const idNum = Number(routeId);
+      if (!Number.isNaN(idNum) && idNum > 0) {
+        retrieveArticle(idNum);
+      }
     }
 
     return {
