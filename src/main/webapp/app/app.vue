@@ -3,9 +3,9 @@
     <div id="page-container">
       <div id="content-wrap">
         <ribbon></ribbon>
-        <Suspense timeout="0">
+        <Suspense v-if="shellReady" timeout="0">
           <template #default>
-            <div v-if="shellReady" class="suspense-content">
+            <div class="suspense-content">
               <div id="app-header">
                 <headers-async></headers-async>
               </div>
@@ -14,10 +14,10 @@
                   <div class="container">
                     <div class="w-auto px-4 px-lg-0 mx-auto">
                       <router-view v-slot="{ Component, route }">
-                        <keep-alive>
-                          <component :is="Component" v-if="route.meta && route.meta.keepAlive" />
+                        <keep-alive v-if="route.meta?.keepAlive">
+                          <component :is="Component" />
                         </keep-alive>
-                        <component :is="Component" v-if="!route.meta || !route.meta.keepAlive" />
+                        <component :is="Component" v-else />
                       </router-view>
                     </div>
                     <b-modal id="login-page" v-model="loginModalOpen" hide-footer lazy>
@@ -34,12 +34,12 @@
                 <ScrollTop />
               </div>
             </div>
-            <app-loader v-else />
           </template>
           <template #fallback>
             <app-loader />
           </template>
         </Suspense>
+        <app-loader v-else />
       </div>
     </div>
   </div>
