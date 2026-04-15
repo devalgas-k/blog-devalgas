@@ -47,7 +47,7 @@ jobs:
       KEY_VAULT_NAME: kv-devalgas-blog
       ADMIN_OBJECT_ID: ${{ vars.ADMIN_OBJECT_ID }}
       ADMIN_UPN: kamgadevalgas@gmail.com
-      TF_VAR_enable_defender_pricing: true
+      TF_VAR_enable_defender_pricing: false
       TF_VAR_defender_tier_app_services: Free
       TF_VAR_defender_tier_open_source_db: Free
       TF_VAR_defender_tier_key_vaults: Free
@@ -346,8 +346,9 @@ jobs:
           azcliversion: latest
           inlineScript: |
             set -e
-            for t in AppServices OpenSourceRelationalDatabases KeyVaults StorageAccounts Containers Arm VirtualMachines KubernetesService ContainerRegistry Dns ApiManagement; do
-              az security pricing create -n "$t" --tier Free >/dev/null 2>&1 || true
+            for t in AppServices OpenSourceRelationalDatabases KeyVaults StorageAccounts Containers Arm VirtualMachines KubernetesService ContainerRegistry Dns ApiManagement Discovery FoundationalCspm; do
+              echo "Setting Defender plan '$t' to Free"
+              az security pricing create -n "$t" --tier Free
             done
       - name: Compute Key Vault name
         shell: bash
