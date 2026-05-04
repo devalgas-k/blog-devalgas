@@ -1,13 +1,13 @@
 <template>
   <div class="container-fluid">
     <div class="w-100 px-0 mx-auto">
-      <template v-if="decodedMarkdownContent.html">
-        <article-info-v1 :article="article" class="mt-5"></article-info-v1>
+      <div v-show="!isLoading && isFullyReady">
+        <article-info-v1 :article="article" class="mt-5" @mounted="onInfoMounted"></article-info-v1>
         <div v-if="isDesktop">
           <p-splitter class="mt-5" style="width: 100%">
             <p-splitter-panel :size="100">
               <div class="editor-content" aria-busy="false">
-                <Transition name="fade">
+                <Transition name="fade-fast">
                   <div class="github-markdown-body article-details-markdown" v-html="decodedMarkdownContent.html"></div>
                 </Transition>
               </div>
@@ -16,7 +16,7 @@
         </div>
         <div v-else class="mt-4">
           <div class="editor-content editor-content--mobile" aria-busy="false">
-            <Transition name="fade">
+            <Transition name="fade-fast">
               <div class="github-markdown-body article-details-markdown" v-html="decodedMarkdownContent.html"></div>
             </Transition>
           </div>
@@ -29,14 +29,18 @@
             </button>
           </router-link>
         </div>
-      </template>
-      <template v-else>
-        <app-loader />
-      </template>
+      </div>
+      <div v-if="isLoading || !isFullyReady">
+        <article-details-skeleton-v1 />
+      </div>
     </div>
   </div>
 </template>
-<script lang="ts" src="./article-details-v1.component.ts"></script>
+
+<script lang="ts">
+import component from './article-details-v1.component';
+export default component;
+</script>
 
 <style lang="scss" scoped>
 .p-splitter {
@@ -57,6 +61,16 @@
 
 .editor-content--mobile {
   margin-top: 0;
+}
+
+.fade-fast-enter-active,
+.fade-fast-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-fast-enter-from,
+.fade-fast-leave-to {
+  opacity: 0;
 }
 
 @media (max-width: 768px) {

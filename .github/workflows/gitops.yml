@@ -346,9 +346,9 @@ jobs:
           azcliversion: latest
           inlineScript: |
             set -e
-            for t in AppServices OpenSourceRelationalDatabases KeyVaults StorageAccounts Containers Arm VirtualMachines KubernetesService ContainerRegistry Dns ApiManagement Discovery FoundationalCspm; do
+            for t in VirtualMachines SqlServers AppServices StorageAccounts SqlServerVirtualMachines KubernetesService ContainerRegistry KeyVaults Dns Arm OpenSourceRelationalDatabases CosmosDbs Containers CloudPosture Api AI; do
               echo "Setting Defender plan '$t' to Free"
-              az security pricing create -n "$t" --tier Free
+              az security pricing create -n "$t" --tier Free || true
             done
       - name: Compute Key Vault name
         shell: bash

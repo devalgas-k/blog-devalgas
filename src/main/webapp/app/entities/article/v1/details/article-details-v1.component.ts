@@ -22,6 +22,7 @@ import { useDateFormat } from '@/shared/composables';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import AppLoader from '@/core/loader/app-loader.vue';
+import ArticleDetailsSkeletonV1 from './article-details-skeleton-v1.vue';
 import ArticleServiceV1 from '@/entities/article/v1/article.service-v1.ts';
 const mode = (import.meta as any).env?.MODE;
 const debugSkeleton =
@@ -54,6 +55,7 @@ export default defineComponent({
     'article-info-v1': ArticleInfoV1,
     adsense: Adsense,
     'app-loader': AppLoader,
+    'article-details-skeleton-v1': ArticleDetailsSkeletonV1,
   },
   props: {
     articleId: { type: Number, required: false, default: undefined },
@@ -71,6 +73,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const isDesktop = ref(true);
+    const isFullyReady = ref(false);
     let mediaQuery: MediaQueryList | null = null;
     const onViewportChange = (event: MediaQueryListEvent) => {
       isDesktop.value = event.matches;
@@ -182,6 +185,10 @@ export default defineComponent({
     const twitterSite = '@devalgas';
     const twitterImageAlt = articleTitle;
 
+    const isLoading = computed(() => {
+      return !article.value.id || !decodedMarkdownContent.value.html;
+    });
+
     const buildSlug = (s: string) =>
       (s ?? '')
         .toLowerCase()
@@ -205,7 +212,11 @@ export default defineComponent({
 
     useHead({
       title: articleTitle,
-      link: [{ rel: 'canonical', href: canonicalUrl }, ...altLinks.value],
+      link: [
+        { rel: 'canonical', href: canonicalUrl },
+        { rel: 'preload', as: 'font', href: '/content/fonts/inter-v12-latin-regular.woff2', type: 'font/woff2', crossorigin: 'anonymous' },
+        ...altLinks.value,
+      ],
       meta: [
         { name: 'description', content: description },
         { property: 'og:title', content: articleTitle },
@@ -250,6 +261,10 @@ export default defineComponent({
 
     // dynamic head handled via Unhead
 
+    const onInfoMounted = () => {
+      isFullyReady.value = true;
+    };
+
     return {
       ...dateFormat,
       alertService,
@@ -263,6 +278,9 @@ export default defineComponent({
       articleTitle,
       description,
       isDesktop,
+      isFullyReady,
+      isLoading,
+      onInfoMounted,
       adsenseClient: ADSENSE_CLIENT,
       adsenseSlot: ADSENSE_SLOT,
       consentGiven,

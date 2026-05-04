@@ -3,10 +3,10 @@
 
   <div class="footer-v1 mt-2">
     <div class="container">
-      <div class="footer-v1__content py-4">
+      <div class="footer-v1__content pt-5">
         <div class="row">
           <p-separator class="col-12" icon="envelopes-bulk"></p-separator>
-          <subscribe-v1 class="mt-3"></subscribe-v1>
+          <subscribe-v1 class="mt-n2"></subscribe-v1>
         </div>
       </div>
     </div>

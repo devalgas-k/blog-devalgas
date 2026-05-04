@@ -1,4 +1,4 @@
-import { type PropType, computed, defineComponent, inject, toRef } from 'vue';
+import { type PropType, computed, defineComponent, inject, toRef, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import type { IArticle } from '@/shared/model/article.model';
@@ -12,6 +12,7 @@ import Skeleton from 'primevue/skeleton';
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'ArticleInfoV1',
+  emits: ['mounted'],
   components: {
     'p-skeleton': Skeleton,
   },
@@ -22,10 +23,15 @@ export default defineComponent({
       default: undefined,
     },
   },
-  setup: function (props) {
+  setup: function (props, { emit }) {
     const dateFormat = useDateFormat();
     const articleData = toRef(props, 'article');
     const currentLanguage = inject('currentLanguage', () => computed(() => navigator.language ?? 'fr'), true);
+
+    onMounted(() => {
+      emit('mounted');
+    });
+
     const publishedDate = computed(() => {
       const d = articleData.value?.date as any;
       if (!d) return '';
