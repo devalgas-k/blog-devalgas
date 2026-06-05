@@ -52,7 +52,11 @@ export default defineComponent({
 
     const initRelationships = () => {
       categoryArticleService()
-        .retrieve()
+        .retrieve({
+          page: 0,
+          size: 1000,
+          sort: ['label,asc', 'id'],
+        })
         .then(res => {
           categoryArticles.value = res.data;
         });
