@@ -1,4 +1,4 @@
-import { vitest } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 import { type MountingOptions, shallowMount } from '@vue/test-utils';
 import sinon, { type SinonStubbedInstance } from 'sinon';
 import { createTestingPinia } from '@pinia/testing';
@@ -27,6 +27,7 @@ const articleSample = { id: 123 };
 describe('Component Tests', () => {
   let mountOptions: MountingOptions<ArticleUpdateComponentType>['global'];
   let alertService: AlertService;
+  let categoryArticleServiceStub: SinonStubbedInstance<CategoryArticleService>;
 
   describe('Article Management Update Component', () => {
     let comp: ArticleUpdateComponentType;
@@ -36,6 +37,8 @@ describe('Component Tests', () => {
       route = {};
       articleServiceStub = sinon.createStubInstance<ArticleService>(ArticleService);
       articleServiceStub.retrieve.onFirstCall().resolves(Promise.resolve([]));
+      categoryArticleServiceStub = sinon.createStubInstance<CategoryArticleService>(CategoryArticleService);
+      categoryArticleServiceStub.retrieve.resolves({ data: [] });
 
       alertService = new AlertService({
         i18n: { t: vitest.fn() } as any,
@@ -56,10 +59,7 @@ describe('Component Tests', () => {
         provide: {
           alertService,
           articleService: () => articleServiceStub,
-          categoryArticleService: () =>
-            sinon.createStubInstance<CategoryArticleService>(CategoryArticleService, {
-              retrieve: sinon.stub().resolves({}),
-            } as any),
+          categoryArticleService: () => categoryArticleServiceStub,
         },
       };
     });
@@ -85,7 +85,20 @@ describe('Component Tests', () => {
       });
 
       it('Should not convert date if date is not present', () => {
-        expect(comp.convertDateTimeFromServer(null)).toBeNull();
+        expect(comp.convertDateTimeFromServer(null as unknown as Date)).toBeNull();
+      });
+
+      it('Should request category articles with expanded pagination', async () => {
+        shallowMount(ArticleUpdate, { global: mountOptions });
+        await Promise.resolve();
+
+        expect(
+          categoryArticleServiceStub.retrieve.calledWith({
+            page: 0,
+            size: 1000,
+            sort: ['label,asc', 'id'],
+          }),
+        ).toBeTruthy();
       });
     });
 
